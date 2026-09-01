@@ -1,0 +1,106 @@
+name: MongoHubPlus
+options:
+  bundleIdPrefix: com.bossagroove
+  developmentLanguage: en
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+packages:
+  ExtendedJSON:
+    path: Packages/ExtendedJSON
+  MongoService:
+    path: Packages/MongoService
+  SSHTunnel:
+    path: Packages/SSHTunnel
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.9.6
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_EMIT_LOC_STRINGS: YES
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEAD_CODE_STRIPPING: YES
+
+targets:
+  MongoHubPlus:
+    type: application
+    platform: macOS
+    sources:
+      - path: MongoHubPlus
+        excludes:
+          - "AppIcon.icon"
+    dependencies:
+      - package: ExtendedJSON
+      - package: MongoService
+      - package: SSHTunnel
+      - package: Sparkle
+    info:
+      path: MongoHubPlus/Info.plist
+      properties:
+        # Release CI overrides these build settings from the tag/run number;
+        # Sparkle compares CFBundleVersion, so it must always increase.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # Icon Composer icon (MongoHubPlus/AppIcon.icon, compiled by the
+        # actool script phase): layered Liquid Glass on macOS 26+, actool's
+        # auto-generated fallbacks (Assets.car + icns) for macOS 14/15.
+        CFBundleIconFile: AppIcon
+        CFBundleIconName: AppIcon
+        LSApplicationCategoryType: public.app-category.developer-tools
+        NSHumanReadableCopyright: "MIT licensed — a revival of MongoHub"
+        NSPrincipalClass: NSApplication
+        LSMinimumSystemVersion: "14.0"
+        CFBundleURLTypes:
+          - CFBundleURLName: com.bossagroove.mongohubplus.mongodb
+            CFBundleURLSchemes:
+              - mongodb
+              - mongodb+srv
+        # JSON Lines as a declared type — the save panel needs a real UTI to
+        # manage the .jsonl extension (dynamic UTTypes double-append it).
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.bossagroove.mongohubplus.jsonl
+            UTTypeDescription: JSON Lines
+            UTTypeConformsTo: [public.plain-text]
+            UTTypeTagSpecification:
+              public.filename-extension: [jsonl]
+              public.mime-type: [application/jsonl]
+        # Sparkle 2. The public key's private half lives in the owner's login
+        # keychain and the SPARKLE_ED_PRIVATE_KEY repo secret (docs/release.md).
+        SUFeedURL: https://github.com/BossaGroove/MongoHubPlus/releases/latest/download/appcast.xml
+        SUPublicEDKey: "P3JgMvAo+iarWBWD6+CyJbIp8yxlMYCuTc4TX3jGofs="
+        SUEnableInstallerLauncherService: true
+        # Default ON; the Settings "Software Update" section owns the choice,
+        # so Sparkle's own first-launch permission prompt is suppressed.
+        SUEnableAutomaticChecks: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.bossagroove.MongoHubPlus
+        PRODUCT_NAME: "MongoHub Plus"
+        MARKETING_VERSION: "4.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_ENTITLEMENTS: MongoHubPlus/MongoHubPlus.entitlements
+        # Dev builds are ad-hoc signed. Release CI overrides on the command
+        # line: CODE_SIGN_IDENTITY="Developer ID Application" DEVELOPMENT_TEAM=…
+        CODE_SIGN_IDENTITY: "-"
+        SWIFT_STRICT_CONCURRENCY: complete
+    postCompileScripts:
+      - name: Compile Icon Composer icon
+        script: |
+          xcrun actool "$SRCROOT/MongoHubPlus/AppIcon.icon" \
+            --compile "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH" \
+            --app-icon AppIcon --platform macosx \
+            --minimum-deployment-target "$MACOSX_DEPLOYMENT_TARGET" \
+            --output-partial-info-plist "$DERIVED_FILE_DIR/AppIcon-partial.plist"
+        inputFiles:
+          - $(SRCROOT)/MongoHubPlus/AppIcon.icon/icon.json
+          - $(SRCROOT)/MongoHubPlus/AppIcon.icon/Assets/mango.svg
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Assets.car
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AppIcon.icns
+
+attributes:
+  knownRegions: [en, ja, de, zh-Hant, zh-Hans, fr]

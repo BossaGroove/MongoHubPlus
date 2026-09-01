@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build & test (macOS, Apple Silicon)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Test ExtendedJSON (incl. official BSON corpus)
+        run: swift test --package-path Packages/ExtendedJSON
+
+      - name: Test MongoService (unit; integration needs MONGOHUBPLUS_TEST_URI)
+        run: swift test --package-path Packages/MongoService
+
+      - name: Test SSHTunnel (hermetic in-process SSH server)
+        run: swift test --package-path Packages/SSHTunnel
+
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build app
+        run: |
+          xcodebuild -project MongoHubPlus.xcodeproj -scheme MongoHubPlus \
+            -configuration Release CODE_SIGN_IDENTITY=- build | tail -20

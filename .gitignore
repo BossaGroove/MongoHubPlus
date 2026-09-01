@@ -1,0 +1,9 @@
+.DS_Store
+.build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+.swiftpm/
+
+# Private working docs (separate private repository, cloned here locally)
+internal/

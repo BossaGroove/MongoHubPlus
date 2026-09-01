@@ -1,0 +1,161 @@
+name: Release
+
+# Pushing a tag like v4.0.1 builds a universal DMG and publishes a GitHub
+# release. Signing, notarization, and the Sparkle appcast each activate only
+# when their secrets exist (MACOS_CERTIFICATE_P12, MACOS_CERTIFICATE_PASSWORD,
+# APPLE_TEAM_ID, APPLE_ID, APPLE_APP_PASSWORD, SPARKLE_ED_PRIVATE_KEY) —
+# without secrets the workflow still produces an ad-hoc-signed DMG marked as
+# a pre-release.
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    name: Build, sign, notarize, publish
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    env:
+      HAS_SIGNING: ${{ secrets.MACOS_CERTIFICATE_P12 != '' && secrets.APPLE_TEAM_ID != '' }}
+      HAS_NOTARY: ${{ secrets.APPLE_ID != '' && secrets.APPLE_APP_PASSWORD != '' }}
+      HAS_SPARKLE: ${{ secrets.SPARKLE_ED_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Import Developer ID certificate
+        if: env.HAS_SIGNING == 'true'
+        env:
+          CERT_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+          CERT_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN=release.keychain-db
+          KEYCHAIN_PASSWORD=$(uuidgen)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$CERT_P12" | base64 --decode > cert.p12
+          security import cert.p12 -k "$KEYCHAIN" -P "$CERT_PASSWORD" \
+            -T /usr/bin/codesign
+          rm cert.p12
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+
+      - name: Build (universal)
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$HAS_SIGNING" = "true" ]; then
+            # Manual style: a command-line identity otherwise conflicts with
+            # the SPM package targets' automatic signing.
+            # Inject-base-entitlements would add get-task-allow (debug-only,
+            # rejected by notarization) to a plain `build` action.
+            SIGNING=(CODE_SIGN_STYLE=Manual \
+                     CODE_SIGN_IDENTITY="Developer ID Application" \
+                     DEVELOPMENT_TEAM="$TEAM_ID" OTHER_CODE_SIGN_FLAGS=--timestamp \
+                     CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO)
+          else
+            SIGNING=(CODE_SIGN_IDENTITY=-)
+          fi
+          xcodebuild -project MongoHubPlus.xcodeproj -scheme MongoHubPlus \
+            -configuration Release -derivedDataPath build \
+            ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+            MARKETING_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="$VERSION" \
+            "${SIGNING[@]}" build | tail -40
+
+      - name: Re-sign Sparkle nested components
+        if: env.HAS_SIGNING == 'true'
+        run: |
+          # Xcode's sign-on-copy re-signs only the framework wrapper; the
+          # executables inside Sparkle keep the Sparkle project's signatures,
+          # which notarization rejects. Re-sign inside-out with our identity
+          # (Sparkle's documented distribution step), then re-seal the app.
+          APP="build/Build/Products/Release/MongoHub Plus.app"
+          SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+          SIGN=(codesign --force --sign "Developer ID Application" \
+                --options runtime --timestamp --preserve-metadata=entitlements)
+          "${SIGN[@]}" "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/XPCServices/Downloader.xpc"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/Autoupdate"
+          "${SIGN[@]}" "$SPARKLE/Versions/B/Updater.app"
+          "${SIGN[@]}" "$SPARKLE"
+          "${SIGN[@]}" "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          # Notarization rejects get-task-allow — fail fast if it crept in.
+          if codesign -d --entitlements - "$APP" 2>/dev/null | grep -q get-task-allow; then
+            echo "get-task-allow entitlement present on the app" >&2
+            exit 1
+          fi
+
+      - name: Package DMG
+        run: |
+          mkdir -p dist/dmg-root artifacts
+          cp -R "build/Build/Products/Release/MongoHub Plus.app" dist/dmg-root/
+          ln -s /Applications dist/dmg-root/Applications
+          hdiutil create -volname "MongoHub Plus" -srcfolder dist/dmg-root \
+            -ov -format UDZO "artifacts/MongoHubPlus-${GITHUB_REF_NAME#v}.dmg"
+
+      - name: Notarize & staple
+        if: env.HAS_SIGNING == 'true' && env.HAS_NOTARY == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          DMG="artifacts/MongoHubPlus-${GITHUB_REF_NAME#v}.dmg"
+          # submit --wait exits 0 even when the verdict is Invalid — check the
+          # status ourselves and dump the notary log on rejection.
+          SUBMIT_JSON=$(xcrun notarytool submit "$DMG" --wait --output-format json \
+            --apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" \
+            --team-id "$TEAM_ID")
+          echo "$SUBMIT_JSON"
+          STATUS=$(echo "$SUBMIT_JSON" | jq -r .status)
+          if [ "$STATUS" != "Accepted" ]; then
+            SUBMISSION_ID=$(echo "$SUBMIT_JSON" | jq -r .id)
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" \
+              --team-id "$TEAM_ID"
+            exit 1
+          fi
+          xcrun stapler staple "$DMG"
+
+      - name: Generate Sparkle appcast
+        if: env.HAS_SPARKLE == 'true'
+        env:
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+        run: |
+          # Keep in sync with the Sparkle version in project.yml.
+          SPARKLE_VERSION=2.9.6
+          curl -L -o sparkle.tar.xz \
+            "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz"
+          mkdir sparkle-dist && tar -xf sparkle.tar.xz -C sparkle-dist
+          echo "$SPARKLE_ED_PRIVATE_KEY" | ./sparkle-dist/bin/generate_appcast \
+            --ed-key-file - \
+            --link "https://github.com/${GITHUB_REPOSITORY}" \
+            --download-url-prefix "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/" \
+            artifacts
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          if [ "$HAS_SIGNING" != "true" ]; then
+            PRERELEASE="--prerelease"
+          fi
+          gh release create "$GITHUB_REF_NAME" artifacts/* \
+            --title "MongoHub Plus ${GITHUB_REF_NAME#v}" \
+            --generate-notes $PRERELEASE

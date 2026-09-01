@@ -1,0 +1,21 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "extended-srgb:0.11765,0.36078,0.25490,1.00000",
+      "extended-srgb:0.05882,0.23922,0.16471,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "mango.svg",
+          "name" : "mango"
+        }
+      ]
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

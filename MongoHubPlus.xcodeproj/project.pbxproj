@@ -1,0 +1,619 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		090DEB6C9E7B664BB2E71300 /* TabHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */; };
+		102E42125A45D2EF89F1881A /* JSONEditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */; };
+		1672D40614A151571F1C46CD /* StatusTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */; };
+		1DB765C04093B69694C911A8 /* MongoService in Frameworks */ = {isa = PBXBuildFile; productRef = 241A7459C1F7C5615018EE67 /* MongoService */; };
+		23B562AA6EC6564E0893A7A7 /* SSHTunnel in Frameworks */ = {isa = PBXBuildFile; productRef = 8E670A7D38F7DE7824B5358C /* SSHTunnel */; };
+		35817954DD35DAF3AF37D21F /* ActivityMonitorTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */; };
+		3673B947038EB1862DB286C6 /* ConnectionWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14E738159542322FDB225F1 /* ConnectionWindowController.swift */; };
+		40F9EBABB94AA24BB217A620 /* UpdatePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89658BED76A86E888269F16 /* UpdatePaneController.swift */; };
+		5363545CEA3DB1A8E01DF110 /* JSONHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE0AB195754C8653918EF1DA /* JSONHighlighter.swift */; };
+		5397914585817A467379ABF9 /* MongoConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF243E2C936A0187603D826 /* MongoConnection.swift */; };
+		597ACC5267BEA1372500722C /* TailPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B64B9C8B7F8BBA85F9BB4 /* TailPaneController.swift */; };
+		5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022957575C63463D1137A66C /* ExplainSheetController.swift */; };
+		5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */; };
+		6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C4BDB065238D92127A7108 /* Preferences.swift */; };
+		6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FE36E484CA51E82513320 /* ConnectionStore.swift */; };
+		6F11FF2D4F5A5301B95E1B13 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78B965F63C7B405D32BAF4E0 /* Keychain.swift */; };
+		74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */; };
+		7688EF9EB247C9967EBF68EC /* LogWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */; };
+		77ECDF78EA2EA931A9F3A668 /* ConnectionEditorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6EABD4C685FBE6D99FB7E7F /* ConnectionEditorController.swift */; };
+		7C19C29D306229182FE4414C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B9DDB148E6C8CD242987F9A5 /* Localizable.xcstrings */; };
+		89AD77259C971DF05617A2CB /* ExtendedJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 754CEB7E126D0DC777E736C1 /* ExtendedJSON */; };
+		8EF2CAC7A518D3CC331D7FEC /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADE8D847F217115820A3CEF /* ImportExport.swift */; };
+		964D6A491C2F503CFB0052E4 /* InsertPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */; };
+		9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC20B2BAAAAF56545546006 /* AggregationStages.swift */; };
+		9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */; };
+		A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */; };
+		A95CBB4568158AE8C9E48305 /* QueryPaneSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E828940898163A28CCB599 /* QueryPaneSupport.swift */; };
+		B0388B745616BEC4D3717E0C /* DocumentOutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */; };
+		B14697869D9A982EF702EE4C /* QueryTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555666D6782E45BC6F0AD091 /* QueryTabController.swift */; };
+		B3E3D526CC1D297F7B3AADC7 /* AggregationPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F51339BE86ABD81A095DE5F /* AggregationPaneController.swift */; };
+		BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */; };
+		D5729E21AA3979AF12EB5146 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 524016CC5DC5617670159682 /* Sparkle */; };
+		F26F78F7987802EC71EC24A9 /* IndexPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */; };
+		FFF3552BEF555E19947BE72F /* QueryHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2D89C40946568C57F7FE0C /* QueryHistoryStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		022957575C63463D1137A66C /* ExplainSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplainSheetController.swift; sourceTree = "<group>"; };
+		082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindPaneController.swift; sourceTree = "<group>"; };
+		0835B66D8869EDF653E132E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		0ADE8D847F217115820A3CEF /* ImportExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
+		0C0FE36E484CA51E82513320 /* ConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStore.swift; sourceTree = "<group>"; };
+		0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionListWindowController.swift; sourceTree = "<group>"; };
+		14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertPaneController.swift; sourceTree = "<group>"; };
+		26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHost.swift; sourceTree = "<group>"; };
+		27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentOutlineViewController.swift; sourceTree = "<group>"; };
+		2CD12AFD5D3EEBCFC05E9851 /* MongoHubPlus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MongoHubPlus.entitlements; sourceTree = "<group>"; };
+		3BC20B2BAAAAF56545546006 /* AggregationStages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregationStages.swift; sourceTree = "<group>"; };
+		3F51339BE86ABD81A095DE5F /* AggregationPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregationPaneController.swift; sourceTree = "<group>"; };
+		45C4BDB065238D92127A7108 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovePaneController.swift; sourceTree = "<group>"; };
+		555666D6782E45BC6F0AD091 /* QueryTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryTabController.swift; sourceTree = "<group>"; };
+		688BCF4F805BA73941436A27 /* MongoHubPlus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MongoHubPlus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BF243E2C936A0187603D826 /* MongoConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MongoConnection.swift; sourceTree = "<group>"; };
+		78B965F63C7B405D32BAF4E0 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		7A47B80AA85030BBF02FD4C2 /* ExtendedJSON */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ExtendedJSON; path = Packages/ExtendedJSON; sourceTree = SOURCE_ROOT; };
+		7C2D89C40946568C57F7FE0C /* QueryHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryHistoryStore.swift; sourceTree = "<group>"; };
+		8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTabController.swift; sourceTree = "<group>"; };
+		8F96695CC0A3DD24B07EB7B8 /* MongoService */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MongoService; path = Packages/MongoService; sourceTree = SOURCE_ROOT; };
+		91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindow.swift; sourceTree = "<group>"; };
+		A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitorTabController.swift; sourceTree = "<group>"; };
+		B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONEditorWindowController.swift; sourceTree = "<group>"; };
+		B7E828940898163A28CCB599 /* QueryPaneSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPaneSupport.swift; sourceTree = "<group>"; };
+		B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindow.swift; sourceTree = "<group>"; };
+		B9DDB148E6C8CD242987F9A5 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		C26820075B38F9F39242889E /* SSHTunnel */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SSHTunnel; path = Packages/SSHTunnel; sourceTree = SOURCE_ROOT; };
+		C89658BED76A86E888269F16 /* UpdatePaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePaneController.swift; sourceTree = "<group>"; };
+		D6EABD4C685FBE6D99FB7E7F /* ConnectionEditorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionEditorController.swift; sourceTree = "<group>"; };
+		DC2B64B9C8B7F8BBA85F9BB4 /* TailPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TailPaneController.swift; sourceTree = "<group>"; };
+		E14E738159542322FDB225F1 /* ConnectionWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionWindowController.swift; sourceTree = "<group>"; };
+		F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPaneController.swift; sourceTree = "<group>"; };
+		FE0AB195754C8653918EF1DA /* JSONHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONHighlighter.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FEC82041868635F4B34984A8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				89AD77259C971DF05617A2CB /* ExtendedJSON in Frameworks */,
+				1DB765C04093B69694C911A8 /* MongoService in Frameworks */,
+				23B562AA6EC6564E0893A7A7 /* SSHTunnel in Frameworks */,
+				D5729E21AA3979AF12EB5146 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1F3E88881D92ABECF11B5C3E /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				78B965F63C7B405D32BAF4E0 /* Keychain.swift */,
+				91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */,
+				45C4BDB065238D92127A7108 /* Preferences.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		4FE29DCDAA34494B9BCC5C70 /* ConnectionWindow */ = {
+			isa = PBXGroup;
+			children = (
+				A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */,
+				E14E738159542322FDB225F1 /* ConnectionWindowController.swift */,
+				27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */,
+				8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */,
+				26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */,
+			);
+			path = ConnectionWindow;
+			sourceTree = "<group>";
+		};
+		5A7A9AFE1620C2058E511013 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
+		6B0267D1F90A64C3B4C1275E /* DocumentEditor */ = {
+			isa = PBXGroup;
+			children = (
+				B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */,
+				FE0AB195754C8653918EF1DA /* JSONHighlighter.swift */,
+			);
+			path = DocumentEditor;
+			sourceTree = "<group>";
+		};
+		7FB36A29A4BE455A089F99E5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				688BCF4F805BA73941436A27 /* MongoHubPlus.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		852016C462E02B67CAB69E2D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B9DDB148E6C8CD242987F9A5 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C0F190D0EB9F2B4E48A43C3D = {
+			isa = PBXGroup;
+			children = (
+				ED4E1B7F6E94519DCFFF1A00 /* MongoHubPlus */,
+				FC54133B8322DA3541B2C77B /* Packages */,
+				7FB36A29A4BE455A089F99E5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CF10DAC469008FC8E13E88D3 /* Query */ = {
+			isa = PBXGroup;
+			children = (
+				3F51339BE86ABD81A095DE5F /* AggregationPaneController.swift */,
+				3BC20B2BAAAAF56545546006 /* AggregationStages.swift */,
+				022957575C63463D1137A66C /* ExplainSheetController.swift */,
+				082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */,
+				F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */,
+				1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */,
+				7C2D89C40946568C57F7FE0C /* QueryHistoryStore.swift */,
+				B7E828940898163A28CCB599 /* QueryPaneSupport.swift */,
+				555666D6782E45BC6F0AD091 /* QueryTabController.swift */,
+				50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */,
+				DC2B64B9C8B7F8BBA85F9BB4 /* TailPaneController.swift */,
+				C89658BED76A86E888269F16 /* UpdatePaneController.swift */,
+			);
+			path = Query;
+			sourceTree = "<group>";
+		};
+		EA182BED1A169FC500AF686A /* Connections */ = {
+			isa = PBXGroup;
+			children = (
+				D6EABD4C685FBE6D99FB7E7F /* ConnectionEditorController.swift */,
+				0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */,
+				0C0FE36E484CA51E82513320 /* ConnectionStore.swift */,
+				6BF243E2C936A0187603D826 /* MongoConnection.swift */,
+			);
+			path = Connections;
+			sourceTree = "<group>";
+		};
+		ED4E1B7F6E94519DCFFF1A00 /* MongoHubPlus */ = {
+			isa = PBXGroup;
+			children = (
+				14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */,
+				0835B66D8869EDF653E132E6 /* Info.plist */,
+				2CD12AFD5D3EEBCFC05E9851 /* MongoHubPlus.entitlements */,
+				EA182BED1A169FC500AF686A /* Connections */,
+				4FE29DCDAA34494B9BCC5C70 /* ConnectionWindow */,
+				6B0267D1F90A64C3B4C1275E /* DocumentEditor */,
+				FC7B9433F23D2FA76C4BBF8F /* ImportExport */,
+				5A7A9AFE1620C2058E511013 /* Preferences */,
+				CF10DAC469008FC8E13E88D3 /* Query */,
+				852016C462E02B67CAB69E2D /* Resources */,
+				1F3E88881D92ABECF11B5C3E /* Support */,
+			);
+			path = MongoHubPlus;
+			sourceTree = "<group>";
+		};
+		FC54133B8322DA3541B2C77B /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				7A47B80AA85030BBF02FD4C2 /* ExtendedJSON */,
+				8F96695CC0A3DD24B07EB7B8 /* MongoService */,
+				C26820075B38F9F39242889E /* SSHTunnel */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		FC7B9433F23D2FA76C4BBF8F /* ImportExport */ = {
+			isa = PBXGroup;
+			children = (
+				0ADE8D847F217115820A3CEF /* ImportExport.swift */,
+			);
+			path = ImportExport;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EAC221C2C8E212878D8DCDF9 /* MongoHubPlus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37573FABD4DF849DF90D641C /* Build configuration list for PBXNativeTarget "MongoHubPlus" */;
+			buildPhases = (
+				4158EF55E343B04B260BFD67 /* Sources */,
+				A1217485F9B4071CAE310F1C /* Compile Icon Composer icon */,
+				C1662FBF93C68F5C679C5855 /* Resources */,
+				FEC82041868635F4B34984A8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MongoHubPlus;
+			packageProductDependencies = (
+				754CEB7E126D0DC777E736C1 /* ExtendedJSON */,
+				241A7459C1F7C5615018EE67 /* MongoService */,
+				8E670A7D38F7DE7824B5358C /* SSHTunnel */,
+				524016CC5DC5617670159682 /* Sparkle */,
+			);
+			productName = MongoHubPlus;
+			productReference = 688BCF4F805BA73941436A27 /* MongoHubPlus.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2A367C02A9C78174168721B5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+				knownRegions = (
+					en,
+					ja,
+					de,
+					"zh-Hant",
+					"zh-Hans",
+					fr,
+				);
+			};
+			buildConfigurationList = A7630BC31878A0141C5AF6A2 /* Build configuration list for PBXProject "MongoHubPlus" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				de,
+				en,
+				fr,
+				ja,
+				"zh-Hans",
+				"zh-Hant",
+			);
+			mainGroup = C0F190D0EB9F2B4E48A43C3D;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BF1DB4DFD550501FA71D9973 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				30BB9823EC8567FD7DACEF3F /* XCLocalSwiftPackageReference "Packages/ExtendedJSON" */,
+				B7374C26FE75B5C6CD551371 /* XCLocalSwiftPackageReference "Packages/MongoService" */,
+				1E90A6D93DD7D5A1C3AED776 /* XCLocalSwiftPackageReference "Packages/SSHTunnel" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7FB36A29A4BE455A089F99E5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EAC221C2C8E212878D8DCDF9 /* MongoHubPlus */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C1662FBF93C68F5C679C5855 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7C19C29D306229182FE4414C /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1217485F9B4071CAE310F1C /* Compile Icon Composer icon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/MongoHubPlus/AppIcon.icon/icon.json",
+				"$(SRCROOT)/MongoHubPlus/AppIcon.icon/Assets/mango.svg",
+			);
+			name = "Compile Icon Composer icon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Assets.car",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AppIcon.icns",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "xcrun actool \"$SRCROOT/MongoHubPlus/AppIcon.icon\" \\\n  --compile \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\" \\\n  --app-icon AppIcon --platform macosx \\\n  --minimum-deployment-target \"$MACOSX_DEPLOYMENT_TARGET\" \\\n  --output-partial-info-plist \"$DERIVED_FILE_DIR/AppIcon-partial.plist\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4158EF55E343B04B260BFD67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35817954DD35DAF3AF37D21F /* ActivityMonitorTabController.swift in Sources */,
+				B3E3D526CC1D297F7B3AADC7 /* AggregationPaneController.swift in Sources */,
+				9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */,
+				A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */,
+				77ECDF78EA2EA931A9F3A668 /* ConnectionEditorController.swift in Sources */,
+				74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */,
+				6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */,
+				3673B947038EB1862DB286C6 /* ConnectionWindowController.swift in Sources */,
+				B0388B745616BEC4D3717E0C /* DocumentOutlineViewController.swift in Sources */,
+				5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */,
+				9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */,
+				8EF2CAC7A518D3CC331D7FEC /* ImportExport.swift in Sources */,
+				F26F78F7987802EC71EC24A9 /* IndexPaneController.swift in Sources */,
+				964D6A491C2F503CFB0052E4 /* InsertPaneController.swift in Sources */,
+				102E42125A45D2EF89F1881A /* JSONEditorWindowController.swift in Sources */,
+				5363545CEA3DB1A8E01DF110 /* JSONHighlighter.swift in Sources */,
+				6F11FF2D4F5A5301B95E1B13 /* Keychain.swift in Sources */,
+				7688EF9EB247C9967EBF68EC /* LogWindow.swift in Sources */,
+				5397914585817A467379ABF9 /* MongoConnection.swift in Sources */,
+				6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */,
+				BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */,
+				FFF3552BEF555E19947BE72F /* QueryHistoryStore.swift in Sources */,
+				A95CBB4568158AE8C9E48305 /* QueryPaneSupport.swift in Sources */,
+				B14697869D9A982EF702EE4C /* QueryTabController.swift in Sources */,
+				5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */,
+				1672D40614A151571F1C46CD /* StatusTabController.swift in Sources */,
+				090DEB6C9E7B664BB2E71300 /* TabHost.swift in Sources */,
+				597ACC5267BEA1372500722C /* TailPaneController.swift in Sources */,
+				40F9EBABB94AA24BB217A620 /* UpdatePaneController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2D6D769E360280E8F7250E26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		3A11981FA70E7832F0182DBE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MongoHubPlus/MongoHubPlus.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = MongoHubPlus/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 4.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bossagroove.MongoHubPlus;
+				PRODUCT_NAME = "MongoHub Plus";
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Debug;
+		};
+		89E9F8D7E9494FFC886BDF24 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		C845639BCE224F2F2FAFF982 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MongoHubPlus/MongoHubPlus.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = MongoHubPlus/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 4.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bossagroove.MongoHubPlus;
+				PRODUCT_NAME = "MongoHub Plus";
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		37573FABD4DF849DF90D641C /* Build configuration list for PBXNativeTarget "MongoHubPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3A11981FA70E7832F0182DBE /* Debug */,
+				C845639BCE224F2F2FAFF982 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A7630BC31878A0141C5AF6A2 /* Build configuration list for PBXProject "MongoHubPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D6D769E360280E8F7250E26 /* Debug */,
+				89E9F8D7E9494FFC886BDF24 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1E90A6D93DD7D5A1C3AED776 /* XCLocalSwiftPackageReference "Packages/SSHTunnel" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SSHTunnel;
+		};
+		30BB9823EC8567FD7DACEF3F /* XCLocalSwiftPackageReference "Packages/ExtendedJSON" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ExtendedJSON;
+		};
+		B7374C26FE75B5C6CD551371 /* XCLocalSwiftPackageReference "Packages/MongoService" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/MongoService;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BF1DB4DFD550501FA71D9973 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		241A7459C1F7C5615018EE67 /* MongoService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MongoService;
+		};
+		524016CC5DC5617670159682 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BF1DB4DFD550501FA71D9973 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		754CEB7E126D0DC777E736C1 /* ExtendedJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ExtendedJSON;
+		};
+		8E670A7D38F7DE7824B5358C /* SSHTunnel */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SSHTunnel;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 2A367C02A9C78174168721B5 /* Project object */;
+}
