@@ -458,7 +458,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bossagroove.MongoHubPlus;
 				PRODUCT_NAME = "MongoHub Plus";
 				SDKROOT = macosx;
@@ -538,7 +538,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 4.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bossagroove.MongoHubPlus;
 				PRODUCT_NAME = "MongoHub Plus";
 				SDKROOT = macosx;

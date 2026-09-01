@@ -67,8 +67,8 @@ targets:
             UTTypeTagSpecification:
               public.filename-extension: [jsonl]
               public.mime-type: [application/jsonl]
-        # Sparkle 2. The public key's private half lives in the owner's login
-        # keychain and the SPARKLE_ED_PRIVATE_KEY repo secret (docs/release.md).
+        # Sparkle 2. The public key's private half lives in the maintainer's
+        # keychain and the SPARKLE_ED_PRIVATE_KEY repo secret.
         SUFeedURL: https://github.com/BossaGroove/MongoHubPlus/releases/latest/download/appcast.xml
         SUPublicEDKey: "P3JgMvAo+iarWBWD6+CyJbIp8yxlMYCuTc4TX3jGofs="
         SUEnableInstallerLauncherService: true
@@ -79,7 +79,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.bossagroove.MongoHubPlus
         PRODUCT_NAME: "MongoHub Plus"
-        MARKETING_VERSION: "4.0.0"
+        MARKETING_VERSION: "4.0.1"
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_ENTITLEMENTS: MongoHubPlus/MongoHubPlus.entitlements
