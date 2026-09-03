@@ -126,8 +126,23 @@ private final class ExportFormatAccessory: NSView {
         switch selectedFormat {
         case .jsonLines: panel.allowedContentTypes = [Self.jsonLinesType]
         case .csv: panel.allowedContentTypes = [.commaSeparatedText]
-        case .bson: panel.allowedContentTypes = []
+        case .bson:
+            panel.allowedContentTypes = []
+            // Clearing the content types stops the panel enforcing an
+            // extension but does not remove the one already in the name, and
+            // the field hides it — so the URL would still come back as
+            // "…​.jsonl" for what is meant to be a folder.
+            panel.nameFieldStringValue = Self.withoutExportExtension(
+                panel.nameFieldStringValue)
         }
+    }
+
+    /// Drops a trailing export extension, and only those: a folder the user
+    /// deliberately named "june.dump" keeps its name.
+    static func withoutExportExtension(_ name: String) -> String {
+        let stripped = (name as NSString).pathExtension.lowercased()
+        guard ["jsonl", "csv", "json", "bson"].contains(stripped) else { return name }
+        return (name as NSString).deletingPathExtension
     }
 
     static let jsonLinesType = UTType(exportedAs: "com.bossagroove.mongohubplus.jsonl")
@@ -266,7 +281,11 @@ enum ImportExport {
             do {
                 let total = try await session.count(
                     database: database, collection: collection, filter: query.filter)
-                let databaseDirectory = url.appendingPathComponent(database)
+                // Belt and braces: whatever the panel hands back, a dump is a
+                // folder and must not wear a file extension.
+                let root = URL(
+                    fileURLWithPath: ExportFormatAccessory.withoutExportExtension(url.path))
+                let databaseDirectory = root.appendingPathComponent(database)
                 try FileManager.default.createDirectory(
                     at: databaseDirectory, withIntermediateDirectories: true)
                 let bsonURL = databaseDirectory.appendingPathComponent("\(collection).bson")
@@ -299,7 +318,7 @@ enum ImportExport {
                     window: window, title: String(localized: "Export Complete"),
                     message: String(
                         localized:
-                            "\(exported) documents exported to \(url.lastPathComponent). Restore with: mongorestore \(url.lastPathComponent)"
+                            "\(exported) documents exported to \(root.lastPathComponent). Restore with: mongorestore \(root.lastPathComponent)"
                     ))
             } catch is CancellationError {
                 sheet.finish()
