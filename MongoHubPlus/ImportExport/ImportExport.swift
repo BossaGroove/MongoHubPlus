@@ -75,17 +75,31 @@ final class ProgressSheetController: NSWindowController {
 }
 
 /// Save-panel accessory: Format popup that keeps the filename extension in
-/// sync (JSON Lines = lossless canonical EJSON; CSV = flattened, lossy).
+/// sync (JSON Lines = lossless canonical EJSON; CSV = flattened, lossy; BSON =
+/// a mongodump-layout folder).
 @MainActor
 private final class ExportFormatAccessory: NSView {
+    enum Format {
+        case jsonLines, csv, bson
+    }
+
     private weak var panel: NSSavePanel?
     private let popup = NSPopUpButton(frame: .zero, pullsDown: false)
+
+    var selectedFormat: Format {
+        switch popup.indexOfSelectedItem {
+        case 1: return .csv
+        case 2: return .bson
+        default: return .jsonLines
+        }
+    }
 
     init(panel: NSSavePanel) {
         self.panel = panel
         super.init(frame: NSRect(x: 0, y: 0, width: 360, height: 44))
         popup.addItems(withTitles: [
             String(localized: "JSON Lines (lossless)"), String(localized: "CSV (flattened, lossy)"),
+            String(localized: "BSON folder (for mongorestore)"),
         ])
         popup.target = self
         popup.action = #selector(formatChanged(_:))
@@ -108,10 +122,12 @@ private final class ExportFormatAccessory: NSView {
         guard let panel else { return }
         // The panel swaps the visible extension itself — assigning
         // nameFieldStringValue doesn't reach the out-of-process (sandboxed)
-        // panel reliably.
-        panel.allowedContentTypes =
-            popup.indexOfSelectedItem == 1
-            ? [.commaSeparatedText] : [Self.jsonLinesType]
+        // panel reliably. BSON writes a folder, so it wants no extension.
+        switch selectedFormat {
+        case .jsonLines: panel.allowedContentTypes = [Self.jsonLinesType]
+        case .csv: panel.allowedContentTypes = [.commaSeparatedText]
+        case .bson: panel.allowedContentTypes = []
+        }
     }
 
     static let jsonLinesType = UTType(exportedAs: "com.bossagroove.mongohubplus.jsonl")
@@ -170,11 +186,18 @@ enum ImportExport {
         panel.accessoryView = accessory
         panel.beginSheetModal(for: window) { response in
             guard response == .OK, let url = panel.url else { return }
-            if url.pathExtension.lowercased() == "csv" {
+            // Trust the Format popup rather than whatever extension ended up
+            // in the name field.
+            switch accessory.selectedFormat {
+            case .csv:
                 runExportCSV(
                     to: url, database: database, collection: collection, query: query,
                     session: session, window: window)
-            } else {
+            case .bson:
+                runExportBSON(
+                    to: url, database: database, collection: collection, query: query,
+                    session: session, window: window)
+            case .jsonLines:
                 runExport(
                     to: url, database: database, collection: collection, query: query,
                     session: session, window: window)
@@ -226,6 +249,101 @@ enum ImportExport {
             }
         }
         sheet.begin(on: window, task: task)
+    }
+
+    /// Writes what `mongodump` writes: raw BSON documents concatenated into
+    /// `<folder>/<database>/<collection>.bson`, beside the
+    /// `<collection>.metadata.json` that carries the indexes. The chosen
+    /// folder can be handed straight to `mongorestore`.
+    private static func runExportBSON(
+        to url: URL, database: String, collection: String, query: ExportQuery,
+        session: ConnectionSession, window: NSWindow
+    ) {
+        let sheet = ProgressSheetController(
+            title: String(localized: "Exporting \(database).\(collection)…"))
+        let task = Task {
+            var exported = 0
+            do {
+                let total = try await session.count(
+                    database: database, collection: collection, filter: query.filter)
+                let databaseDirectory = url.appendingPathComponent(database)
+                try FileManager.default.createDirectory(
+                    at: databaseDirectory, withIntermediateDirectories: true)
+                let bsonURL = databaseDirectory.appendingPathComponent("\(collection).bson")
+                FileManager.default.createFile(atPath: bsonURL.path, contents: nil)
+                let handle = try FileHandle(forWritingTo: bsonURL)
+                defer { try? handle.close() }
+
+                let command = query.findCommand(collection: collection)
+                for try await batch in session.cursorBatches(
+                    command: command, onDatabase: database)
+                {
+                    var chunk = Data()
+                    // A .bson file is documents back to back — each one already
+                    // carries its own length, so there is nothing between them.
+                    for document in batch { chunk.append(document.makeData()) }
+                    try handle.write(contentsOf: chunk)
+                    exported += batch.count
+                    sheet.setProgress(
+                        total > 0 ? Double(exported) / Double(total) : 1,
+                        detail: String(localized: "Exported \(exported) of \(total) documents…"))
+                }
+
+                let metadata = try await bsonMetadata(
+                    database: database, collection: collection, session: session)
+                try Data(metadata.utf8).write(
+                    to: databaseDirectory.appendingPathComponent("\(collection).metadata.json"))
+
+                sheet.finish()
+                presentInfo(
+                    window: window, title: String(localized: "Export Complete"),
+                    message: String(
+                        localized:
+                            "\(exported) documents exported to \(url.lastPathComponent). Restore with: mongorestore \(url.lastPathComponent)"
+                    ))
+            } catch is CancellationError {
+                sheet.finish()
+            } catch {
+                sheet.finish()
+                presentInfo(
+                    window: window, title: String(localized: "Export Failed"),
+                    message: String(localized: "After \(exported) documents: \(String(describing: error))"))
+            }
+        }
+        sheet.begin(on: window, task: task)
+    }
+
+    /// The sidecar `mongorestore` reads to recreate indexes and collection
+    /// options. Canonical Extended JSON, matching mongodump byte for byte in
+    /// shape; `uuid` is included when the server reports one (restores work
+    /// without it, but `--preserveUUID` needs it).
+    private static func bsonMetadata(
+        database: String, collection: String, session: ConnectionSession
+    ) async throws -> String {
+        var command = Document()
+        command["listIndexes"] = collection
+        let specs = try await session.collectCursor(command: command, onDatabase: database)
+
+        var indexes = Document(isArray: true)
+        for (position, spec) in specs.enumerated() {
+            var cleaned = Document()
+            // `ns` is a legacy server field mongodump does not carry over.
+            for pair in spec.pairs where pair.key != "ns" { cleaned[pair.key] = pair.value }
+            indexes[String(position)] = cleaned
+        }
+
+        var metadata = Document()
+        metadata["indexes"] = indexes
+        let info = try? await session.collectionInfo(database: database, collection: collection)
+        if let details = info?["info"] as? Document, let uuid = details["uuid"] as? Binary {
+            metadata["uuid"] = uuid.data.map { String(format: "%02x", $0) }.joined()
+        }
+        if let options = info?["options"] as? Document, !options.isEmpty {
+            metadata["options"] = options
+        }
+        metadata["collectionName"] = collection
+        metadata["type"] = "collection"
+        return try ExtendedJSON.stringify(metadata, format: .canonical)
     }
 
     static func importCollection(
@@ -457,6 +575,15 @@ enum ImportExport {
     }
 
     /// UI-verification hooks (bypass the panels).
+    static func debugExportBSON(
+        to url: URL, database: String, collection: String, session: ConnectionSession,
+        window: NSWindow
+    ) {
+        runExportBSON(
+            to: url, database: database, collection: collection, query: ExportQuery(),
+            session: session, window: window)
+    }
+
     static func debugExportCSV(
         to url: URL, database: String, collection: String, session: ConnectionSession,
         window: NSWindow

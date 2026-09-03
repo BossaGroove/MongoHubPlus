@@ -54,7 +54,7 @@ Requires **macOS 14 (Sonoma) or later**. MongoDB **6.0+** servers and
 - **Explain plans**: one click on any query or pipeline — index-vs-collection-scan verdict, execution stats, and index suggestions.
 - **Edit documents** in place in the results tree (values, add/delete fields — type-fidelity preserved) or in a syntax-colored JSON editor using official MongoDB Extended JSON (Compass-compatible; accepts mongosh-style input like `ObjectId(…)` and unquoted keys), with byte-level round-trip verification so editing never silently changes BSON types. Typing a bare id in a query field still means `{_id: ObjectId("…")}` — the classic MongoHub shortcut.
 - **Monitor**: mongostat-style live activity table, log window.
-- **Import/Export**: JSON-Lines (lossless canonical Extended JSON) and CSV (flattened, spreadsheet-friendly) — whole collections, current query results, or selected documents.
+- **Import/Export**: JSON-Lines (lossless canonical Extended JSON), CSV (flattened, spreadsheet-friendly), and **BSON folders `mongorestore` reads** — whole collections, current query results, or selected documents.
 - **Localized**: English, 日本語, Deutsch, 繁體中文, 简体中文, Français — switchable in Settings.
 
 ## New since the original MongoHub
@@ -86,6 +86,10 @@ macOS evolution brought features the original never had:
   imports type each cell and rebuild nested documents and arrays.
 - **Export scopes** — export the current query's full matching results or
   just the selected documents, not only whole collections.
+- **`mongodump`-compatible BSON export** — writes the same
+  `<database>/<collection>.bson` plus `<collection>.metadata.json` layout
+  `mongodump` produces, so the folder restores with a plain `mongorestore`,
+  indexes included.
 - **Pinned favorite connections and connection search** — plus multiple
   windows per connection.
 - **SSH host-key verification** — trust-on-first-use prompts instead of the

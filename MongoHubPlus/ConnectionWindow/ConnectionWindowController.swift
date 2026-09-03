@@ -326,6 +326,13 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
                             to: URL(fileURLWithPath: path), database: node.database,
                             collection: node.name, session: session, window: window)
                     }
+                    if let path = UserDefaults.standard.string(forKey: "MAExportBSON"),
+                        let session = self.session, let window = self.window
+                    {
+                        ImportExport.debugExportBSON(
+                            to: URL(fileURLWithPath: path), database: node.database,
+                            collection: node.name, session: session, window: window)
+                    }
                     if let path = UserDefaults.standard.string(forKey: "MAImportCSV"),
                         let session = self.session, let window = self.window
                     {

@@ -1,6 +1,40 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%1$lld documents exported to %2$@. Restore with: mongorestore %3$@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Dokumente nach %2$@ exportiert. Wiederherstellen mit: mongorestore %3$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld documents exportés vers %2$@. Restaurer avec : mongorestore %3$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 件のドキュメントを %2$@ に書き出しました。復元コマンド: mongorestore %3$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将 %1$lld 份文档导出至 %2$@。还原命令: mongorestore %3$@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已將 %1$lld 份文件匯出至 %2$@。還原指令: mongorestore %3$@"
+          }
+        }
+      }
+    },
     "%@ Stats": {
       "localizations": {
         "de": {
@@ -1255,6 +1289,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "自動下載並安裝更新"
+          }
+        }
+      }
+    },
+    "BSON folder (for mongorestore)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSON-Ordner (für mongorestore)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dossier BSON (pour mongorestore)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSON フォルダ (mongorestore 用)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSON 文件夹 (供 mongorestore 使用)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSON 檔案夾 (供 mongorestore 使用)"
           }
         }
       }
