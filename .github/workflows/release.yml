@@ -24,6 +24,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Fails before the (long) build if the tagged version has no changelog
+      # entry — the release notes feed both Sparkle and the GitHub release.
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Strip blank lines from both ends, keeping the ones that separate
+          # blocks — markdown needs them around headings and lists.
+          trim() {
+            awk 'NF || seen { print; seen = 1 }' | tail -r \
+              | awk 'NF || seen { print; seen = 1 }' | tail -r
+          }
+          awk -v version="$VERSION" '
+            /^## / {
+              if (found) exit
+              split(substr($0, 4), heading, " ")
+              if (heading[1] == version) found = 1
+              next
+            }
+            found { print }
+          ' CHANGELOG.md | trim > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "CHANGELOG.md has no '## $VERSION' section — add one before tagging." >&2
+            exit 1
+          fi
+          cat release-notes.md
+
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
@@ -142,11 +168,20 @@ jobs:
           curl -L -o sparkle.tar.xz \
             "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz"
           mkdir sparkle-dist && tar -xf sparkle.tar.xz -C sparkle-dist
+          # generate_appcast attaches release notes from a file named after
+          # the archive; --embed-release-notes inlines them in the appcast as
+          # <description sparkle:format="markdown">, so the update alert needs
+          # no second download. Removed again afterwards to keep the release
+          # assets to the DMG and the appcast.
+          NOTES="artifacts/MongoHubPlus-${GITHUB_REF_NAME#v}.md"
+          cp release-notes.md "$NOTES"
           echo "$SPARKLE_ED_PRIVATE_KEY" | ./sparkle-dist/bin/generate_appcast \
             --ed-key-file - \
+            --embed-release-notes \
             --link "https://github.com/${GITHUB_REPOSITORY}" \
             --download-url-prefix "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/" \
             artifacts
+          rm -f "$NOTES"
 
       - name: Publish GitHub release
         env:
@@ -158,4 +193,4 @@ jobs:
           fi
           gh release create "$GITHUB_REF_NAME" artifacts/* \
             --title "MongoHub Plus ${GITHUB_REF_NAME#v}" \
-            --generate-notes $PRERELEASE
+            --notes-file release-notes.md $PRERELEASE

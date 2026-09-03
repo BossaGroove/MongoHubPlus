@@ -21,6 +21,7 @@
 		5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022957575C63463D1137A66C /* ExplainSheetController.swift */; };
 		5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */; };
 		6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C4BDB065238D92127A7108 /* Preferences.swift */; };
+		6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F283322B6230E66016034C0 /* Changelog.swift */; };
 		6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FE36E484CA51E82513320 /* ConnectionStore.swift */; };
 		6F11FF2D4F5A5301B95E1B13 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78B965F63C7B405D32BAF4E0 /* Keychain.swift */; };
 		74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */; };
@@ -32,6 +33,7 @@
 		964D6A491C2F503CFB0052E4 /* InsertPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */; };
 		9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC20B2BAAAAF56545546006 /* AggregationStages.swift */; };
 		9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */; };
+		A5895644C0F71FB21C449763 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 947290413378D99E62F73675 /* CHANGELOG.md */; };
 		A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */; };
 		A95CBB4568158AE8C9E48305 /* QueryPaneSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E828940898163A28CCB599 /* QueryPaneSupport.swift */; };
 		B0388B745616BEC4D3717E0C /* DocumentOutlineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */; };
@@ -58,6 +60,7 @@
 		3BC20B2BAAAAF56545546006 /* AggregationStages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregationStages.swift; sourceTree = "<group>"; };
 		3F51339BE86ABD81A095DE5F /* AggregationPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregationPaneController.swift; sourceTree = "<group>"; };
 		45C4BDB065238D92127A7108 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		4F283322B6230E66016034C0 /* Changelog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Changelog.swift; sourceTree = "<group>"; };
 		50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovePaneController.swift; sourceTree = "<group>"; };
 		555666D6782E45BC6F0AD091 /* QueryTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryTabController.swift; sourceTree = "<group>"; };
 		688BCF4F805BA73941436A27 /* MongoHubPlus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MongoHubPlus.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +71,7 @@
 		8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTabController.swift; sourceTree = "<group>"; };
 		8F96695CC0A3DD24B07EB7B8 /* MongoService */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MongoService; path = Packages/MongoService; sourceTree = SOURCE_ROOT; };
 		91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindow.swift; sourceTree = "<group>"; };
+		947290413378D99E62F73675 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitorTabController.swift; sourceTree = "<group>"; };
 		B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONEditorWindowController.swift; sourceTree = "<group>"; };
 		B7E828940898163A28CCB599 /* QueryPaneSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPaneSupport.swift; sourceTree = "<group>"; };
@@ -100,6 +104,7 @@
 		1F3E88881D92ABECF11B5C3E /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				4F283322B6230E66016034C0 /* Changelog.swift */,
 				78B965F63C7B405D32BAF4E0 /* Keychain.swift */,
 				91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */,
 				45C4BDB065238D92127A7108 /* Preferences.swift */,
@@ -155,6 +160,7 @@
 		C0F190D0EB9F2B4E48A43C3D = {
 			isa = PBXGroup;
 			children = (
+				947290413378D99E62F73675 /* CHANGELOG.md */,
 				ED4E1B7F6E94519DCFFF1A00 /* MongoHubPlus */,
 				FC54133B8322DA3541B2C77B /* Packages */,
 				7FB36A29A4BE455A089F99E5 /* Products */,
@@ -308,6 +314,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5895644C0F71FB21C449763 /* CHANGELOG.md in Resources */,
 				7C19C29D306229182FE4414C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -348,6 +355,7 @@
 				B3E3D526CC1D297F7B3AADC7 /* AggregationPaneController.swift in Sources */,
 				9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */,
 				A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */,
+				6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */,
 				77ECDF78EA2EA931A9F3A668 /* ConnectionEditorController.swift in Sources */,
 				74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */,
 				6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */,

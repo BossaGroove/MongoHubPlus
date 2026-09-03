@@ -7,3 +7,6 @@ xcuserdata/
 
 # Private working docs (separate private repository, cloned here locally)
 internal/
+
+# Release notes sliced out of CHANGELOG.md by the release workflow
+release-notes.md

@@ -32,6 +32,10 @@ targets:
       - path: MongoHubPlus
         excludes:
           - "AppIcon.icon"
+      # Shipped so Settings can show what's new in the installed version; the
+      # release workflow slices the same file for Sparkle's appcast.
+      - path: CHANGELOG.md
+        buildPhase: resources
     dependencies:
       - package: ExtendedJSON
       - package: MongoService

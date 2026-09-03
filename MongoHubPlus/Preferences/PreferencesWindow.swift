@@ -314,6 +314,7 @@ private struct UpdateSettings: View {
     @State private var autoDownload = false
     @State private var includeBeta = Preferences.includeBetaUpdates
     @State private var lastCheck: Date?
+    @State private var changelog: [Changelog.Line] = []
 
     var body: some View {
         Form {
@@ -360,11 +361,20 @@ private struct UpdateSettings: View {
             Section {
                 LabeledContent("Version:", value: versionText)
             }
+
+            if !changelog.isEmpty {
+                Section {
+                    ChangelogView(lines: changelog)
+                } header: {
+                    Text("What's New in \(shortVersion)")
+                }
+            }
         }
         .onAppear {
             autoCheck = updater?.automaticallyChecksForUpdates ?? false
             autoDownload = updater?.automaticallyDownloadsUpdates ?? false
             lastCheck = updater?.lastUpdateCheckDate
+            changelog = Changelog.entryForCurrentVersion()
         }
     }
 
@@ -374,10 +384,49 @@ private struct UpdateSettings: View {
     }
 
     private var versionText: String {
-        let short =
-            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
-        return "\(short) (\(build))"
+        return "\(shortVersion) (\(build))"
+    }
+
+    private var shortVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    }
+}
+
+/// Renders one version's `CHANGELOG.md` entry — the same text the update
+/// notification shows for a version being offered.
+private struct ChangelogView: View {
+    let lines: [Changelog.Line]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                switch line {
+                case .heading(let text):
+                    Text(text)
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.top, 2)
+                case .bullet(let text):
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(verbatim: "•").foregroundStyle(.secondary)
+                        Text(inline(text))
+                    }
+                case .paragraph(let text):
+                    Text(inline(text))
+                }
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .textSelection(.enabled)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Emphasis, code spans and links inside a line; block structure has
+    /// already been parsed out by `Changelog`.
+    private func inline(_ text: String) -> AttributedString {
+        (try? AttributedString(
+            markdown: text,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+            ?? AttributedString(text)
     }
 }
