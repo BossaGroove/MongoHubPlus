@@ -9,7 +9,29 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
-## 4.0.3 — unreleased
+## 4.1.0 — 2026-09-03
+
+### Added
+
+- **Choose how documents are written out, per place.** Settings → Syntax has
+  a row each for the results table, editing a value in place, copying, and
+  the JSON editor. Each picks between official Extended JSON and mongosh
+  syntax — `{ _id: ObjectId('6a96…'), price: NumberDecimal('42.95') }` —
+  because reading a value, editing one, and copying are different jobs.
+  Whatever you choose, both syntaxes are still accepted when you type, and
+  exported files are always Extended JSON.
+- **BSON export for `mongorestore`.** The export Format popup can now write
+  the same folder `mongodump` produces — `<database>/<collection>.bson` plus
+  the metadata file carrying the indexes — so restoring one collection is
+  just `mongorestore <folder>`, indexes included.
+- **A bare date now works in the shell constructors**: `ISODate('2026-01-01')`
+  means midnight UTC, as it does in mongosh. A timestamp with no time zone,
+  like `ISODate('2026-01-01T10:00:00')`, is still refused with advice to add
+  `Z` or an offset — JavaScript reads it as local time and mongosh as UTC, so
+  guessing would quietly shift your query by hours.
+- The mongosh shorthand MongoHub Plus has always accepted when you type —
+  `ObjectId(…)`, `NumberDecimal(…)`, `/regex/i`, unquoted keys, and the rest
+  — is now written down, in the README.
 
 ### Fixed
 
