@@ -535,7 +535,7 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         // Prefill with a lossless, parseable representation of the value.
         let text =
             (try? ExtendedJSON.stringifyValue(
-                value, format: EJSONFormat(mode: .editor, pretty: false))) ?? node.valueText
+                value, format: Preferences.documentFormat(pretty: false))) ?? node.valueText
         endInlineEdit(commit: false)
         field.stringValue = text
         field.isEditable = true
@@ -613,7 +613,8 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         for (index, document) in documents.enumerated() {
             array[String(index)] = document
         }
-        guard let text = try? ExtendedJSON.stringify(array, format: .editor) else { return }
+        guard let text = try? ExtendedJSON.stringify(array, format: Preferences.documentFormat(pretty: true))
+        else { return }
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)

@@ -199,8 +199,26 @@ private struct EditorSettings: View {
 
     private let fontChoices = ["SF Mono", "Menlo", "Monaco", "Courier New"]
 
+    @State private var documentSyntax = Preferences.documentSyntax
+
     var body: some View {
         Form {
+            Section {
+                Picker("Document Syntax:", selection: $documentSyntax) {
+                    Text("Extended JSON").tag(Preferences.DocumentSyntax.extendedJSON)
+                    Text("Shell (mongosh)").tag(Preferences.DocumentSyntax.shell)
+                }
+                .onChange(of: documentSyntax) { _, newValue in
+                    Preferences.documentSyntax = newValue
+                }
+            } footer: {
+                Text(
+                    "How documents are shown in the JSON editor, when editing a value in the results, and when you copy. Both are always accepted when you type, and exported files are always Extended JSON."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+
             Section {
                 colorRow("Background:", \.background)
                 colorRow("Text:", \.text)

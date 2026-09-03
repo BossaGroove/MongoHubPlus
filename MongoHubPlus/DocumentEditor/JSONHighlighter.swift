@@ -195,7 +195,15 @@ final class JSONHighlighter {
                     "NaN", "Infinity":
                     setColor(theme.number, range)
                 default:
-                    break
+                    // Shell syntax writes keys bare, so an identifier followed
+                    // by ':' is a key and gets the key colour like a quoted one.
+                    var lookahead = i
+                    while lookahead < scalars.count, isInlineSpace(scalars[lookahead]) {
+                        lookahead += 1
+                    }
+                    if lookahead < scalars.count, scalars[lookahead] == UInt16(UInt8(ascii: ":")) {
+                        setColor(theme.key, range)
+                    }
                 }
             default:
                 i += 1
@@ -208,6 +216,10 @@ final class JSONHighlighter {
         (UInt16(UInt8(ascii: "0"))...UInt16(UInt8(ascii: "9"))).contains(c)
             || c == UInt16(UInt8(ascii: ".")) || c == UInt16(UInt8(ascii: "e")) || c == UInt16(UInt8(ascii: "E"))
             || c == UInt16(UInt8(ascii: "-")) || c == UInt16(UInt8(ascii: "+"))
+    }
+
+    private func isInlineSpace(_ c: UInt16) -> Bool {
+        c == UInt16(UInt8(ascii: " ")) || c == UInt16(UInt8(ascii: "\t"))
     }
 
     private func isIdentifierStart(_ c: UInt16) -> Bool {

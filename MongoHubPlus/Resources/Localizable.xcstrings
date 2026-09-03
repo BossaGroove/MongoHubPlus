@@ -2993,6 +2993,40 @@
         }
       }
     },
+    "Document Syntax:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumentsyntax:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syntaxe des documents :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ドキュメントの構文:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文档语法:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件語法:"
+          }
+        }
+      }
+    },
     "Don't Save": {
       "localizations": {
         "de": {
@@ -4217,6 +4251,40 @@
         }
       }
     },
+    "Extended JSON": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extended JSON"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON étendu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拡張 JSON"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扩展 JSON"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "擴充 JSON"
+          }
+        }
+      }
+    },
     "Field": {
       "localizations": {
         "de": {
@@ -4315,6 +4383,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "查詢"
+          }
+        }
+      }
+    },
+    "Fix the JSON to switch syntax": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON korrigieren, um die Syntax zu wechseln"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corrigez le JSON pour changer de syntaxe"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "構文を切り替えるには JSON を修正してください"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先修正 JSON 才能切换语法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先修正 JSON 才能切換語法"
           }
         }
       }
@@ -4587,6 +4689,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "主機:"
+          }
+        }
+      }
+    },
+    "How documents are shown in the JSON editor, when editing a value in the results, and when you copy. Both are always accepted when you type, and exported files are always Extended JSON.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie Dokumente im JSON-Editor, beim Bearbeiten eines Werts in den Ergebnissen und beim Kopieren dargestellt werden. Bei der Eingabe werden immer beide Syntaxen akzeptiert, und exportierte Dateien sind immer Extended JSON."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affichage des documents dans l'éditeur JSON, lors de la modification d'une valeur dans les résultats et lors d'une copie. Les deux syntaxes sont toujours acceptées à la saisie, et les fichiers exportés sont toujours en JSON étendu."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON エディタ、結果での値の編集、コピー時にドキュメントを表示する方法です。入力時はどちらの構文も常に受け付けられ、書き出したファイルは常に拡張 JSON です。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "决定 JSON 编辑器、在结果中编辑值以及复制时如何显示文档。输入时两种语法始终都接受，导出的文件始终为扩展 JSON。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "決定 JSON 編輯器、在結果中編輯值以及複製時如何顯示文件。輸入時兩種語法一律都接受，匯出的檔案一律為擴充 JSON。"
+          }
+        }
+      }
+    },
+    "How this document is displayed. Both syntaxes are always accepted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie dieses Dokument dargestellt wird. Beide Syntaxen werden immer akzeptiert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affichage de ce document. Les deux syntaxes sont toujours acceptées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このドキュメントの表示方法です。入力時はどちらの構文も常に受け付けられます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此文档的显示方式。两种语法始终都接受。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此文件的顯示方式。兩種語法一律都接受。"
           }
         }
       }
@@ -8259,6 +8429,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "分片叢集"
+          }
+        }
+      }
+    },
+    "Shell (mongosh)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell (mongosh)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell (mongosh)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シェル (mongosh)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell (mongosh)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell (mongosh)"
           }
         }
       }

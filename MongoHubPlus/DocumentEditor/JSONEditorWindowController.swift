@@ -24,6 +24,7 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
     var onClose: (() -> Void)?
 
     private var textView: NSTextView!
+    private let syntaxPopup = NSPopUpButton(frame: .zero, pullsDown: false)
     private let statusLabel = NSTextField(labelWithString: "")
     private let progress = NSProgressIndicator()
     private var saveButton: NSButton!
@@ -94,7 +95,23 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
         statusLabel.textColor = .secondaryLabelColor
         statusLabel.lineBreakMode = .byTruncatingTail
 
-        let topBar = NSStackView(views: [saveButton, cancelButton, progress, statusLabel])
+        // The syntax control lives here as well as in Settings: it shows which
+        // dialect you are looking at, switches it in one click, and is how most
+        // people will discover the shell dialect exists at all.
+        syntaxPopup.addItems(withTitles: [
+            String(localized: "Extended JSON"), String(localized: "Shell (mongosh)"),
+        ])
+        syntaxPopup.selectItem(at: Preferences.documentSyntax == .shell ? 1 : 0)
+        syntaxPopup.target = self
+        syntaxPopup.action = #selector(syntaxChanged(_:))
+        syntaxPopup.controlSize = .small
+        syntaxPopup.font = .systemFont(ofSize: 11)
+        syntaxPopup.toolTip = String(
+            localized: "How this document is displayed. Both syntaxes are always accepted.")
+
+        let topBar = NSStackView(views: [
+            saveButton, cancelButton, progress, statusLabel, syntaxPopup,
+        ])
         topBar.orientation = .horizontal
         topBar.spacing = 8
         topBar.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +131,7 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
         NSLayoutConstraint.activate([
             topBar.topAnchor.constraint(equalTo: content.topAnchor, constant: 8),
             topBar.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 10),
-            topBar.trailingAnchor.constraint(lessThanOrEqualTo: content.trailingAnchor, constant: -10),
+            topBar.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -10),
 
             scrollView.topAnchor.constraint(equalTo: topBar.bottomAnchor, constant: 8),
             scrollView.leadingAnchor.constraint(equalTo: content.leadingAnchor),
@@ -130,7 +147,7 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
         do {
             originalText = try ExtendedJSON.stringify(
                 originalDocument,
-                format: EJSONFormat(mode: .editor, pretty: true, keyOrder: Preferences.jsonKeyOrder))
+                format: Preferences.documentFormat(pretty: true, applyKeyOrder: true))
         } catch {
             originalText = "// Could not render document: \(error)"
             saveButton.isEnabled = false
@@ -159,6 +176,40 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
 
     @objc private func preferencesChanged() {
         highlighter.refresh(textView)
+        let expected = Preferences.documentSyntax == .shell ? 1 : 0
+        if syntaxPopup.indexOfSelectedItem != expected {
+            syntaxPopup.selectItem(at: expected)
+            rerenderForSyntaxChange()
+        }
+    }
+
+    @objc private func syntaxChanged(_ sender: NSPopUpButton) {
+        let syntax: Preferences.DocumentSyntax =
+            sender.indexOfSelectedItem == 1 ? .shell : .extendedJSON
+        guard syntax != Preferences.documentSyntax else { return }
+        Preferences.documentSyntax = syntax
+        rerenderForSyntaxChange()
+    }
+
+    /// Re-renders in the newly chosen syntax. What is on screen is re-rendered
+    /// — not the document we loaded — so switching syntax mid-edit keeps the
+    /// user's edits instead of throwing them away. Text that does not parse
+    /// (someone is mid-keystroke) is left exactly as it is.
+    private func rerenderForSyntaxChange() {
+        let format = Preferences.documentFormat(pretty: true, applyKeyOrder: true)
+        if let edited = try? ExtendedJSON.parseDocument(textView.string),
+            let converted = try? ExtendedJSON.stringify(edited, format: format)
+        {
+            textView.string = converted
+            statusLabel.stringValue = ""
+        } else {
+            statusLabel.stringValue = String(localized: "Fix the JSON to switch syntax")
+        }
+        if let rendered = try? ExtendedJSON.stringify(originalDocument, format: format) {
+            originalText = rendered
+        }
+        highlighter.highlight(textView)
+        window?.isDocumentEdited = isDirty
     }
 
     // MARK: - Editing

@@ -149,6 +149,12 @@ as UTC; add `Z` or an offset like `+08:00`.
 query bar on its own and it becomes `{_id: ObjectId('6a96d7fee80fb3561ff545e9')}` —
 the shortcut from the original MongoHub, kept.
 
+**You can read documents in either syntax as well.** Settings → Editor →
+Document Syntax switches the JSON editor, in-place value editing in the
+results, and ⌘C copy between Extended JSON (the default) and shell syntax —
+and the JSON editor has the same switch next to its Save button. It changes
+what you see, never what is accepted: typing works the same either way.
+
 **Exported files are always Extended JSON**, whichever style you type in.
 JSON-Lines exports are valid JSON that Compass, `mongoimport`, and every
 driver can read — the shorthand is a convenience for writing and reading in

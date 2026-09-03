@@ -144,6 +144,39 @@ enum Preferences {
         }
     }
 
+    /// Which dialect the document editor, the results-outline inline editor
+    /// and ⌘C copy *render* (docs/json-dialects.md). Input always accepts both
+    /// dialects regardless, and file export is always Extended JSON.
+    enum DocumentSyntax: String, CaseIterable, Sendable {
+        case extendedJSON
+        case shell
+
+        var serializerMode: EJSONFormat.Mode {
+            switch self {
+            case .extendedJSON: return .editor
+            case .shell: return .shell
+            }
+        }
+    }
+
+    static var documentSyntax: DocumentSyntax {
+        get {
+            DocumentSyntax(rawValue: defaults.string(forKey: "documentSyntax") ?? "")
+                ?? .extendedJSON
+        }
+        set {
+            defaults.set(newValue.rawValue, forKey: "documentSyntax")
+            post()
+        }
+    }
+
+    /// The output format for every value the user reads or edits in place.
+    static func documentFormat(pretty: Bool, applyKeyOrder: Bool = false) -> EJSONFormat {
+        EJSONFormat(
+            mode: documentSyntax.serializerMode, pretty: pretty,
+            keyOrder: applyKeyOrder ? jsonKeyOrder : .document)
+    }
+
     /// Opt into Sparkle's "beta" appcast channel (feature-spec 6.2 — the
     /// legacy beta-channel preference). Read by `UpdateChannelDelegate`,
     /// which uses the raw key because Sparkle may ask off the main thread.
