@@ -83,7 +83,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.bossagroove.MongoHubPlus
         PRODUCT_NAME: "MongoHub Plus"
-        MARKETING_VERSION: "4.0.1"
+        MARKETING_VERSION: "4.0.2"
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_ENTITLEMENTS: MongoHubPlus/MongoHubPlus.entitlements
