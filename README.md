@@ -121,7 +121,7 @@ The shorthand covers every BSON type:
 | Shorthand | Type | Same value in Extended JSON |
 |---|---|---|
 | `ObjectId('6a96…')` | ObjectId | `{"$oid":"6a96…"}` |
-| `ISODate('2026-01-01T00:00:00Z')`<br>`new Date(1767225600000)` | date | `{"$date":"2026-01-01T00:00:00Z"}` |
+| `ISODate('2026-01-01T00:00:00Z')`<br>`ISODate('2026-01-01')`<br>`new Date(1767225600000)` | date | `{"$date":"2026-01-01T00:00:00Z"}` |
 | `NumberInt(7)` | 32-bit integer | `7` — no wrapper needed |
 | `NumberLong('9007199254740993')` | 64-bit integer | `{"$numberLong":"9007199254740993"}` |
 | `NumberDecimal('42.95')` | Decimal128 — exact, no float rounding | `{"$numberDecimal":"42.95"}` |
@@ -138,6 +138,12 @@ So a filter can stay readable even with typed values:
 ```javascript
 { price: { $gt: NumberDecimal('20') }, published: { $lt: ISODate('2000-01-01T00:00:00Z') } }
 ```
+
+A date on its own means UTC midnight, as it does in the shell:
+`ISODate('2026-01-01')` is `2026-01-01T00:00:00Z`. A timestamp with **no**
+time zone — `ISODate('2026-01-01T10:00:00')` — is refused rather than
+guessed at, because JavaScript reads it as local time and mongosh reads it
+as UTC; add `Z` or an offset like `+08:00`.
 
 **Typing a bare id looks it up.** Paste `6a96d7fee80fb3561ff545e9` into the
 query bar on its own and it becomes `{_id: ObjectId('6a96d7fee80fb3561ff545e9')}` —

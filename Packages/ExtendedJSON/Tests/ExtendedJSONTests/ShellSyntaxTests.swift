@@ -217,3 +217,52 @@ struct StringifyValueTests {
         _ = try ExtendedJSON.parseValue(text)
     }
 }
+
+// MARK: - Date-only shell dates (2026-09-03)
+
+@Suite struct ShellDateTests {
+    private func date(_ source: String) throws -> Date {
+        let document = try ExtendedJSON.parseDocument("{ a: \(source) }")
+        return try #require(document["a"] as? Date)
+    }
+
+    /// mongosh and the ECMAScript spec both read a bare date as UTC midnight.
+    @Test func bareDateIsUTCMidnight() throws {
+        let expected = Date(timeIntervalSince1970: 1_767_225_600)
+        #expect(try date("ISODate('2026-01-01')") == expected)
+        #expect(try date("Date('2026-01-01')") == expected)
+        #expect(try date("new Date('2026-01-01')") == expected)
+    }
+
+    /// `.withFullDate` would accept this and silently drop the time.
+    @Test func bareDateParsingNeverTruncatesATimestamp() throws {
+        #expect(throws: EJSONError.self) { _ = try date("ISODate('2026-01-01T10:00:00')") }
+    }
+
+    /// Refused on purpose — JS says local, mongosh says UTC, so we ask.
+    @Test func timestampWithoutZoneIsRefusedWithAdvice() throws {
+        do {
+            _ = try date("ISODate('2026-01-01T10:00:00')")
+            Issue.record("expected a parse error")
+        } catch let error as EJSONError {
+            #expect(error.message.contains("no time zone"))
+            #expect(error.message.contains("Z"))
+        }
+    }
+
+    /// The `$date` wrapper stays spec-strict; only the constructors loosened.
+    @Test func dollarDateStillRequiresAFullTimestamp() throws {
+        #expect(throws: EJSONError.self) {
+            _ = try ExtendedJSON.parseDocument(#"{"a": {"$date": "2026-01-01"}}"#)
+        }
+        #expect(throws: Never.self) {
+            _ = try ExtendedJSON.parseDocument(#"{"a": {"$date": "2026-01-01T00:00:00Z"}}"#)
+        }
+    }
+
+    @Test func garbageIsStillRejected() throws {
+        #expect(throws: EJSONError.self) { _ = try date("ISODate('hello')") }
+        #expect(throws: EJSONError.self) { _ = try date("ISODate('2026-1-1')") }
+        #expect(throws: EJSONError.self) { _ = try date("ISODate('20260101')") }
+    }
+}

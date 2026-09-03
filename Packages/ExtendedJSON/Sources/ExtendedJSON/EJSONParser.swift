@@ -463,13 +463,28 @@ struct EJSONParser {
         case let millis as Int: return Self.exactDate(millis: millis)
         case let millis as Double: return Self.exactDate(millis: Int(millis))
         case let text as String:
-            guard let date = ISO8601.parse(text) else {
-                throw err("Invalid ISO-8601 date string '\(text)'")
+            guard let date = ISO8601.parseShellDate(text) else {
+                throw err(Self.dateErrorMessage(for: text))
             }
             return Self.exactDate(date)
         default:
             throw err("Date(...) requires milliseconds or an ISO-8601 string")
         }
+    }
+
+    /// A timestamp with no time zone is refused rather than guessed: the
+    /// ECMAScript spec reads it as local time and mongosh reads it as UTC, so
+    /// picking either would shift the value by hours without saying so.
+    private static func dateErrorMessage(for text: String) -> String {
+        if let marker = text.firstIndex(of: "T") {
+            let time = text[text.index(after: marker)...]
+            if !time.hasSuffix("Z"), !time.contains("+"), !time.contains("-") {
+                return """
+                    Date '\(text)' has no time zone — add 'Z' for UTC, or an offset like +08:00
+                    """
+            }
+        }
+        return "Invalid ISO-8601 date string '\(text)'"
     }
 
     /// Parses `( value, value, ... )` argument lists for shell constructors.
@@ -809,14 +824,49 @@ enum ISO8601 {
         return f
     }()
 
+    nonisolated(unsafe) private static let dateOnly: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withFullDate]
+        f.timeZone = TimeZone(identifier: "UTC")
+        return f
+    }()
+
     nonisolated(unsafe) private static let withoutFraction: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
         return f
     }()
 
+    /// Full ISO-8601 timestamps only — what relaxed Extended JSON's `$date`
+    /// requires, and what the official corpus tests. Never accepts a bare date.
     static func parse(_ text: String) -> Date? {
         withFraction.date(from: text) ?? withoutFraction.date(from: text)
+    }
+
+    /// The shell constructors additionally accept a bare `YYYY-MM-DD`, which
+    /// both mongosh and the ECMAScript spec read as UTC midnight.
+    ///
+    /// The shape is checked before parsing on purpose: `.withFullDate` happily
+    /// accepts `2026-01-01T10:00:00` and silently throws the time away, which
+    /// would turn a precise query into a wrong one.
+    static func parseShellDate(_ text: String) -> Date? {
+        if let date = parse(text) { return date }
+        guard isBareDate(text) else { return nil }
+        return dateOnly.date(from: text)
+    }
+
+    /// Exactly `YYYY-MM-DD`.
+    private static func isBareDate(_ text: String) -> Bool {
+        let bytes = Array(text.utf8)
+        guard bytes.count == 10 else { return false }
+        for (offset, byte) in bytes.enumerated() {
+            if offset == 4 || offset == 7 {
+                guard byte == UInt8(ascii: "-") else { return false }
+            } else {
+                guard byte >= UInt8(ascii: "0"), byte <= UInt8(ascii: "9") else { return false }
+            }
+        }
+        return true
     }
 
     /// Formats with millisecond precision, UTC, trailing 'Z' — or without the

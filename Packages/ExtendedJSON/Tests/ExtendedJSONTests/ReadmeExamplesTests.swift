@@ -10,6 +10,7 @@ import Testing
     let pairs: [(shorthand: String, extendedJSON: String)] = [
         ("ObjectId('6a96d7fee80fb3561ff545e9')", #"{"$oid":"6a96d7fee80fb3561ff545e9"}"#),
         ("ISODate('2026-01-01T00:00:00Z')", #"{"$date":"2026-01-01T00:00:00Z"}"#),
+        ("ISODate('2026-01-01')", #"{"$date":"2026-01-01T00:00:00Z"}"#),
         ("new Date(1767225600000)", #"{"$date":"2026-01-01T00:00:00Z"}"#),
         ("NumberInt(7)", "7"),
         ("NumberLong('9007199254740993')", #"{"$numberLong":"9007199254740993"}"#),
