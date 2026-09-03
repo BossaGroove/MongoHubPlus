@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		090DEB6C9E7B664BB2E71300 /* TabHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */; };
+		0EDA8DD6A6CCC6703D1A8B71 /* AutoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B2A3E0095B04976E20D2FC /* AutoLayout.swift */; };
 		102E42125A45D2EF89F1881A /* JSONEditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */; };
 		1672D40614A151571F1C46CD /* StatusTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */; };
 		1DB765C04093B69694C911A8 /* MongoService in Frameworks */ = {isa = PBXBuildFile; productRef = 241A7459C1F7C5615018EE67 /* MongoService */; };
@@ -82,6 +83,7 @@
 		D6EABD4C685FBE6D99FB7E7F /* ConnectionEditorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionEditorController.swift; sourceTree = "<group>"; };
 		DC2B64B9C8B7F8BBA85F9BB4 /* TailPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TailPaneController.swift; sourceTree = "<group>"; };
 		E14E738159542322FDB225F1 /* ConnectionWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionWindowController.swift; sourceTree = "<group>"; };
+		E8B2A3E0095B04976E20D2FC /* AutoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoLayout.swift; sourceTree = "<group>"; };
 		F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPaneController.swift; sourceTree = "<group>"; };
 		FE0AB195754C8653918EF1DA /* JSONHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONHighlighter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -104,6 +106,7 @@
 		1F3E88881D92ABECF11B5C3E /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				E8B2A3E0095B04976E20D2FC /* AutoLayout.swift */,
 				4F283322B6230E66016034C0 /* Changelog.swift */,
 				78B965F63C7B405D32BAF4E0 /* Keychain.swift */,
 				91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */,
@@ -355,6 +358,7 @@
 				B3E3D526CC1D297F7B3AADC7 /* AggregationPaneController.swift in Sources */,
 				9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */,
 				A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */,
+				0EDA8DD6A6CCC6703D1A8B71 /* AutoLayout.swift in Sources */,
 				6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */,
 				77ECDF78EA2EA931A9F3A668 /* ConnectionEditorController.swift in Sources */,
 				74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */,

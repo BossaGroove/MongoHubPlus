@@ -88,7 +88,7 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         connectionStringField.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         connectionStringField.lineBreakMode = .byCharWrapping
         connectionStringField.cell?.wraps = true
-        connectionStringField.setContentHuggingPriority(.init(1), for: .horizontal)
+        connectionStringField.fillsRowWidth()
         userField.placeholderString = String(localized: "Username (optional)")
         passwordField.placeholderString = String(localized: "Password (optional)")
         databaseField.placeholderString = String(localized: "Database Name (optional)")
@@ -136,7 +136,7 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         }
 
         hostPortField.widthAnchor.constraint(equalToConstant: 64).isActive = true
-        hostField.setContentHuggingPriority(.init(1), for: .horizontal)
+        hostField.fillsRowWidth()
         let hostRow = NSStackView(views: [hostField, label(":"), hostPortField])
         hostRow.orientation = .horizontal
         gridTab("standalone", [
@@ -178,8 +178,8 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         sshPasswordField.toolTip =
             "SSH password — used as the key passphrase when a key file is set"
         sshPortField.widthAnchor.constraint(equalToConstant: 64).isActive = true
-        sshHostField.setContentHuggingPriority(.init(1), for: .horizontal)
-        sshKeyField.setContentHuggingPriority(.init(1), for: .horizontal)
+        sshHostField.fillsRowWidth()
+        sshKeyField.fillsRowWidth()
         let sshHostRow = NSStackView(views: [sshHostField, label(":"), sshPortField])
         sshHostRow.orientation = .horizontal
         let sshKeyRow = NSStackView(views: [sshKeyField, sshKeyButton])

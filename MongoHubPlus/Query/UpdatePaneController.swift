@@ -70,7 +70,7 @@ final class UpdatePaneController: NSViewController {
         criteriaRow.orientation = .horizontal
         criteriaRow.spacing = 6
         criteriaRow.translatesAutoresizingMaskIntoConstraints = false
-        criteriaField.setContentHuggingPriority(.init(1), for: .horizontal)
+        criteriaField.fillsRowWidth()
 
         rowsStack.orientation = .vertical
         rowsStack.alignment = .leading
@@ -143,7 +143,7 @@ final class UpdatePaneController: NSViewController {
         newRow.stack.addArrangedSubview(newRow.addButton)
         newRow.stack.addArrangedSubview(newRow.removeButton)
         newRow.popup.widthAnchor.constraint(equalToConstant: 140).isActive = true
-        newRow.field.setContentHuggingPriority(.init(1), for: .horizontal)
+        newRow.field.fillsRowWidth()
         newRow.stack.translatesAutoresizingMaskIntoConstraints = false
 
         let insertIndex = row.flatMap { r in rows.firstIndex(where: { $0 === r }).map { $0 + 1 } } ?? rows.count

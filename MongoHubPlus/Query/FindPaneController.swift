@@ -95,8 +95,8 @@ final class FindPaneController: NSViewController {
             row.spacing = 6
             row.translatesAutoresizingMaskIntoConstraints = false
         }
-        criteriaCombo.setContentHuggingPriority(.init(1), for: .horizontal)
-        fieldsField.setContentHuggingPriority(.init(1), for: .horizontal)
+        criteriaCombo.fillsRowWidth()
+        fieldsField.fillsRowWidth()
         sortField.widthAnchor.constraint(equalToConstant: 150).isActive = true
         skipField.widthAnchor.constraint(equalToConstant: 56).isActive = true
         limitField.widthAnchor.constraint(equalToConstant: 56).isActive = true

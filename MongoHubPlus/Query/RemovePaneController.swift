@@ -40,7 +40,7 @@ final class RemovePaneController: NSViewController {
         row.orientation = .horizontal
         row.spacing = 6
         row.translatesAutoresizingMaskIntoConstraints = false
-        criteriaField.setContentHuggingPriority(.init(1), for: .horizontal)
+        criteriaField.fillsRowWidth()
 
         container.addSubview(previewField)
         container.addSubview(spinner)

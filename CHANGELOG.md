@@ -9,6 +9,18 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.0.3 — unreleased
+
+### Fixed
+
+- Typing or pasting a long query no longer makes the window grow by itself.
+  The grey query preview now shortens with an ellipsis when it does not fit
+  (hover it to read the whole query), instead of pushing the window wider.
+- The query field no longer ends up with a gap of empty space and its last
+  characters cut off after the text outgrows the field.
+- Long connection strings in the connection editor, and long queries in the
+  Update and Remove tabs, behaved the same way and are fixed too.
+
 ## 4.0.2 — 2026-09-03
 
 ### Added

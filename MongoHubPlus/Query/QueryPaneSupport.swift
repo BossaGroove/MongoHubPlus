@@ -11,18 +11,31 @@ struct QueryPaneContext {
     var namespace: String { "\(database).\(collection)" }
 }
 
+/// The query preview label: truncates instead of widening the window, and
+/// keeps the full composed query reachable as a tooltip.
+private final class PreviewField: NSTextField {
+    override var stringValue: String {
+        didSet { toolTip = stringValue.isEmpty ? nil : stringValue }
+    }
+}
+
 /// Shared factories/behaviors for the query sub-panes (legacy MHQueryView).
 @MainActor
 enum QueryPaneUI {
     /// The grey read-only `db.coll.…` preview field ("Query Viewer").
     static func previewField() -> NSTextField {
-        let field = NSTextField(labelWithString: "")
+        let field = PreviewField(labelWithString: "")
         field.textColor = NSColor(white: 0.5, alpha: 1)
         field.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
-        field.lineBreakMode = .byCharWrapping
+        field.lineBreakMode = .byTruncatingTail
         field.maximumNumberOfLines = 1
         field.isSelectable = true
         field.translatesAutoresizingMaskIntoConstraints = false
+        // The composed query is unbounded: without this the label's intrinsic
+        // width wins over the window, so typing a long query silently widened
+        // the window (and left the criteria field editor sized for the old
+        // width — dead space at the end, the tail of the text clipped).
+        field.setContentCompressionResistancePriority(.init(1), for: .horizontal)
         return field
     }
 
