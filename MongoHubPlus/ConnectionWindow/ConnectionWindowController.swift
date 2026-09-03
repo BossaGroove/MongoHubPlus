@@ -477,7 +477,7 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
-    private func loadCollections(for database: DatabaseNode) {
+    private func loadCollections(for database: DatabaseNode, expandWhenLoaded: Bool = false) {
         guard let session else { return }
         Task {
             do {
@@ -486,6 +486,9 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
                     CollectionNode(database: database.name, name: $0)
                 }
                 self.sidebarOutline.reloadItem(database, reloadChildren: true)
+                if expandWhenLoaded {
+                    self.sidebarOutline.expandItem(database)
+                }
             } catch {
                 self.presentError(
                     title: "Could Not List Collections in \(database.name)",
@@ -544,8 +547,20 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
     }
 
     @objc private func sidebarDoubleAction(_ sender: Any?) {
-        if let collection = selectedCollectionNode {
+        let row = sidebarOutline.clickedRow >= 0 ? sidebarOutline.clickedRow : sidebarOutline.selectedRow
+        let item = sidebarOutline.item(atRow: row)
+        if let collection = item as? CollectionNode {
             openQueryTab(for: collection)
+        } else if let database = item as? DatabaseNode {
+            // Double-clicking a database toggles its collection list (owner
+            // request 2026-09-03); the first expand loads the names lazily.
+            if sidebarOutline.isItemExpanded(database) {
+                sidebarOutline.collapseItem(database)
+            } else if database.collections == nil {
+                loadCollections(for: database, expandWhenLoaded: true)
+            } else {
+                sidebarOutline.expandItem(database)
+            }
         }
     }
 
@@ -682,8 +697,7 @@ extension ConnectionWindowController: NSMenuDelegate {
                     command["create"] = name
                     _ = try await session.runCommand(command, onDatabase: database.name)
                     database.isTemporary = false
-                    self.loadCollections(for: database)
-                    self.sidebarOutline.expandItem(database)
+                    self.loadCollections(for: database, expandWhenLoaded: true)
                 } catch {
                     self.presentError(
                         title: String(localized: "Could Not Create Collection"), message: String(describing: error))

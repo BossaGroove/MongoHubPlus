@@ -23,6 +23,9 @@ final class FindPaneController: NSViewController {
             autosaveName: "find-outline"))
 
     private var history: [QueryHistoryEntry] = []
+    /// True while the criteria combo's history list is dropped down — Return
+    /// then belongs to the list, not to Run (owner request 2026-09-03).
+    private var criteriaPopupIsVisible = false
     private var editorWindows: [Data: JSONEditorWindowController] = [:]
 
     init(context: QueryPaneContext) {
@@ -846,6 +849,18 @@ extension FindPaneController: NSComboBoxDataSource, NSComboBoxDelegate, NSTextFi
         history.first { $0.criteria.hasPrefix(string) }?.criteria
     }
 
+    func comboBoxWillPopUp(_ notification: Notification) {
+        criteriaPopupIsVisible = true
+    }
+
+    func comboBoxWillDismiss(_ notification: Notification) {
+        criteriaPopupIsVisible = false
+        // Picking an entry writes it into the combo's text without posting a
+        // text-did-change, and only after this notification returns — so the
+        // preview has to be recomposed off the next turn of the runloop.
+        DispatchQueue.main.async { [weak self] in self?.composePreview() }
+    }
+
     func comboBoxSelectionDidChange(_ notification: Notification) {
         let index = criteriaCombo.indexOfSelectedItem
         guard history.indices.contains(index) else { return }
@@ -865,6 +880,9 @@ extension FindPaneController: NSComboBoxDataSource, NSComboBoxDelegate, NSTextFi
         _ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector
     ) -> Bool {
         if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+            // With the history list dropped down, Return picks the highlighted
+            // entry (AppKit's own handling); it runs the query on the next one.
+            if control === criteriaCombo, criteriaPopupIsVisible { return false }
             runQuery(nil)
             return true
         }
