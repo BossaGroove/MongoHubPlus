@@ -25,7 +25,7 @@ final class PreferencesWindowController: NSWindowController {
 }
 
 private enum SettingsSection: String, CaseIterable, Identifiable {
-    case general, results, editor, connection
+    case general, results, syntax, editor, connection
     case softwareUpdate = "update"
 
     var id: String { rawValue }
@@ -34,6 +34,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .general: return String(localized: "General")
         case .results: return String(localized: "Results")
+        case .syntax: return String(localized: "Syntax")
         case .editor: return String(localized: "Editor")
         case .connection: return String(localized: "Connection")
         case .softwareUpdate: return String(localized: "Software Update")
@@ -44,6 +45,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .general: return "gearshape"
         case .results: return "tablecells"
+        case .syntax: return "textformat"
         case .editor: return "curlybraces"
         case .connection: return "network"
         case .softwareUpdate: return "arrow.triangle.2.circlepath"
@@ -82,6 +84,7 @@ private struct SettingsRootView: View {
                 switch selection {
                 case .general: GeneralSettings()
                 case .results: ResultsSettings()
+                case .syntax: SyntaxSettings()
                 case .editor: EditorSettings()
                 case .connection: ConnectionSettings()
                 case .softwareUpdate: UpdateSettings()
@@ -183,6 +186,64 @@ private struct ResultsSettings: View {
     }
 }
 
+// MARK: - Syntax (how values are written out, per surface)
+
+/// One row per surface. They are separate settings on purpose: reading a
+/// value in a table, editing one in place, copying, and editing a whole
+/// document are different jobs. Typing always accepts both dialects, and
+/// exported files are always Extended JSON.
+private struct SyntaxSettings: View {
+    @State private var resultsSyntax = Preferences.resultsSyntax
+    @State private var inlineEditSyntax = Preferences.inlineEditSyntax
+    @State private var copySyntax = Preferences.copySyntax
+    @State private var jsonEditorSyntax = Preferences.jsonEditorSyntax
+
+    var body: some View {
+        Form {
+            Section {
+                Picker("Results:", selection: $resultsSyntax) {
+                    Text("Compact").tag(Preferences.ResultsSyntax.compact)
+                    Text("Extended JSON").tag(Preferences.ResultsSyntax.extendedJSON)
+                }
+                .onChange(of: resultsSyntax) { _, newValue in Preferences.resultsSyntax = newValue }
+
+                dialectPicker("Editing a Value:", $inlineEditSyntax) {
+                    Preferences.inlineEditSyntax = $0
+                }
+                dialectPicker("Copy:", $copySyntax) { Preferences.copySyntax = $0 }
+                dialectPicker("JSON Editor:", $jsonEditorSyntax) {
+                    Preferences.jsonEditorSyntax = $0
+                }
+            } footer: {
+                Text(
+                    "Both syntaxes are always accepted when you type, whatever you choose here. Exported files are always Extended JSON."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+        }
+        // Read the stored values again whenever the section is shown, so the
+        // rows cannot drift from a preference changed elsewhere.
+        .onAppear {
+            resultsSyntax = Preferences.resultsSyntax
+            inlineEditSyntax = Preferences.inlineEditSyntax
+            copySyntax = Preferences.copySyntax
+            jsonEditorSyntax = Preferences.jsonEditorSyntax
+        }
+    }
+
+    private func dialectPicker(
+        _ label: LocalizedStringKey, _ selection: Binding<Preferences.ValueSyntax>,
+        onChange: @escaping (Preferences.ValueSyntax) -> Void
+    ) -> some View {
+        Picker(label, selection: selection) {
+            Text("Extended JSON").tag(Preferences.ValueSyntax.extendedJSON)
+            Text("Shell (mongosh)").tag(Preferences.ValueSyntax.shell)
+        }
+        .onChange(of: selection.wrappedValue) { _, newValue in onChange(newValue) }
+    }
+}
+
 // MARK: - Editor (JSON theme colors + font)
 
 private struct EditorSettings: View {
@@ -199,26 +260,8 @@ private struct EditorSettings: View {
 
     private let fontChoices = ["SF Mono", "Menlo", "Monaco", "Courier New"]
 
-    @State private var documentSyntax = Preferences.documentSyntax
-
     var body: some View {
         Form {
-            Section {
-                Picker("Document Syntax:", selection: $documentSyntax) {
-                    Text("Extended JSON").tag(Preferences.DocumentSyntax.extendedJSON)
-                    Text("Shell (mongosh)").tag(Preferences.DocumentSyntax.shell)
-                }
-                .onChange(of: documentSyntax) { _, newValue in
-                    Preferences.documentSyntax = newValue
-                }
-            } footer: {
-                Text(
-                    "How documents are shown in the JSON editor, when editing a value in the results, and when you copy. Both are always accepted when you type, and exported files are always Extended JSON."
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-
             Section {
                 colorRow("Background:", \.background)
                 colorRow("Text:", \.text)

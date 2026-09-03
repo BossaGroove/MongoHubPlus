@@ -1,4 +1,5 @@
 import AppKit
+import BSON
 import ExtendedJSON
 import Foundation
 
@@ -144,10 +145,12 @@ enum Preferences {
         }
     }
 
-    /// Which dialect the document editor, the results-outline inline editor
-    /// and ⌘C copy *render* (docs/json-dialects.md). Input always accepts both
-    /// dialects regardless, and file export is always Extended JSON.
-    enum DocumentSyntax: String, CaseIterable, Sendable {
+    /// How BSON values are written out as text. Each surface has its own
+    /// setting (docs/json-dialects.md) — reading a value in a table, editing
+    /// one in place, copying, and editing a whole document are different jobs
+    /// with different right answers. Input always accepts both dialects, and
+    /// file export is always Extended JSON regardless.
+    enum ValueSyntax: String, CaseIterable, Sendable {
         case extendedJSON
         case shell
 
@@ -159,22 +162,73 @@ enum Preferences {
         }
     }
 
-    static var documentSyntax: DocumentSyntax {
-        get {
-            DocumentSyntax(rawValue: defaults.string(forKey: "documentSyntax") ?? "")
-                ?? .extendedJSON
-        }
+    /// The results outline additionally offers its compact table rendering —
+    /// bare strings, local-time dates — which is not a dialect at all.
+    enum ResultsSyntax: String, CaseIterable, Sendable {
+        case compact
+        case extendedJSON
+    }
+
+    private static func valueSyntax(_ key: String, default fallback: ValueSyntax) -> ValueSyntax {
+        ValueSyntax(rawValue: defaults.string(forKey: key) ?? "") ?? fallback
+    }
+
+    private static func setValueSyntax(_ value: ValueSyntax, _ key: String) {
+        defaults.set(value.rawValue, forKey: key)
+        post()
+    }
+
+    /// Results outline, and everything else drawn in it: Stats, Explain,
+    /// the Index pane, Tail.
+    static var resultsSyntax: ResultsSyntax {
+        get { ResultsSyntax(rawValue: defaults.string(forKey: "resultsSyntax") ?? "") ?? .compact }
         set {
-            defaults.set(newValue.rawValue, forKey: "documentSyntax")
+            defaults.set(newValue.rawValue, forKey: "resultsSyntax")
             post()
         }
     }
 
-    /// The output format for every value the user reads or edits in place.
-    static func documentFormat(pretty: Bool, applyKeyOrder: Bool = false) -> EJSONFormat {
+    /// Editing a single value in place in the results.
+    static var inlineEditSyntax: ValueSyntax {
+        get { valueSyntax("inlineEditSyntax", default: .shell) }
+        set { setValueSyntax(newValue, "inlineEditSyntax") }
+    }
+
+    /// ⌘C. Defaults to Extended JSON because copied text leaves the app and
+    /// has to paste into Compass, a driver, or a ticket — not just mongosh.
+    static var copySyntax: ValueSyntax {
+        get { valueSyntax("copySyntax", default: .extendedJSON) }
+        set { setValueSyntax(newValue, "copySyntax") }
+    }
+
+    /// The JSON editor window.
+    static var jsonEditorSyntax: ValueSyntax {
+        get { valueSyntax("jsonEditorSyntax", default: .extendedJSON) }
+        set { setValueSyntax(newValue, "jsonEditorSyntax") }
+    }
+
+    static func format(
+        _ syntax: ValueSyntax, pretty: Bool, applyKeyOrder: Bool = false
+    ) -> EJSONFormat {
         EJSONFormat(
-            mode: documentSyntax.serializerMode, pretty: pretty,
+            mode: syntax.serializerMode, pretty: pretty,
             keyOrder: applyKeyOrder ? jsonKeyOrder : .document)
+    }
+
+    /// The results outline's Value column.
+    static func resultsValueText(for value: Primitive) -> String {
+        switch resultsSyntax {
+        case .compact:
+            return BSONDisplay.valueString(value)
+        case .extendedJSON:
+            guard let text = try? ExtendedJSON.stringifyValue(
+                value, format: EJSONFormat(mode: .editor, pretty: false))
+            else { return BSONDisplay.valueString(value) }
+            // A container renders its whole subtree here; one table row does
+            // not need all of it.
+            let limit = 300
+            return text.count > limit ? text.prefix(limit) + "…" : text
+        }
     }
 
     /// Opt into Sparkle's "beta" appcast channel (feature-spec 6.2 — the

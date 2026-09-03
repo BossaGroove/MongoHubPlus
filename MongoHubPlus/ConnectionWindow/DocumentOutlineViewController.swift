@@ -9,7 +9,24 @@ import ExtendedJSON
 final class OutlineNode {
     let name: String
     private(set) var value: Primitive?
-    private(set) var valueText: String
+    /// Rendered on demand, because the results-syntax preference can change
+    /// while rows are on screen. Cached against the syntax it was rendered
+    /// for: the outline asks for this every time a cell is drawn, and in
+    /// Extended JSON mode a container row renders its whole subtree, which is
+    /// not something to redo on every scroll tick.
+    var valueText: String {
+        if let literalText { return literalText }
+        guard let value else { return "" }
+        let syntax = Preferences.resultsSyntax
+        if let cachedValueText, cachedSyntax == syntax { return cachedValueText }
+        let text = Preferences.resultsValueText(for: value)
+        cachedValueText = text
+        cachedSyntax = syntax
+        return text
+    }
+    private let literalText: String?
+    private var cachedValueText: String?
+    private var cachedSyntax: Preferences.ResultsSyntax?
     private(set) var typeText: String
     let children: [OutlineNode]
     /// Key path from the root document ("a", "0", "b" …); empty on root rows
@@ -25,7 +42,7 @@ final class OutlineNode {
     ) {
         self.name = name
         self.value = value
-        self.valueText = value.map(BSONDisplay.valueString) ?? ""
+        self.literalText = nil
         self.typeText = value.map(BSONDisplay.typeName) ?? ""
         self.children = children
         self.path = path
@@ -36,7 +53,7 @@ final class OutlineNode {
     init(name: String, valueText: String, typeText: String) {
         self.name = name
         self.value = nil
-        self.valueText = valueText
+        self.literalText = valueText
         self.typeText = typeText
         self.children = []
         self.path = []
@@ -47,7 +64,7 @@ final class OutlineNode {
     /// In-place value patch after a successful server-side edit.
     func setValue(_ newValue: Primitive) {
         value = newValue
-        valueText = BSONDisplay.valueString(newValue)
+        cachedValueText = nil
         typeText = BSONDisplay.typeName(newValue)
     }
 
@@ -535,7 +552,8 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         // Prefill with a lossless, parseable representation of the value.
         let text =
             (try? ExtendedJSON.stringifyValue(
-                value, format: Preferences.documentFormat(pretty: false))) ?? node.valueText
+                value, format: Preferences.format(Preferences.inlineEditSyntax, pretty: false)))
+                ?? node.valueText
         endInlineEdit(commit: false)
         field.stringValue = text
         field.isEditable = true
@@ -613,7 +631,8 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         for (index, document) in documents.enumerated() {
             array[String(index)] = document
         }
-        guard let text = try? ExtendedJSON.stringify(array, format: Preferences.documentFormat(pretty: true))
+        guard let text = try? ExtendedJSON.stringify(
+            array, format: Preferences.format(Preferences.copySyntax, pretty: true))
         else { return }
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

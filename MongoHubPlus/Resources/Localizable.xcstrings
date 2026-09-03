@@ -1361,6 +1361,40 @@
         }
       }
     },
+    "Both syntaxes are always accepted when you type, whatever you choose here. Exported files are always Extended JSON.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unabhängig von dieser Auswahl werden bei der Eingabe immer beide Syntaxen akzeptiert. Exportierte Dateien sind immer Extended JSON."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quel que soit votre choix ici, les deux syntaxes sont toujours acceptées à la saisie. Les fichiers exportés sont toujours en JSON étendu."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここでの選択に関わらず、入力時はどちらの構文も常に受け付けられます。書き出したファイルは常に拡張 JSON です。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无论此处如何选择，输入时两种语法始终都接受。导出的文件始终为扩展 JSON。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無論此處如何選擇，輸入時兩種語法一律都接受。匯出的檔案一律為擴充 JSON。"
+          }
+        }
+      }
+    },
     "CSV (flattened, lossy)": {
       "localizations": {
         "de": {
@@ -1803,6 +1837,40 @@
         }
       }
     },
+    "Compact": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kompakt"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compact"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンパクト"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "精简"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "精簡"
+          }
+        }
+      }
+    },
     "Connect": {
       "localizations": {
         "de": {
@@ -2139,6 +2207,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "拷貝 URL"
+          }
+        }
+      }
+    },
+    "Copy:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopieren:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copie :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピー:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製:"
           }
         }
       }
@@ -2993,40 +3095,6 @@
         }
       }
     },
-    "Document Syntax:": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dokumentsyntax:"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Syntaxe des documents :"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ドキュメントの構文:"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "文档语法:"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "文件語法:"
-          }
-        }
-      }
-    },
     "Don't Save": {
       "localizations": {
         "de": {
@@ -3465,6 +3533,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "編輯值"
+          }
+        }
+      }
+    },
+    "Editing a Value:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wert bearbeiten:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modification d'une valeur :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "値の編集:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑值:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯值:"
           }
         }
       }
@@ -4693,74 +4795,6 @@
         }
       }
     },
-    "How documents are shown in the JSON editor, when editing a value in the results, and when you copy. Both are always accepted when you type, and exported files are always Extended JSON.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wie Dokumente im JSON-Editor, beim Bearbeiten eines Werts in den Ergebnissen und beim Kopieren dargestellt werden. Bei der Eingabe werden immer beide Syntaxen akzeptiert, und exportierte Dateien sind immer Extended JSON."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Affichage des documents dans l'éditeur JSON, lors de la modification d'une valeur dans les résultats et lors d'une copie. Les deux syntaxes sont toujours acceptées à la saisie, et les fichiers exportés sont toujours en JSON étendu."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JSON エディタ、結果での値の編集、コピー時にドキュメントを表示する方法です。入力時はどちらの構文も常に受け付けられ、書き出したファイルは常に拡張 JSON です。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "决定 JSON 编辑器、在结果中编辑值以及复制时如何显示文档。输入时两种语法始终都接受，导出的文件始终为扩展 JSON。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "決定 JSON 編輯器、在結果中編輯值以及複製時如何顯示文件。輸入時兩種語法一律都接受，匯出的檔案一律為擴充 JSON。"
-          }
-        }
-      }
-    },
-    "How this document is displayed. Both syntaxes are always accepted.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wie dieses Dokument dargestellt wird. Beide Syntaxen werden immer akzeptiert."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Affichage de ce document. Les deux syntaxes sont toujours acceptées."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このドキュメントの表示方法です。入力時はどちらの構文も常に受け付けられます。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此文档的显示方式。两种语法始终都接受。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此文件的顯示方式。兩種語法一律都接受。"
-          }
-        }
-      }
-    },
     "Import (File)": {
       "localizations": {
         "de": {
@@ -5233,6 +5267,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "欄位名稱無效"
+          }
+        }
+      }
+    },
+    "JSON Editor:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON-Editor:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éditeur JSON :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON エディタ:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON 编辑器:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JSON 編輯器:"
           }
         }
       }
@@ -7753,6 +7821,40 @@
         }
       }
     },
+    "Results:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ergebnisse:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Résultats :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結果:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结果:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結果:"
+          }
+        }
+      }
+    },
     "Returned": {
       "localizations": {
         "de": {
@@ -8973,6 +9075,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "字串:"
+          }
+        }
+      }
+    },
+    "Syntax": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syntax"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syntaxe"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "構文"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語法"
           }
         }
       }
