@@ -23,6 +23,10 @@ version from the heading, so it must match the tag exactly.
 - In the Add Connection sheet, the example connection string shown in an
   empty URI field now wraps onto the next line straight away, instead of
   being cut off until you clicked into the field and back out.
+- The connection cards are now centred as a group. They used to spread out
+  to the window's edges, which left a wide empty channel down the middle at
+  two columns, and they kept the spacing of the previous window size after
+  a resize.
 
 ## 4.0.2 — 2026-09-03
 

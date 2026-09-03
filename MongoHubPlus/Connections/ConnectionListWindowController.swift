@@ -359,7 +359,36 @@ extension ConnectionListWindowController: NSToolbarDelegate {
 
 // MARK: - Collection view plumbing
 
-extension ConnectionListWindowController: NSCollectionViewDataSource, NSCollectionViewDelegate {
+extension ConnectionListWindowController: NSCollectionViewDataSource, NSCollectionViewDelegate,
+    NSCollectionViewDelegateFlowLayout
+{
+    /// Centres the grid instead of letting the cards drift apart.
+    ///
+    /// AppKit's flow layout spreads a row's leftover width *between* its items
+    /// (iOS left-aligns instead), so at two columns the cards ended up pinned
+    /// to opposite edges with a canyon down the middle. Widening the side
+    /// insets to swallow the leftover leaves the row with no slack to spread,
+    /// which centres the block and keeps the cards their natural distance
+    /// apart at every window width.
+    func collectionView(
+        _ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> NSEdgeInsets {
+        guard let flow = collectionViewLayout as? NSCollectionViewFlowLayout else {
+            return NSEdgeInsets()
+        }
+        let base = flow.sectionInset
+        let itemWidth = flow.itemSize.width
+        let spacing = flow.minimumInteritemSpacing
+        let width = collectionView.bounds.width
+        let available = width - base.left - base.right
+        guard available >= itemWidth else { return base }
+        let columns = max(1, ((available + spacing) / (itemWidth + spacing)).rounded(.down))
+        let used = columns * itemWidth + (columns - 1) * spacing
+        let side = max(base.left, (width - used) / 2)
+        return NSEdgeInsets(top: base.top, left: side, bottom: base.bottom, right: side)
+    }
+
     func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
         visibleConnections.count
     }
@@ -422,6 +451,20 @@ protocol ConnectionCollectionViewMenuDelegate: AnyObject {
 
 final class ConnectionCollectionView: NSCollectionView {
     weak var menuDelegate: ConnectionCollectionViewMenuDelegate?
+
+    private var widthAtLastLayout: CGFloat = -1
+
+    /// Re-runs the layout when the view gets wider or narrower, so the
+    /// delegate's centring insets are recomputed for the new width. The
+    /// layout's own `shouldInvalidateLayout(forBoundsChange:)` is not called
+    /// for a resize, so without this the grid keeps the insets it was first
+    /// laid out with and the row spreads to fill whatever width it now has.
+    override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+        guard newSize.width != widthAtLastLayout else { return }
+        widthAtLastLayout = newSize.width
+        collectionViewLayout?.invalidateLayout()
+    }
 
     override func menu(for event: NSEvent) -> NSMenu? {
         let point = convert(event.locationInWindow, from: nil)
