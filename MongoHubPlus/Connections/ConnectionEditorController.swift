@@ -83,11 +83,17 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         replicaServersField.placeholderString = String(localized: "host1:port1,host2:port2…")
         shardedServersField.placeholderString = String(localized: "host1:port1,host2:port2…")
         srvHostField.placeholderString = String(localized: "cluster0.example.mongodb.net")
-        connectionStringField.placeholderString =
-            "mongodb+srv://user:password@cluster0.example.mongodb.net/db?retryWrites=true"
         connectionStringField.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         connectionStringField.lineBreakMode = .byCharWrapping
+        // The URI field is a wrapping multi-line field: `wraps` alone is not
+        // enough, a scrollable cell scrolls its placeholder on one clipped
+        // line instead of wrapping it (it only wrapped after an edit cycle
+        // had rebuilt the cell).
+        connectionStringField.usesSingleLineMode = false
+        connectionStringField.cell?.isScrollable = false
         connectionStringField.cell?.wraps = true
+        connectionStringField.placeholderString =
+            "mongodb+srv://user:password@cluster0.example.mongodb.net/db?retryWrites=true"
         connectionStringField.fillsRowWidth()
         userField.placeholderString = String(localized: "Username (optional)")
         passwordField.placeholderString = String(localized: "Password (optional)")

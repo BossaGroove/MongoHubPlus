@@ -20,6 +20,9 @@ version from the heading, so it must match the tag exactly.
   characters cut off after the text outgrows the field.
 - Long connection strings in the connection editor, and long queries in the
   Update and Remove tabs, behaved the same way and are fixed too.
+- In the Add Connection sheet, the example connection string shown in an
+  empty URI field now wraps onto the next line straight away, instead of
+  being cut off until you clicked into the field and back out.
 
 ## 4.0.2 — 2026-09-03
 
