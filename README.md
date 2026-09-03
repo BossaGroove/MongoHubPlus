@@ -96,6 +96,55 @@ macOS evolution brought features the original never had:
 - **System dark and light appearance** — with a follow-system default and an
   in-app override.
 
+## Writing queries
+
+Anywhere MongoHub Plus takes JSON — the query bar, Insert, Update, the
+aggregation builder, the document editor — you can write it two ways, and
+mix them freely.
+
+Official [Extended JSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/),
+exactly as Compass and `mongoexport` produce it:
+
+```json
+{"_id": {"$oid": "6a96d7fee80fb3561ff545e9"}, "price": {"$numberDecimal": "42.95"}}
+```
+
+Or mongosh shorthand, exactly as you would type it in the shell — unquoted
+keys and single quotes included:
+
+```javascript
+{ _id: ObjectId('6a96d7fee80fb3561ff545e9'), price: NumberDecimal('42.95') }
+```
+
+The shorthand covers every BSON type:
+
+| Shorthand | Type |
+|---|---|
+| `ObjectId('6a96…')` | ObjectId |
+| `ISODate('2026-01-01T00:00:00Z')`, `new Date(1767225600000)` | date |
+| `NumberInt(7)`, `NumberLong('9007199254740993')` | 32- and 64-bit integers |
+| `NumberDecimal('42.95')` | Decimal128 — exact, no float rounding |
+| `/^mongo/i` or `RegExp('^mongo', 'i')` | regular expression |
+| `BinData(0, 'SGVsbG8=')`, `UUID('…')` | binary, UUID |
+| `Timestamp(1699999999, 1)` | timestamp |
+| `Code('function () { … }')` | JavaScript |
+| `MinKey()`, `MaxKey()`, `NaN`, `Infinity` | the rest |
+
+So a filter can stay readable even with typed values:
+
+```javascript
+{ price: { $gt: NumberDecimal('20') }, published: { $lt: ISODate('2000-01-01T00:00:00Z') } }
+```
+
+**Typing a bare id looks it up.** Paste `6a96d7fee80fb3561ff545e9` into the
+query bar on its own and it becomes `{_id: ObjectId('6a96d7fee80fb3561ff545e9')}` —
+the shortcut from the original MongoHub, kept.
+
+**Exported files are always Extended JSON**, whichever style you type in.
+JSON-Lines exports are valid JSON that Compass, `mongoimport`, and every
+driver can read — the shorthand is a convenience for writing and reading in
+the app, never something we write into a file.
+
 ## Building from source
 
 ```bash
