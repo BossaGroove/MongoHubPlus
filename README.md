@@ -118,17 +118,20 @@ keys and single quotes included:
 
 The shorthand covers every BSON type:
 
-| Shorthand | Type |
-|---|---|
-| `ObjectId('6a96…')` | ObjectId |
-| `ISODate('2026-01-01T00:00:00Z')`, `new Date(1767225600000)` | date |
-| `NumberInt(7)`, `NumberLong('9007199254740993')` | 32- and 64-bit integers |
-| `NumberDecimal('42.95')` | Decimal128 — exact, no float rounding |
-| `/^mongo/i` or `RegExp('^mongo', 'i')` | regular expression |
-| `BinData(0, 'SGVsbG8=')`, `UUID('…')` | binary, UUID |
-| `Timestamp(1699999999, 1)` | timestamp |
-| `Code('function () { … }')` | JavaScript |
-| `MinKey()`, `MaxKey()`, `NaN`, `Infinity` | the rest |
+| Shorthand | Type | Same value in Extended JSON |
+|---|---|---|
+| `ObjectId('6a96…')` | ObjectId | `{"$oid":"6a96…"}` |
+| `ISODate('2026-01-01T00:00:00Z')`<br>`new Date(1767225600000)` | date | `{"$date":"2026-01-01T00:00:00Z"}` |
+| `NumberInt(7)` | 32-bit integer | `7` — no wrapper needed |
+| `NumberLong('9007199254740993')` | 64-bit integer | `{"$numberLong":"9007199254740993"}` |
+| `NumberDecimal('42.95')` | Decimal128 — exact, no float rounding | `{"$numberDecimal":"42.95"}` |
+| `/^mongo/i`<br>`RegExp('^mongo', 'i')` | regular expression | `{"$regularExpression":{"pattern":"^mongo","options":"i"}}` |
+| `BinData(0, 'SGVsbG8=')` | binary | `{"$binary":{"base64":"SGVsbG8=","subType":"00"}}` |
+| `UUID('123e4567-…')` | UUID | `{"$binary":{"base64":"Ej5FZ…","subType":"04"}}` |
+| `Timestamp(1699999999, 1)` | timestamp | `{"$timestamp":{"t":1699999999,"i":1}}` |
+| `Code('function () { … }')` | JavaScript | `{"$code":"function () { … }"}` |
+| `MinKey()` / `MaxKey()` | min / max key | `{"$minKey":1}` / `{"$maxKey":1}` |
+| `NaN` / `Infinity` | special doubles | `{"$numberDouble":"NaN"}` / `{"$numberDouble":"Infinity"}` |
 
 So a filter can stay readable even with typed values:
 
