@@ -498,8 +498,9 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
     }
 
     @objc private func doubleClickAction(_ sender: Any?) {
-        // Double-click on an editable Value cell edits in place; anywhere
-        // else opens the JSON editor window (both editors — owner request).
+        // Double-click on an editable Value cell edits in place; on the
+        // immutable top-level _id it copies the id; anywhere else opens the
+        // JSON editor window (both editors — owner request).
         let row = outlineView.clickedRow
         let column = outlineView.clickedColumn
         if row >= 0, column >= 0,
@@ -510,8 +511,35 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
             beginInlineEdit(row: row)
             return
         }
+        if row >= 0, let node = outlineView.item(atRow: row) as? OutlineNode,
+            node.path == ["_id"], let value = node.value, copyIDValue(value)
+        {
+            return
+        }
         guard let document = selectedRootNodes.first?.rootDocument else { return }
         delegate?.documentOutline(self, doubleClickedDocument: document)
+    }
+
+    /// The top-level `_id` can't be edited in place (it is immutable), so a
+    /// double-click there puts it on the clipboard instead — in the form the
+    /// Query or id box takes straight back (owner request 2026-09-15).
+    private func copyIDValue(_ value: Primitive) -> Bool {
+        let text: String
+        switch value {
+        case let objectId as ObjectId: text = objectId.hexString
+        case let string as String: text = string
+        default:
+            guard
+                let json = try? ExtendedJSON.stringifyValue(
+                    value, format: Preferences.format(Preferences.copySyntax, pretty: false))
+            else { return false }
+            text = json
+        }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(text, forType: .string)
+        setLabel(String(localized: "Copied \(text)"))
+        return true
     }
 
     // MARK: - In-place value editing (feature-spec 4.4)
