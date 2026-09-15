@@ -57,6 +57,7 @@ final class UpdatePaneController: NSViewController {
         upsertCheckbox.action = #selector(composeAction(_:))
         multiCheckbox.target = self
         multiCheckbox.action = #selector(composeAction(_:))
+        multiCheckbox.state = .on
 
         let updateButton = QueryPaneUI.runButton(
             title: String(localized: "Update"), target: self, action: #selector(updateAction(_:)))
