@@ -1,4 +1,5 @@
 import AppKit
+import ExtendedJSON
 import MongoService
 
 /// Everything a query sub-pane needs to know about its collection.
@@ -90,6 +91,41 @@ enum QueryPaneUI {
         button.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
         button.imagePosition = .imageLeading
         return button
+    }
+
+    /// ⌘Return has no AppKit binding, so the field editor reports it as
+    /// `noop:` — which is also what makes it beep. Every other unbound ⌘
+    /// combination arrives on that same selector, so the event itself has to
+    /// be matched: exactly ⌘, and Return or the keypad's Enter.
+    static let noopSelector = Selector(("noop:"))
+
+    static var isCommandReturn: Bool {
+        guard let event = NSApp.currentEvent,
+            event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command
+        else { return false }
+        return event.keyCode == 36 || event.keyCode == 76
+    }
+
+    /// ⌘Return in a criteria field: rewrite the shortcut forms into the
+    /// field itself — braces around a bare `key: value`, the bare-id form,
+    /// and 24-hex string values wrapped as `ObjectId(…)` (feature-spec 3.3,
+    /// extended-json.md §3/§3.1). Everything it does not promote survives
+    /// character for character. Returns true when the text changed.
+    ///
+    /// Input that does not parse is left alone: the run that follows reports
+    /// it the way it always has, rather than the field rewriting itself into
+    /// something the user did not type.
+    @discardableResult
+    static func expandIDShortcuts(in field: NSControl) -> Bool {
+        let raw = field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return false }
+        let expanded = QueryNormalizer.promotingObjectIds(
+            QueryNormalizer.normalizeCriteria(raw, emptyIsValid: false))
+        guard expanded != raw, (try? ExtendedJSON.parseDocument(expanded)) != nil else {
+            return false
+        }
+        field.stringValue = expanded
+        return true
     }
 
     static func alertSheet(in view: NSView?, title: String, message: String) {

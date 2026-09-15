@@ -334,6 +334,15 @@ extension UpdatePaneController: NSTextFieldDelegate {
             updateAction(nil)
             return true
         }
+        // ⌘Return expands the id shortcuts into the criteria field first
+        // (feature-spec 3.3), so they are visible before the update runs.
+        if commandSelector == QueryPaneUI.noopSelector, control === criteriaField,
+            QueryPaneUI.isCommandReturn
+        {
+            if QueryPaneUI.expandIDShortcuts(in: criteriaField) { composePreview() }
+            updateAction(nil)
+            return true
+        }
         return false
     }
 }

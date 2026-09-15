@@ -930,6 +930,15 @@ extension FindPaneController: NSComboBoxDataSource, NSComboBoxDelegate, NSTextFi
             runQuery(nil)
             return true
         }
+        // ⌘Return expands the id shortcuts into the box first, so the ids it
+        // promoted are visible before the results arrive (feature-spec 3.3).
+        if commandSelector == QueryPaneUI.noopSelector, control === criteriaCombo,
+            QueryPaneUI.isCommandReturn
+        {
+            if QueryPaneUI.expandIDShortcuts(in: criteriaCombo) { composePreview() }
+            runQuery(nil)
+            return true
+        }
         // Tab from the query box goes to Sort, not Fields (owner request —
         // matches the visual row order, not the automatic key loop).
         if commandSelector == #selector(NSResponder.insertTab(_:)), control === criteriaCombo {

@@ -154,6 +154,17 @@ extension RemovePaneController: NSTextFieldDelegate {
             removeAction(nil)
             return true
         }
+        // ⌘Return expands the id shortcuts into the criteria field first
+        // (feature-spec 3.3). An empty criteria expands to nothing, so ⌘'s
+        // other meaning here — skip the remove-all confirmation, which
+        // removeAction reads off the same event — is untouched.
+        if commandSelector == QueryPaneUI.noopSelector, control === criteriaField,
+            QueryPaneUI.isCommandReturn
+        {
+            if QueryPaneUI.expandIDShortcuts(in: criteriaField) { composePreview() }
+            removeAction(nil)
+            return true
+        }
         return false
     }
 }

@@ -9,6 +9,32 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.2.0 — unreleased
+
+### Added
+
+- **⌘Return in a query box expands id shortcuts before running.** Typing a
+  24-hex id has always worked for `_id`; now `user_id: '5f50a10dff1ce7314da050ca'`
+  and ⌘Return rewrites the box to
+  `{user_id: ObjectId('5f50a10dff1ce7314da050ca')}` and runs it, so ids match
+  instead of quietly comparing as strings. It reaches nested fields and
+  `$in` lists too, leaves the rest of what you typed exactly as you typed it,
+  and works in the Find, Update and Remove query boxes. Plain Return still
+  runs the query untouched.
+- **Take a query from Find straight to Update or Remove.** Two buttons next
+  to Run open the Update or Remove tab with the query already filled in —
+  prefilled only, so nothing runs until you say so.
+
+### Changed
+
+- **The Update tab's Multi checkbox now starts ticked**, so an update covers
+  every matching document rather than silently touching the first one.
+- **Double-clicking a document's `_id` copies it** instead of opening the
+  JSON editor, and the footer confirms what went to the clipboard. `_id`
+  can't be edited — MongoDB won't allow it — so the double-click now does
+  the thing that was always wanted there. The editor is still on the
+  right-click menu, and on the document's own row.
+
 ## 4.1.0 — 2026-09-03
 
 ### Added
