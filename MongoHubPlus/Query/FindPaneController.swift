@@ -3,6 +3,11 @@ import BSON
 import ExtendedJSON
 import MongoService
 
+/// Where a Find hand-off button sends the pane's current criteria.
+enum CriteriaHandoff {
+    case update, remove
+}
+
 /// The Find sub-tab (legacy MHQueryViewController's find pane): criteria
 /// history combo, sort/fields/skip/limit, live preview, results outline,
 /// pagination, per-document JSON editors.
@@ -27,6 +32,11 @@ final class FindPaneController: NSViewController {
     /// then belongs to the list, not to Run (owner request 2026-09-03).
     private var criteriaPopupIsVisible = false
     private var editorWindows: [Data: JSONEditorWindowController] = [:]
+
+    /// Set by QueryTabController: the Update…/Remove… buttons hand the
+    /// current criteria to the sibling pane and switch to it (owner request
+    /// 2026-09-15). Prefill only — running stays the user's call.
+    var onHandOffCriteria: ((CriteriaHandoff, String) -> Void)?
 
     init(context: QueryPaneContext) {
         self.context = context
@@ -85,10 +95,26 @@ final class FindPaneController: NSViewController {
         explainButton.keyEquivalentModifierMask = [.command, .shift]
         explainButton.toolTip = String(localized: "Explain (⇧⌘R)")
 
+        let updateHandoffButton = NSButton(
+            title: String(localized: "Update…"), target: self,
+            action: #selector(handOffToUpdate(_:)))
+        updateHandoffButton.bezelStyle = .rounded
+        updateHandoffButton.controlSize = .small
+        updateHandoffButton.toolTip = String(
+            localized: "Open the Update tab with this query (does not run it)")
+
+        let removeHandoffButton = NSButton(
+            title: String(localized: "Remove…"), target: self,
+            action: #selector(handOffToRemove(_:)))
+        removeHandoffButton.bezelStyle = .rounded
+        removeHandoffButton.controlSize = .small
+        removeHandoffButton.toolTip = String(
+            localized: "Open the Remove tab with this query (does not run it)")
+
         let row2 = NSStackView(views: [label(String(localized: "Query or id")), criteriaCombo, label(String(localized: "Sort")), sortField])
         let row3 = NSStackView(views: [
             label(String(localized: "Fields")), fieldsField, label(String(localized: "Skip")), skipField, label(String(localized: "Limit")), limitField,
-            explainButton, runButton,
+            explainButton, runButton, updateHandoffButton, removeHandoffButton,
         ])
         for row in [row2, row3] {
             row.orientation = .horizontal
@@ -223,6 +249,24 @@ final class FindPaneController: NSViewController {
         if let criteria { criteriaCombo.stringValue = criteria }
         if let fields { fieldsField.stringValue = fields }
         if let sort { sortField.stringValue = sort }
+    }
+
+    // MARK: - Hand off to Update / Remove (owner request 2026-09-15)
+
+    /// The criteria as the panes will read it: normalized, so the id
+    /// shortcuts resolve to the document the destination pane will act on.
+    /// Blank stays blank — an empty field reads as "unset", not "match all".
+    private var handOffCriteria: String {
+        criteriaCombo.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "" : normalizedCriteria
+    }
+
+    @objc private func handOffToUpdate(_ sender: Any?) {
+        onHandOffCriteria?(.update, handOffCriteria)
+    }
+
+    @objc private func handOffToRemove(_ sender: Any?) {
+        onHandOffCriteria?(.remove, handOffCriteria)
     }
 
     func debugExportResults(to url: URL) {

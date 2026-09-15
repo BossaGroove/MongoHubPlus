@@ -80,6 +80,18 @@ final class QueryTabController: TabItemViewController {
         segmentedControl.segmentStyle = .automatic
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
 
+        findPane.onHandOffCriteria = { [weak self] destination, criteria in
+            guard let self else { return }
+            switch destination {
+            case .update:
+                self.updatePane.prefillCriteria(criteria)
+                self.select(.update)
+            case .remove:
+                self.removePane.prefillCriteria(criteria)
+                self.select(.remove)
+            }
+        }
+
         subTabs.tabViewType = .noTabsNoBorder
         subTabs.translatesAutoresizingMaskIntoConstraints = false
         for segment in Segment.allCases {
@@ -138,12 +150,16 @@ final class QueryTabController: TabItemViewController {
         focusSelectedPane()
     }
 
+    private func select(_ segment: Segment) {
+        segmentedControl.selectedSegment = segment.rawValue
+        segmentChanged(nil)
+    }
+
     /// Programmatic segment selection (UI-verification hooks).
     func selectSegment(named name: String) {
         guard let segment = Segment.allCases.first(where: { $0.label.lowercased() == name.lowercased() })
         else { return }
-        segmentedControl.selectedSegment = segment.rawValue
-        segmentChanged(nil)
+        select(segment)
     }
 
     /// Kept for the -MAOpenQuery verification hook.

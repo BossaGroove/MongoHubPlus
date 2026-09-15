@@ -69,6 +69,13 @@ final class RemovePaneController: NSViewController {
         composePreview()
     }
 
+    /// Prefill from the Find pane's Remove… button (owner request
+    /// 2026-09-15): criteria only, never run.
+    func prefillCriteria(_ criteria: String) {
+        criteriaField.stringValue = criteria
+        if isViewLoaded { composePreview() }
+    }
+
     private var normalizedCriteria: String {
         QueryNormalizer.normalizeCriteria(criteriaField.stringValue, emptyIsValid: false)
     }

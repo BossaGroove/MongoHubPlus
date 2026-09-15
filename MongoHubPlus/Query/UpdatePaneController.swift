@@ -227,6 +227,13 @@ final class UpdatePaneController: NSViewController {
 
     // MARK: - Compose / run
 
+    /// Prefill from the Find pane's Update… button (owner request
+    /// 2026-09-15): criteria only, never run.
+    func prefillCriteria(_ criteria: String) {
+        criteriaField.stringValue = criteria
+        if isViewLoaded { composePreview() }
+    }
+
     private var normalizedCriteria: String {
         QueryNormalizer.normalizeCriteria(criteriaField.stringValue, emptyIsValid: false)
     }
