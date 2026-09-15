@@ -9,7 +9,7 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
-## 4.2.0 — unreleased
+## 4.2.0 — 2026-09-15
 
 ### Added
 
