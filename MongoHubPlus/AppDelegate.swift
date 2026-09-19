@@ -274,10 +274,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Edit ▸ Find — the standard text-finder items, targetless so they run
     /// down the responder chain to whichever text view is focused: the JSON
-    /// editor window and the query JSON boxes opt in. Same five items, tags
-    /// and shortcuts the legacy menu carried (legacy MHMainMenu.xib), ⌘E
-    /// included — it shadows Connection ▸ Edit Connection only while a text
-    /// view can actually use it, exactly as it did there.
+    /// editor window and the query JSON boxes opt in. Same five items and
+    /// tags the legacy menu carried (legacy MHMainMenu.xib).
+    ///
+    /// "Use Selection for Find" keeps its place but not legacy's ⌘E (owner
+    /// decision 2026-09-19): legacy bound the same key to Connection ▸ Edit
+    /// Connection, so ⌘E meant one thing or the other depending on what had
+    /// focus, and the find half is a silent action — it loads the selection
+    /// into the search string and shows nothing until the next ⌘G. ⌘E now
+    /// belongs to Edit Connection alone; the item still works from the menu.
     private func findMenuItem() -> NSMenuItem {
         // Keyed rather than titled "Find" so it does not share a translation
         // with the Find *query tab*, which several languages render as "query".
@@ -296,7 +301,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         add(String(localized: "Find…"), .showFindPanel, keyEquivalent: "f")
         add(String(localized: "Find Next"), .next, keyEquivalent: "g")
         add(String(localized: "Find Previous"), .previous, keyEquivalent: "G")
-        add(String(localized: "Use Selection for Find"), .setFindString, keyEquivalent: "e")
+        add(String(localized: "Use Selection for Find"), .setFindString, keyEquivalent: "")
         menu.addItem(
             withTitle: String(localized: "Jump to Selection"),
             action: #selector(NSResponder.centerSelectionInVisibleArea(_:)), keyEquivalent: "j")

@@ -14,8 +14,8 @@ version from the heading, so it must match the tag exactly.
 ### Added
 
 - **⌘F searches the document in the JSON editor.** Find… (⌘F), Find Next
-  (⌘G), Find Previous (⇧⌘G), Use Selection for Find (⌘E) and Jump to
-  Selection (⌘J) now live under Edit ▸ Find, so a long document — a big
+  (⌘G), Find Previous (⇧⌘G), Use Selection for Find and Jump to Selection
+  (⌘J) now live under Edit ▸ Find, so a long document — a big
   `snapshot` blob, a description full of HTML — no longer has to be read by
   scrolling. Matches highlight as you type, ⌘G and ⇧⌘G step through them
   without having to click out of the search box first, Esc closes the search
