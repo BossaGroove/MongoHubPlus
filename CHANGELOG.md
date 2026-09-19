@@ -9,6 +9,16 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.4.0 — unreleased
+
+### Added
+
+- **The Index tab shows how big each index is.** A Size column, in the units
+  you would expect — `842 B`, `160 KB`, `1.5 MB` — so the indexes worth
+  questioning stand out. Sizes come from the collection's stats; where your
+  user cannot read those, the column stays empty and the footer says so,
+  the same way index usage already does.
+
 ## 4.3.0 — 2026-09-20
 
 ### Added

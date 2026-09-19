@@ -14,7 +14,15 @@ final class IndexPaneController: NSViewController, DocumentOutlineDelegate {
     private let outline = DocumentOutlineViewController(
         options: .init(
             showsFooter: true, showsRemoveButton: false, showsPagination: false,
-            autosaveName: "index-outline"))
+            extraColumn: .init(identifier: "size", title: String(localized: "Size"), width: 90),
+            // Bumped with the Size column: an autosaved layout only knows the
+            // columns it was saved with, so the old name keeps the new column
+            // hidden for anyone who has used this pane before.
+            autosaveName: "index-outline-2"))
+    /// Index name → bytes on disk, from `collStats.indexSizes`; empty when the
+    /// user cannot read collStats, which is the same privilege story as
+    /// $indexStats and is reported the same way.
+    private var indexSizes: [String: Int] = [:]
     private var indexEditor: IndexEditorController?
 
     init(context: QueryPaneContext) {
@@ -55,6 +63,12 @@ final class IndexPaneController: NSViewController, DocumentOutlineDelegate {
         buttonRow.translatesAutoresizingMaskIntoConstraints = false
 
         outline.delegate = self
+        outline.extraColumnText = { [weak self] document in
+            guard let self, let name = document["name"] as? String,
+                let bytes = self.indexSizes[name]
+            else { return nil }
+            return ByteSize.string(bytes)
+        }
         let outlineView = outline.view
         outlineView.translatesAutoresizingMaskIntoConstraints = false
         addChild(outline)
@@ -83,6 +97,26 @@ final class IndexPaneController: NSViewController, DocumentOutlineDelegate {
                 command["listIndexes"] = context.collection
                 var indexes = try await session.collectCursor(
                     command: command, onDatabase: context.database)
+
+                // Sizes come from collStats rather than listIndexes, which
+                // does not carry them. Unreadable for the same reason
+                // $indexStats can be (privileges) — the column just stays
+                // empty then, and the footer says why.
+                var sizes: [String: Int] = [:]
+                var sizesProblem: String?
+                do {
+                    let stats = try await session.collectionStats(
+                        database: self.context.database, collection: self.context.collection)
+                    if let sizeDocument = stats["indexSizes"] as? Document {
+                        for pair in sizeDocument.pairs {
+                            guard let bytes = Self.intValue(pair.value) else { continue }
+                            sizes[pair.key] = bytes
+                        }
+                    }
+                } catch {
+                    sizesProblem = String(localized: "sizes unavailable")
+                }
+                self.indexSizes = sizes
 
                 // Merge $indexStats usage (ops count + counting-since date)
                 // into each index; degrade gracefully when unavailable
@@ -130,6 +164,9 @@ final class IndexPaneController: NSViewController, DocumentOutlineDelegate {
                     }
                 } catch {
                     usageLabel = String(localized: "Index usage unavailable: \(String(describing: error))")
+                }
+                if let sizesProblem {
+                    usageLabel = "\(usageLabel) — \(sizesProblem)"
                 }
                 self.spinner.stopAnimation(nil)
                 self.outline.display(documents: indexes, label: usageLabel)

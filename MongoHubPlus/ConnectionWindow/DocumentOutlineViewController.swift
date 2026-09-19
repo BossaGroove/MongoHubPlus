@@ -157,8 +157,23 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         var showsFooter = true
         var showsRemoveButton = true
         var showsPagination = true
+        /// An extra right-hand column, for facts about a whole document that
+        /// are not fields of it — the Index pane's size comes from collStats,
+        /// not from the index. Its text is supplied by `extraColumnText`.
+        var extraColumn: ExtraColumn?
         var autosaveName: String
     }
+
+    struct ExtraColumn {
+        var identifier: String
+        var title: String
+        var width: Double
+    }
+
+    /// Fills the extra column for a top-level row, given that row's document.
+    /// Child rows leave it blank: the value describes the document, not a
+    /// field inside it.
+    var extraColumnText: ((Document) -> String?)?
 
     weak var delegate: DocumentOutlineDelegate?
 
@@ -201,10 +216,14 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         let root = NSView()
 
         // Outline
-        for (identifier, title, width) in [
+        var columnSpecs: [(String, String, Double)] = [
             ("name", String(localized: "Name"), 180.0), ("value", String(localized: "Value"), 300.0),
             ("type", String(localized: "Type"), 110.0),
-        ] {
+        ]
+        if let extra = options.extraColumn {
+            columnSpecs.append((extra.identifier, extra.title, extra.width))
+        }
+        for (identifier, title, width) in columnSpecs {
             let column = NSTableColumn(identifier: .init(identifier))
             column.title = title
             column.width = width
@@ -842,6 +861,8 @@ extension DocumentOutlineViewController: NSOutlineViewDataSource, NSOutlineViewD
         switch identifier.rawValue {
         case "name": text = node.name
         case "value": text = node.valueText
+        case options.extraColumn?.identifier:
+            text = node.rootDocument.flatMap { extraColumnText?($0) } ?? ""
         default: text = node.typeText
         }
 
