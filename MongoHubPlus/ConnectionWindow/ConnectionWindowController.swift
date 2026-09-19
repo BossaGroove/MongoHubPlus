@@ -36,6 +36,7 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
     private let sidebarOutline = NSOutlineView()
     let tabHost = TabHostViewController()
     private var statusTab: StatusTabController?
+    private var collectionsTab: CollectionsTabController?
     private var activityTab: ActivityMonitorTabController?
     private var queryTabs: [String: QueryTabController] = [:]
 
@@ -211,6 +212,7 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         static let serverStatus = NSToolbarItem.Identifier("serverStatus")
         static let databaseStats = NSToolbarItem.Identifier("databaseStats")
         static let collectionStats = NSToolbarItem.Identifier("collectionStats")
+        static let collections = NSToolbarItem.Identifier("collections")
         static let query = NSToolbarItem.Identifier("query")
         static let importFile = NSToolbarItem.Identifier("importFile")
         static let exportFile = NSToolbarItem.Identifier("exportFile")
@@ -587,6 +589,23 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         showServerStatusTab()
     }
 
+    @objc func showCollectionsAction(_ sender: Any?) {
+        guard let database = selectedDatabaseNode else { return }
+        let tab = ensureCollectionsTab()
+        tab.show(database: database.name)
+        tabHost.select(tab: tab)
+    }
+
+    private func ensureCollectionsTab() -> CollectionsTabController {
+        if let collectionsTab { return collectionsTab }
+        let tab = CollectionsTabController(session: sessionProvider) { [weak self] db, name in
+            self?.openQueryTab(for: CollectionNode(database: db, name: name))
+        }
+        collectionsTab = tab
+        tabHost.addTab(tab)
+        return tab
+    }
+
     @objc func showDatabaseStatsAction(_ sender: Any?) {
         guard let database = selectedDatabaseNode else { return }
         let tab = ensureStatusTab()
@@ -849,6 +868,9 @@ extension ConnectionWindowController: NSMenuDelegate {
             add(String(localized: "New Collection…"), #selector(createCollectionAction(_:)))
         } else if let database = selectedDatabaseNode {
             add(String(localized: "\(database.name) Stats"), #selector(showDatabaseStatsAction(_:)))
+            add(
+                String(localized: "\(database.name) Collections"),
+                #selector(showCollectionsAction(_:)))
             add(String(localized: "Drop \(database.name)…"), #selector(dropDatabaseAction(_:)))
             menu.addItem(.separator())
             add(String(localized: "New Database…"), #selector(createDatabaseAction(_:)))
@@ -865,6 +887,8 @@ extension ConnectionWindowController {
     private func tabClosed(_ tab: TabItemViewController) {
         if tab === statusTab {
             statusTab = nil
+        } else if tab === collectionsTab {
+            collectionsTab = nil
         } else if tab === activityTab {
             activityTab = nil
         } else if let key = queryTabs.first(where: { $0.value === tab })?.key {
@@ -968,7 +992,8 @@ extension ConnectionWindowController: NSOutlineViewDataSource, NSOutlineViewDele
 extension ConnectionWindowController: NSToolbarDelegate, NSToolbarItemValidation {
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
         [
-            ToolbarID.serverStatus, ToolbarID.databaseStats, ToolbarID.collectionStats,
+            ToolbarID.serverStatus, ToolbarID.databaseStats, ToolbarID.collections,
+            ToolbarID.collectionStats,
             ToolbarID.query, ToolbarID.activityMonitor, .flexibleSpace,
             ToolbarID.exportFile, ToolbarID.importFile,
         ]
@@ -993,6 +1018,11 @@ extension ConnectionWindowController: NSToolbarDelegate, NSToolbarItemValidation
             item.image = NSImage(
                 systemSymbolName: "cylinder.split.1x2", accessibilityDescription: nil)
             item.action = #selector(showDatabaseStatsAction(_:))
+        case ToolbarID.collections:
+            item.label = String(localized: "Collections")
+            item.image = NSImage(
+                systemSymbolName: "list.bullet.rectangle", accessibilityDescription: nil)
+            item.action = #selector(showCollectionsAction(_:))
         case ToolbarID.collectionStats:
             item.label = String(localized: "Collection Stats")
             item.image = NSImage(systemSymbolName: "tablecells", accessibilityDescription: nil)
@@ -1029,7 +1059,7 @@ extension ConnectionWindowController: NSToolbarDelegate, NSToolbarItemValidation
         switch item.itemIdentifier {
         case ToolbarID.serverStatus:
             return true
-        case ToolbarID.databaseStats:
+        case ToolbarID.databaseStats, ToolbarID.collections:
             return selectedDatabaseNode != nil
         case ToolbarID.collectionStats, ToolbarID.query,
             ToolbarID.importFile, ToolbarID.exportFile:

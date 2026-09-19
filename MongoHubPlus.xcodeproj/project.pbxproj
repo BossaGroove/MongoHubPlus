@@ -44,6 +44,7 @@
 		B61F3BB7141B33827BC5D406 /* UpdatePreviewRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F8FBD8BA014DB63F78C8DA /* UpdatePreviewRenderer.swift */; };
 		BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */; };
 		D5729E21AA3979AF12EB5146 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 524016CC5DC5617670159682 /* Sparkle */; };
+		E5DA901CD9879202A870C0E0 /* CollectionsTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D63E2C1DE8A9DE81104837C /* CollectionsTabController.swift */; };
 		F26F78F7987802EC71EC24A9 /* IndexPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */; };
 		F68562152A9ECCD504D71CE8 /* ByteSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB2D8E529F39C0ED2DBF32F /* ByteSize.swift */; };
 		FFF3552BEF555E19947BE72F /* QueryHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2D89C40946568C57F7FE0C /* QueryHistoryStore.swift */; };
@@ -74,6 +75,7 @@
 		78B965F63C7B405D32BAF4E0 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		7A47B80AA85030BBF02FD4C2 /* ExtendedJSON */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ExtendedJSON; path = Packages/ExtendedJSON; sourceTree = SOURCE_ROOT; };
 		7C2D89C40946568C57F7FE0C /* QueryHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryHistoryStore.swift; sourceTree = "<group>"; };
+		8D63E2C1DE8A9DE81104837C /* CollectionsTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionsTabController.swift; sourceTree = "<group>"; };
 		8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTabController.swift; sourceTree = "<group>"; };
 		8F96695CC0A3DD24B07EB7B8 /* MongoService */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MongoService; path = Packages/MongoService; sourceTree = SOURCE_ROOT; };
 		91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindow.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */,
+				8D63E2C1DE8A9DE81104837C /* CollectionsTabController.swift */,
 				E14E738159542322FDB225F1 /* ConnectionWindowController.swift */,
 				27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */,
 				8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */,
@@ -370,6 +373,7 @@
 				0EDA8DD6A6CCC6703D1A8B71 /* AutoLayout.swift in Sources */,
 				F68562152A9ECCD504D71CE8 /* ByteSize.swift in Sources */,
 				6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */,
+				E5DA901CD9879202A870C0E0 /* CollectionsTabController.swift in Sources */,
 				77ECDF78EA2EA931A9F3A668 /* ConnectionEditorController.swift in Sources */,
 				74D4EB111571ECFE0FC11C8C /* ConnectionListWindowController.swift in Sources */,
 				6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */,

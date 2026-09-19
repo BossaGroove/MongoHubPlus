@@ -13,6 +13,13 @@ version from the heading, so it must match the tag exactly.
 
 ### Added
 
+- **A Collections table for a database.** Select a database and the new
+  Collections toolbar button lists every collection in it with storage size,
+  data size, documents, average document size, index count and total index
+  size — so the collection responsible for a database's size is obvious at a
+  glance, which the totals in Database Stats cannot tell you. Click a column
+  header to sort, double-click a row to open that collection's query tab.
+  Database Stats and Collection Stats are unchanged.
 - **The Index tab shows how big each index is.** A Size column, in the units
   you would expect — `842 B`, `160 KB`, `1.5 MB` — so the indexes worth
   questioning stand out. Sizes come from the collection's stats; where your
