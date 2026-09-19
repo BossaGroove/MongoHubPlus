@@ -218,6 +218,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         editMenu.addItem(withTitle: String(localized: "Copy"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
         editMenu.addItem(withTitle: String(localized: "Paste"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
         editMenu.addItem(withTitle: String(localized: "Select All"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editMenu.addItem(.separator())
+        editMenu.addItem(findMenuItem())
 
         // Connection (legacy menu, legacy-architecture.md §4)
         let connectionMenu = submenu("Connection")
@@ -268,6 +270,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             action: #selector(openRepository(_:)), keyEquivalent: "")
 
         return mainMenu
+    }
+
+    /// Edit ▸ Find — the standard text-finder items, targetless so they run
+    /// down the responder chain to whichever text view is focused: the JSON
+    /// editor window and the query JSON boxes opt in. Same five items, tags
+    /// and shortcuts the legacy menu carried (legacy MHMainMenu.xib), ⌘E
+    /// included — it shadows Connection ▸ Edit Connection only while a text
+    /// view can actually use it, exactly as it did there.
+    private func findMenuItem() -> NSMenuItem {
+        // Keyed rather than titled "Find" so it does not share a translation
+        // with the Find *query tab*, which several languages render as "query".
+        let item = NSMenuItem(
+            title: String(localized: "menu.edit.find", defaultValue: "Find"), action: nil,
+            keyEquivalent: "")
+        let menu = NSMenu(title: item.title)
+
+        func add(_ title: String, _ action: NSFindPanelAction, keyEquivalent: String) {
+            let entry = menu.addItem(
+                withTitle: title, action: #selector(NSTextView.performFindPanelAction(_:)),
+                keyEquivalent: keyEquivalent)
+            entry.tag = Int(action.rawValue)
+        }
+
+        add(String(localized: "Find…"), .showFindPanel, keyEquivalent: "f")
+        add(String(localized: "Find Next"), .next, keyEquivalent: "g")
+        add(String(localized: "Find Previous"), .previous, keyEquivalent: "G")
+        add(String(localized: "Use Selection for Find"), .setFindString, keyEquivalent: "e")
+        menu.addItem(
+            withTitle: String(localized: "Jump to Selection"),
+            action: #selector(NSResponder.centerSelectionInVisibleArea(_:)), keyEquivalent: "j")
+
+        item.submenu = menu
+        return item
     }
 
     @objc func openPreferences(_ sender: Any?) {

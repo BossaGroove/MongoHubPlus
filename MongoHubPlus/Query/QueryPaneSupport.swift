@@ -73,7 +73,7 @@ enum QueryPaneUI {
 
     /// Syntax-colored JSON editor area (legacy black theme).
     static func jsonTextView(highlighter: JSONHighlighter) -> (NSScrollView, NSTextView) {
-        let scrollView = NSScrollView()
+        let scrollView = FindBarScrollView()
         scrollView.hasVerticalScroller = true
         scrollView.borderType = .bezelBorder
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -81,6 +81,10 @@ enum QueryPaneUI {
         textView.autoresizingMask = [.width]
         textView.allowsUndo = true
         textView.textContainerInset = NSSize(width: 4, height: 4)
+        // ⌘F here too — the legacy query boxes all carried the find panel,
+        // and a half-live Edit ▸ Find menu would be worse than none.
+        textView.usesFindBar = true
+        textView.isIncrementalSearchingEnabled = true
         scrollView.documentView = textView
         highlighter.apply(to: textView)
         return (scrollView, textView)

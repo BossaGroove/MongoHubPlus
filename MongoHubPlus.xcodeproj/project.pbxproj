@@ -11,6 +11,7 @@
 		0EDA8DD6A6CCC6703D1A8B71 /* AutoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B2A3E0095B04976E20D2FC /* AutoLayout.swift */; };
 		102E42125A45D2EF89F1881A /* JSONEditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */; };
 		1672D40614A151571F1C46CD /* StatusTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */; };
+		1BAEA7DEA72F90012EF383A5 /* FindBarScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2330074180538B933B57B552 /* FindBarScrollView.swift */; };
 		1DB765C04093B69694C911A8 /* MongoService in Frameworks */ = {isa = PBXBuildFile; productRef = 241A7459C1F7C5615018EE67 /* MongoService */; };
 		23B562AA6EC6564E0893A7A7 /* SSHTunnel in Frameworks */ = {isa = PBXBuildFile; productRef = 8E670A7D38F7DE7824B5358C /* SSHTunnel */; };
 		35817954DD35DAF3AF37D21F /* ActivityMonitorTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */; };
@@ -55,6 +56,7 @@
 		0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionListWindowController.swift; sourceTree = "<group>"; };
 		14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertPaneController.swift; sourceTree = "<group>"; };
+		2330074180538B933B57B552 /* FindBarScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindBarScrollView.swift; sourceTree = "<group>"; };
 		26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHost.swift; sourceTree = "<group>"; };
 		27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentOutlineViewController.swift; sourceTree = "<group>"; };
 		2CD12AFD5D3EEBCFC05E9851 /* MongoHubPlus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MongoHubPlus.entitlements; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 			children = (
 				E8B2A3E0095B04976E20D2FC /* AutoLayout.swift */,
 				4F283322B6230E66016034C0 /* Changelog.swift */,
+				2330074180538B933B57B552 /* FindBarScrollView.swift */,
 				78B965F63C7B405D32BAF4E0 /* Keychain.swift */,
 				91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */,
 				45C4BDB065238D92127A7108 /* Preferences.swift */,
@@ -366,6 +369,7 @@
 				3673B947038EB1862DB286C6 /* ConnectionWindowController.swift in Sources */,
 				B0388B745616BEC4D3717E0C /* DocumentOutlineViewController.swift in Sources */,
 				5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */,
+				1BAEA7DEA72F90012EF383A5 /* FindBarScrollView.swift in Sources */,
 				9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */,
 				8EF2CAC7A518D3CC331D7FEC /* ImportExport.swift in Sources */,
 				F26F78F7987802EC71EC24A9 /* IndexPaneController.swift in Sources */,

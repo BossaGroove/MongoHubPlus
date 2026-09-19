@@ -9,6 +9,19 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.3.0 — unreleased
+
+### Added
+
+- **⌘F searches the document in the JSON editor.** Find… (⌘F), Find Next
+  (⌘G), Find Previous (⇧⌘G), Use Selection for Find (⌘E) and Jump to
+  Selection (⌘J) now live under Edit ▸ Find, so a long document — a big
+  `snapshot` blob, a description full of HTML — no longer has to be read by
+  scrolling. Matches highlight as you type, ⌘G and ⇧⌘G step through them
+  without having to click out of the search box first, Esc closes the search
+  bar without closing the window, and the same search works in the Insert
+  and Aggregation JSON boxes.
+
 ## 4.2.0 — 2026-09-15
 
 ### Added

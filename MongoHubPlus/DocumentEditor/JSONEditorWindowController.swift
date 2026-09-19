@@ -99,7 +99,7 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
         topBar.spacing = 8
         topBar.translatesAutoresizingMaskIntoConstraints = false
 
-        let scrollView = NSScrollView()
+        let scrollView = FindBarScrollView()
         scrollView.hasVerticalScroller = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         textView = NSTextView()
@@ -107,6 +107,13 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
         textView.allowsUndo = true
         textView.delegate = self
         textView.textContainerInset = NSSize(width: 4, height: 6)
+        // ⌘F searches the document (feature-spec 4.8). Legacy opened the
+        // floating find panel; the inline bar is the current system idiom and
+        // does not sit on top of the text it is searching. `usesFindBar` and
+        // `usesFindPanel` are the two settings of one switch — setting either
+        // clears the other — so the bar is all there is to turn on.
+        textView.usesFindBar = true
+        textView.isIncrementalSearchingEnabled = true
         scrollView.documentView = textView
 
         content.addSubview(topBar)
@@ -195,14 +202,27 @@ final class JSONEditorWindowController: NSWindowController, NSWindowDelegate, NS
 
     /// Esc closes the window even while typing (macOS would otherwise show
     /// the text-completion menu). The unsaved-changes prompt still applies.
+    /// An open find bar takes the Esc first — there it means "done searching",
+    /// not "throw the window away".
     func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if commandSelector == #selector(NSResponder.cancelOperation(_:))
             || commandSelector == #selector(NSStandardKeyBindingResponding.complete(_:))
         {
+            if hideFindBar() { return true }
             window?.performClose(nil)
             return true
         }
         return false
+    }
+
+    /// Closes the find bar the way its own Done button does. Returns whether
+    /// there was one open — the caller decides what Esc means otherwise.
+    private func hideFindBar() -> Bool {
+        guard textView.enclosingScrollView?.isFindBarVisible == true else { return false }
+        let hide = NSMenuItem()
+        hide.tag = NSTextFinder.Action.hideFindInterface.rawValue
+        textView.performTextFinderAction(hide)
+        return true
     }
 
     // MARK: - Save (replaceOne by _id, upsert — legacy `save` semantics)
