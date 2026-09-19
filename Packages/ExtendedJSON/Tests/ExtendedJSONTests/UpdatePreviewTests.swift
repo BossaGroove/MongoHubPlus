@@ -180,6 +180,38 @@ struct UpdatePreviewTests {
         #expect(old as? String == "JP")
     }
 
+    // MARK: - Operand normalization
+
+    /// An update operand is not a query. The "type an id" shortcut turning a
+    /// bare word into `{_id: "word"}` is right for a criteria box and very
+    /// wrong here: it made `$set: name` mean "rewrite every matched
+    /// document's _id", which is what the Update pane used to build.
+    @Test func aBareWordIsNotAnIdShortcutInAnOperand() throws {
+        #expect(QueryNormalizer.normalizeOperand("name") == "name")
+        #expect(throws: (any Error).self) {
+            _ = try ExtendedJSON.parseDocument(QueryNormalizer.normalizeOperand("name"))
+        }
+        // …while the criteria box keeps the shortcut it is meant to have.
+        #expect(QueryNormalizer.normalizeCriteria("name") == "{_id: \"name\"}")
+    }
+
+    @Test func anOperandKeepsTheOuterBraceConvenience() throws {
+        #expect(QueryNormalizer.normalizeOperand("currency: 'HKD'") == "{currency: 'HKD'}")
+        #expect(QueryNormalizer.normalizeOperand("{currency: 'HKD'}") == "{currency: 'HKD'}")
+        #expect(QueryNormalizer.normalizeOperand("   ") == "{}")
+        let parsed = try ExtendedJSON.parseDocument(
+            QueryNormalizer.normalizeOperand("currency: 'HKD'"))
+        #expect(parsed["currency"] as? String == "HKD")
+    }
+
+    /// A 24-hex string is an id in a query box; in an operand it is just a
+    /// string value, and must not be wrapped as `{_id: ObjectId(…)}`.
+    @Test func anOperandDoesNotPromoteAHexStringToAnIdQuery() {
+        let hex = "5f50a10dff1ce7314da050ca"
+        #expect(QueryNormalizer.normalizeOperand(hex) == hex)
+        #expect(QueryNormalizer.normalizeCriteria(hex).contains("_id"))
+    }
+
     // MARK: - The unhappy paths that clear the preview
 
     @Test func aFieldWithoutAnOperatorIsRejected() {

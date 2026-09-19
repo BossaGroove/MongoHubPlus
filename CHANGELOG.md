@@ -45,6 +45,13 @@ version from the heading, so it must match the tag exactly.
 
 ### Fixed
 
+- **A stray word in an update operator box no longer becomes an `_id`
+  rewrite.** The operator boxes were being read the way the query box is,
+  where a bare word is shorthand for "the document with this id" — so
+  typing `name` into Set quietly built `{$set: {_id: "name"}}`, an update
+  that rewrites the `_id` of every matching document. Operator boxes now
+  reject anything that is not a document, and say so. The shorthand still
+  works where it belongs, in the query box.
 - **The Aggregation tab's Options box no longer overlaps the stage buttons.**
   It is taller than its label, and was being centred on it, so its top edge
   rode up over the +/− buttons beneath the stage list.

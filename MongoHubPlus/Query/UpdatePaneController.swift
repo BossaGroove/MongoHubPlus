@@ -370,7 +370,7 @@ final class UpdatePaneController: NSViewController {
         var update = Document()
         for row in rows {
             guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
-            let text = QueryNormalizer.normalizeCriteria(row.field.stringValue, emptyIsValid: false)
+            let text = QueryNormalizer.normalizeOperand(row.field.stringValue)
             do {
                 update[key] = try ExtendedJSON.parseDocument(text)
             } catch {
@@ -533,7 +533,7 @@ final class UpdatePaneController: NSViewController {
         var update = Document()
         for row in rows {
             guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
-            let text = QueryNormalizer.normalizeCriteria(row.field.stringValue, emptyIsValid: false)
+            let text = QueryNormalizer.normalizeOperand(row.field.stringValue)
             do {
                 update[key] = try ExtendedJSON.parseDocument(text)
             } catch {
