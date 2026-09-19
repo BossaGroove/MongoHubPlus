@@ -35,7 +35,7 @@ final class RemovePaneController: NSViewController {
         removeButton.toolTip = String(localized: "Use ⌘ to skip the confirmation panel")
 
         let row = NSStackView(views: [
-            NSTextField(labelWithString: String(localized: "Query:")), criteriaField, removeButton,
+            NSTextField(labelWithString: String(localized: "Query")), criteriaField, removeButton,
         ])
         row.orientation = .horizontal
         row.spacing = 6
