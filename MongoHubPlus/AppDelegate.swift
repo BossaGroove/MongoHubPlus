@@ -17,17 +17,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var preferencesWindowController: PreferencesWindowController?
     private var logWindowController: LogWindowController?
 
-    /// Sparkle stays dormant while SUPublicEDKey is empty (docs/release.md) —
-    /// such builds have no update feed to check. Exposed so the Settings
-    /// "Software Update" section can bind to the updater.
+    /// Sparkle stays dormant in Debug builds, and in any build whose
+    /// SUPublicEDKey is empty (docs/release.md) — the latter has no feed to
+    /// check. Exposed so the Settings "Software Update" section can bind to
+    /// the updater.
+    ///
+    /// The Debug half matters because the key is no longer empty anywhere:
+    /// once it went into project.yml, a dev build polled the public appcast
+    /// like any other, and accepting the update let Sparkle replace the app
+    /// in DerivedData with the notarized release — after which rebuilding
+    /// over it fails on macOS App Management. A build you are developing
+    /// should not be able to overwrite itself with a shipped one.
     private let updateChannelDelegate = UpdateChannelDelegate()
     lazy var updaterController: SPUStandardUpdaterController? = {
-        guard let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String,
-            !key.isEmpty
-        else { return nil }
-        return SPUStandardUpdaterController(
-            startingUpdater: true, updaterDelegate: updateChannelDelegate,
-            userDriverDelegate: nil)
+        #if DEBUG
+            return nil
+        #else
+            guard let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String,
+                !key.isEmpty
+            else { return nil }
+            return SPUStandardUpdaterController(
+                startingUpdater: true, updaterDelegate: updateChannelDelegate,
+                userDriverDelegate: nil)
+        #endif
     }()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
