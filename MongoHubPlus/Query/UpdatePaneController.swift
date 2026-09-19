@@ -50,6 +50,10 @@ final class UpdatePaneController: NSViewController {
     private let previewProblem = NSTextField(labelWithString: "")
     private var updateButton: NSButton!
     private var refreshWork: DispatchWorkItem?
+    /// Collapses the problem line when there is nothing wrong. `isHidden`
+    /// alone does not: outside a stack view a hidden view keeps its height,
+    /// which left a blank band under the Preview heading.
+    private var previewProblemCollapsed: NSLayoutConstraint!
     private var matchCount: Int?
 
     init(context: QueryPaneContext) {
@@ -132,6 +136,7 @@ final class UpdatePaneController: NSViewController {
         container.addSubview(criteriaRow)
         container.addSubview(rowsStack)
         container.addSubview(previewHeader)
+        previewProblemCollapsed = previewProblem.heightAnchor.constraint(equalToConstant: 0)
         container.addSubview(previewProblem)
         container.addSubview(previewScroll)
         container.addSubview(resultLabel)
@@ -159,6 +164,7 @@ final class UpdatePaneController: NSViewController {
                 lessThanOrEqualTo: container.trailingAnchor, constant: -8),
 
             previewProblem.topAnchor.constraint(equalTo: previewHeader.bottomAnchor, constant: 4),
+            previewProblemCollapsed,
             previewProblem.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
             previewProblem.trailingAnchor.constraint(
                 equalTo: container.trailingAnchor, constant: -8),
@@ -427,6 +433,7 @@ final class UpdatePaneController: NSViewController {
         }
         previewProblem.stringValue = ""
         previewProblem.isHidden = true
+        previewProblemCollapsed.isActive = true
         previewHeader.stringValue = String(
             format: String(localized: "Preview (sample of %d documents)"), rendered.count)
         setPreviewCards(
@@ -445,6 +452,7 @@ final class UpdatePaneController: NSViewController {
         setPreviewCards([])
         previewProblem.stringValue = message.replacingOccurrences(of: "\n", with: " ")
         previewProblem.isHidden = false
+        previewProblemCollapsed.isActive = false
         updateButton.isEnabled = false
     }
 
