@@ -286,6 +286,16 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
                         criteria: hookString("MAQueryCriteria"),
                         fields: hookString("MAQueryFields"),
                         sort: hookString("MAQuerySort"))
+                    // UI-verification hook: preload the Update pane so the
+                    // preview and affected count can be checked.
+                    if UserDefaults.standard.string(forKey: "MAUpdateOperator") != nil
+                        || hookString("MAUpdateValue") != nil
+                    {
+                        (self.queryTabs[node.absoluteName])?.debugSetUpdate(
+                            criteria: hookString("MAQueryCriteria"),
+                            operatorName: UserDefaults.standard.string(forKey: "MAUpdateOperator"),
+                            value: hookString("MAUpdateValue"))
+                    }
                     if let segment = UserDefaults.standard.string(forKey: "MAQuerySegment") {
                         (self.queryTabs[node.absoluteName])?.selectSegment(named: segment)
                     } else {

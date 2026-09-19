@@ -167,3 +167,9 @@ enum QueryPaneUI {
         alert.beginSheetModal(for: window)
     }
 }
+
+/// A top-down coordinate view, for use as a scroll view's document view —
+/// AppKit otherwise lays content out from the bottom edge.
+final class FlippedView: NSView {
+    override var isFlipped: Bool { true }
+}

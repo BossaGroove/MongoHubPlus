@@ -1,6 +1,7 @@
 import AppKit
 import BSON
 import ExtendedJSON
+import MongoService
 
 /// The Update sub-tab: criteria + Upsert/Multi + dynamic update-operator rows
 /// (legacy MHQueryUpdateOperatorView mechanics, `upsert` spelled right).
@@ -38,6 +39,19 @@ final class UpdatePaneController: NSViewController {
     private let resultLabel = QueryPaneUI.resultLabel(placeholder: "Update Result")
     private var rows: [OperatorRow] = []
 
+    // MARK: - Preview (feature-spec 3.21)
+
+    private let previewHeader = NSTextField(labelWithString: "")
+    private let previewStack = NSStackView()
+    private let previewScroll = NSScrollView()
+    /// Shown instead of the preview when the update cannot be read — bad JSON
+    /// in a value field, nothing to update. The count survives it, because the
+    /// count only ever depended on the query.
+    private let previewProblem = NSTextField(labelWithString: "")
+    private var updateButton: NSButton!
+    private var refreshWork: DispatchWorkItem?
+    private var matchCount: Int?
+
     init(context: QueryPaneContext) {
         self.context = context
         super.init(nibName: nil, bundle: nil)
@@ -59,14 +73,15 @@ final class UpdatePaneController: NSViewController {
         multiCheckbox.action = #selector(composeAction(_:))
         multiCheckbox.state = .on
 
-        let updateButton = QueryPaneUI.runButton(
+        updateButton = QueryPaneUI.runButton(
             title: String(localized: "Update"), target: self, action: #selector(updateAction(_:)))
         updateButton.keyEquivalent = "r"
         updateButton.keyEquivalentModifierMask = .command
+        updateButton.setContentHuggingPriority(.required, for: .horizontal)
 
         let criteriaRow = NSStackView(views: [
             NSTextField(labelWithString: String(localized: "Query")), criteriaField,
-            upsertCheckbox, multiCheckbox, updateButton,
+            upsertCheckbox, multiCheckbox, updateButton!,
         ])
         criteriaRow.orientation = .horizontal
         criteriaRow.spacing = 6
@@ -78,10 +93,47 @@ final class UpdatePaneController: NSViewController {
         rowsStack.spacing = 6
         rowsStack.translatesAutoresizingMaskIntoConstraints = false
 
+        previewHeader.font = .systemFont(ofSize: 11)
+        previewHeader.textColor = .secondaryLabelColor
+        previewHeader.translatesAutoresizingMaskIntoConstraints = false
+
+        previewProblem.font = .systemFont(ofSize: 11)
+        previewProblem.textColor = .systemOrange
+        previewProblem.lineBreakMode = .byWordWrapping
+        previewProblem.maximumNumberOfLines = 3
+        previewProblem.translatesAutoresizingMaskIntoConstraints = false
+
+        previewStack.orientation = .vertical
+        previewStack.alignment = .leading
+        previewStack.spacing = 10
+        previewStack.edgeInsets = NSEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        previewStack.translatesAutoresizingMaskIntoConstraints = false
+        // A scroll view lays its document view out from the bottom unless the
+        // view is flipped, which would park the first document off screen.
+        let previewDocument = FlippedView()
+        previewDocument.translatesAutoresizingMaskIntoConstraints = false
+        previewDocument.addSubview(previewStack)
+        previewScroll.documentView = previewDocument
+        previewScroll.hasVerticalScroller = true
+        previewScroll.borderType = .bezelBorder
+        previewScroll.drawsBackground = true
+        previewScroll.backgroundColor = JSONTheme.current.background
+        previewScroll.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            previewStack.topAnchor.constraint(equalTo: previewDocument.topAnchor),
+            previewStack.leadingAnchor.constraint(equalTo: previewDocument.leadingAnchor),
+            previewStack.trailingAnchor.constraint(equalTo: previewDocument.trailingAnchor),
+            previewStack.bottomAnchor.constraint(equalTo: previewDocument.bottomAnchor),
+            previewDocument.widthAnchor.constraint(equalTo: previewScroll.contentView.widthAnchor),
+        ])
+
         container.addSubview(previewField)
         container.addSubview(spinner)
         container.addSubview(criteriaRow)
         container.addSubview(rowsStack)
+        container.addSubview(previewHeader)
+        container.addSubview(previewProblem)
+        container.addSubview(previewScroll)
         container.addSubview(resultLabel)
         NSLayoutConstraint.activate([
             previewField.topAnchor.constraint(equalTo: container.topAnchor, constant: 4),
@@ -101,10 +153,25 @@ final class UpdatePaneController: NSViewController {
             rowsStack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
             rowsStack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
 
-            resultLabel.topAnchor.constraint(greaterThanOrEqualTo: rowsStack.bottomAnchor, constant: 12),
+            previewHeader.topAnchor.constraint(equalTo: rowsStack.bottomAnchor, constant: 12),
+            previewHeader.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            previewHeader.trailingAnchor.constraint(
+                lessThanOrEqualTo: container.trailingAnchor, constant: -8),
+
+            previewProblem.topAnchor.constraint(equalTo: previewHeader.bottomAnchor, constant: 4),
+            previewProblem.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            previewProblem.trailingAnchor.constraint(
+                equalTo: container.trailingAnchor, constant: -8),
+
+            previewScroll.topAnchor.constraint(equalTo: previewProblem.bottomAnchor, constant: 4),
+            previewScroll.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            previewScroll.trailingAnchor.constraint(
+                equalTo: container.trailingAnchor, constant: -8),
+            previewScroll.bottomAnchor.constraint(equalTo: resultLabel.topAnchor, constant: -8),
+
             resultLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             resultLabel.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor, constant: 8),
-            resultLabel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor, constant: -12),
+            resultLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12),
         ])
         view = container
 
@@ -234,6 +301,19 @@ final class UpdatePaneController: NSViewController {
         if isViewLoaded { composePreview() }
     }
 
+    /// UI-verification hook: fills the first operator row so the preview can
+    /// be exercised without driving the text fields by hand
+    /// (--args -MAUpdateOperator Set -MAUpdateValue64 <base64 EJSON>).
+    func debugSetOperator(named name: String?, value: String?) {
+        loadViewIfNeeded()
+        guard let row = rows.first else { return }
+        if let name, let index = row.popup.itemTitles.firstIndex(of: name) {
+            row.popup.selectItem(at: index)
+        }
+        if let value { row.field.stringValue = value }
+        composePreview()
+    }
+
     private var normalizedCriteria: String {
         QueryNormalizer.normalizeCriteria(criteriaField.stringValue, emptyIsValid: false)
     }
@@ -243,6 +323,7 @@ final class UpdatePaneController: NSViewController {
     }
 
     private func composePreview() {
+        schedulePreviewRefresh()
         var sets: [String] = []
         for row in rows {
             guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
@@ -258,6 +339,173 @@ final class UpdatePaneController: NSViewController {
         }
         preview += ")"
         previewField.stringValue = preview
+    }
+
+    // MARK: - Preview + affected count (feature-spec 3.21)
+
+    /// Re-reads the query and the operator rows and refreshes both halves.
+    /// Debounced, because it runs on every keystroke.
+    private func schedulePreviewRefresh() {
+        refreshWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.refreshPreview() }
+        refreshWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4, execute: work)
+    }
+
+    /// The update spec as the operator rows currently read, or the reason it
+    /// cannot be read. Same parse the Update button uses, so what you preview
+    /// is what you would run.
+    private enum ComposedUpdate {
+        case ready(Document)
+        case unreadable(String)
+    }
+
+    private func composedUpdate() -> ComposedUpdate {
+        var update = Document()
+        for row in rows {
+            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
+            let text = QueryNormalizer.normalizeCriteria(row.field.stringValue, emptyIsValid: false)
+            do {
+                update[key] = try ExtendedJSON.parseDocument(text)
+            } catch {
+                let name = row.popup.titleOfSelectedItem ?? key
+                return .unreadable("\(name): \(error)")
+            }
+        }
+        guard !update.isEmpty else {
+            return .unreadable(String(localized: "Nothing to update"))
+        }
+        return .ready(update)
+    }
+
+    private func refreshPreview() {
+        guard let session = context.session() else { return }
+
+        let criteria: Document
+        do {
+            criteria = try ExtendedJSON.parseDocument(normalizedCriteria)
+        } catch {
+            // A query that does not parse has no match count and nothing to
+            // sample, so both halves go quiet rather than showing stale rows.
+            matchCount = nil
+            showPreviewProblem(String(localized: "Query: \(String(describing: error))"))
+            return
+        }
+
+        let composed = composedUpdate()
+        if case .unreadable(let reason) = composed {
+            showPreviewProblem(reason)
+        }
+
+        Task {
+            let count = try? await session.count(
+                database: self.context.database, collection: self.context.collection,
+                filter: criteria)
+            self.matchCount = count
+            self.updateButtonTitle()
+
+            guard case .ready(let update) = composed else { return }
+            let samples =
+                (try? await session.find(
+                    database: self.context.database, collection: self.context.collection,
+                    filter: criteria, options: .init(limit: 3))) ?? []
+            self.showPreview(samples: samples, update: update)
+        }
+    }
+
+    private func showPreview(samples: [Document], update: Document) {
+        var rendered: [(document: Document, effects: [UpdateEffect])] = []
+        for sample in samples {
+            do {
+                var effects = try UpdatePreview.effects(of: update, on: sample)
+                effects += UpdatePreview.renameAdditions(of: update, on: sample)
+                rendered.append((sample, effects))
+            } catch {
+                showPreviewProblem(String(describing: error))
+                return
+            }
+        }
+        previewProblem.stringValue = ""
+        previewProblem.isHidden = true
+        previewHeader.stringValue = String(
+            format: String(localized: "Preview (sample of %d documents)"), rendered.count)
+        setPreviewCards(
+            rendered.map {
+                UpdatePreviewRenderer.render(
+                    document: $0.document, effects: $0.effects, theme: JSONTheme.current)
+            })
+        updateButton.isEnabled = true
+    }
+
+    /// Clears the preview and says why, the way Compass does: the diff goes
+    /// rather than going stale, and Update is refused until it reads again.
+    private func showPreviewProblem(_ message: String) {
+        previewHeader.stringValue = String(
+            format: String(localized: "Preview (sample of %d documents)"), 0)
+        setPreviewCards([])
+        previewProblem.stringValue = message.replacingOccurrences(of: "\n", with: " ")
+        previewProblem.isHidden = false
+        updateButton.isEnabled = false
+    }
+
+    /// One bordered card per document, the way Compass separates them — a
+    /// blank line between two JSON blobs reads as part of the document.
+    private func setPreviewCards(_ documents: [NSAttributedString]) {
+        let theme = JSONTheme.current
+        for view in previewStack.arrangedSubviews {
+            previewStack.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
+        for document in documents {
+            let card = NSView()
+            card.translatesAutoresizingMaskIntoConstraints = false
+            card.wantsLayer = true
+            card.layer?.backgroundColor = theme.background.cgColor
+            card.layer?.cornerRadius = 6
+            card.layer?.borderWidth = 1
+            card.layer?.borderColor = NSColor.white.withAlphaComponent(0.18).cgColor
+
+            let label = NSTextField(labelWithAttributedString: document)
+            label.isSelectable = true
+            label.allowsEditingTextAttributes = true
+            // Selecting hands the text to the window's shared field editor,
+            // which redraws it with the field's own font and colour — the
+            // system defaults — unless the field is marked as carrying
+            // attributed text. Without this, clicking a card turned the whole
+            // document white in the system font.
+            label.font = theme.font
+            label.textColor = theme.text
+            label.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(label)
+            NSLayoutConstraint.activate([
+                label.topAnchor.constraint(equalTo: card.topAnchor, constant: 8),
+                label.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 10),
+                label.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -10),
+                label.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8),
+            ])
+            previewStack.addArrangedSubview(card)
+            card.widthAnchor.constraint(
+                equalTo: previewStack.widthAnchor, constant: -20
+            ).isActive = true
+        }
+    }
+
+    /// "Update 28 documents" — the count is the query's result count and has
+    /// nothing to do with the operators, so it survives a broken update.
+    private func updateButtonTitle() {
+        guard let matchCount else {
+            updateButton.title = String(localized: "Update")
+            return
+        }
+        if multiCheckbox.state == .on {
+            updateButton.title = String(
+                format: String(localized: "Update %d documents"), matchCount)
+        } else {
+            // Without Multi only the first match is written, so promising 28
+            // would be a lie.
+            updateButton.title = String(
+                format: String(localized: "Update 1 of %d matching"), matchCount)
+        }
     }
 
     @objc func updateAction(_ sender: Any?) {

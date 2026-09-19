@@ -13,6 +13,16 @@ version from the heading, so it must match the tag exactly.
 
 ### Added
 
+- **See what an update will do before you run it.** The Update tab now shows
+  how many documents the query matches — right on the button, so it reads
+  *Update 28 documents* — and a preview of the first three of them with the
+  pending change marked on each: the old value struck through in red, the new
+  value beside it in green. Nothing is written to run the preview; it is the
+  documents you already matched, annotated. Where an operator's result cannot
+  be known without the server (`$pull`'s predicate, `$push` with `$each`,
+  `$currentDate`) the field is marked *will change* rather than guessing.
+  Anything the update cannot be read from — a value that is not valid JSON —
+  clears the preview and disables the button, saying which row is wrong.
 - **Stop a running query.** A Stop button appears next to the spinner while a
   query runs in the Find or Aggregation tab (⌘.), for the moment you realise
   you just scanned a collection with no usable index. It stays available

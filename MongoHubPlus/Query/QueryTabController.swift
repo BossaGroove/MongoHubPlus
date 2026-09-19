@@ -172,6 +172,11 @@ final class QueryTabController: TabItemViewController {
         findPane.debugSetQuery(criteria: criteria, fields: fields, sort: sort)
     }
 
+    func debugSetUpdate(criteria: String?, operatorName: String?, value: String?) {
+        if let criteria { updatePane.prefillCriteria(criteria) }
+        updatePane.debugSetOperator(named: operatorName, value: value)
+    }
+
     func debugExportResults(to url: URL) {
         findPane.debugExportResults(to: url)
     }
