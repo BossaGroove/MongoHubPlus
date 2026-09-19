@@ -17,6 +17,12 @@ final class FindPaneController: NSViewController {
 
     private let queryPreviewField = QueryPaneUI.previewField()
     private let spinner = QueryPaneUI.spinner()
+    private lazy var stopButton = QueryPaneUI.stopButton(
+        target: self, action: #selector(stopQuery(_:)))
+    /// Non-nil exactly while a query is in flight; identifies it to the server.
+    private var runningToken: OperationToken?
+    private var runningTask: Task<Void, Never>?
+    private var stoppedByUser = false
     private let criteriaCombo = NSComboBox()
     private let sortField = NSTextField(string: "")
     private let fieldsField = NSTextField(string: "")
@@ -151,6 +157,7 @@ final class FindPaneController: NSViewController {
         resultsView.translatesAutoresizingMaskIntoConstraints = false
 
         container.addSubview(queryPreviewField)
+        container.addSubview(stopButton)
         container.addSubview(spinner)
         container.addSubview(row2)
         container.addSubview(row3)
@@ -158,7 +165,11 @@ final class FindPaneController: NSViewController {
         NSLayoutConstraint.activate([
             queryPreviewField.topAnchor.constraint(equalTo: container.topAnchor, constant: 4),
             queryPreviewField.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
-            queryPreviewField.trailingAnchor.constraint(equalTo: spinner.leadingAnchor, constant: -6),
+            queryPreviewField.trailingAnchor.constraint(
+                equalTo: stopButton.leadingAnchor, constant: -6),
+
+            stopButton.centerYAnchor.constraint(equalTo: queryPreviewField.centerYAnchor),
+            stopButton.trailingAnchor.constraint(equalTo: spinner.leadingAnchor, constant: -6),
 
             spinner.centerYAnchor.constraint(equalTo: queryPreviewField.centerYAnchor),
             spinner.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
@@ -544,15 +555,20 @@ final class FindPaneController: NSViewController {
 
         criteriaCombo.stringValue = criteriaCombo.stringValue.trimmingCharacters(
             in: .whitespacesAndNewlines)
-        spinner.startAnimation(nil)
         let started = Date()
+        let token = OperationToken()
+        beginRunning(token)
 
-        Task {
+        runningTask = Task {
             do {
                 let documents = try await session.find(
                     database: context.database, collection: context.collection, filter: criteria,
-                    options: .init(projection: projection, sort: sort, skip: skip, limit: limit))
-                self.spinner.stopAnimation(nil)
+                    options: .init(projection: projection, sort: sort, skip: skip, limit: limit),
+                    token: token)
+                // Results show straight away, but the run is not over: the
+                // count below reads the whole match and is usually the part
+                // that takes forever on an unindexed query. Stop has to stay
+                // available for it, which means endRunning() waits.
                 self.rememberQuery()
                 self.resultsOutline.display(documents: documents, label: nil)
                 self.resultsOutline.setBackButtonEnabled(skip > 0)
@@ -628,15 +644,56 @@ final class FindPaneController: NSViewController {
                 }
 
                 let count = try await session.count(
-                    database: context.database, collection: context.collection, filter: criteria)
+                    database: context.database, collection: context.collection, filter: criteria,
+                    token: token)
                 let elapsed = Date().timeIntervalSince(started)
+                self.endRunning()
                 self.resultsOutline.setLabel(
                     String(format: String(localized: "Total Results: %d (%.2fs)"), count, elapsed))
             } catch {
-                self.spinner.stopAnimation(nil)
-                self.resultsOutline.displayError(String(describing: error))
-                self.queryPreviewField.stringValue = "Error: \(error)"
+                let stopped = self.stoppedByUser
+                self.endRunning()
+                if stopped {
+                    // The server reports the kill as an interrupted operation;
+                    // to the person who pressed Stop that is not an error.
+                    self.resultsOutline.setLabel(String(localized: "Query stopped"))
+                    self.queryPreviewField.stringValue = String(localized: "Query stopped")
+                } else {
+                    self.resultsOutline.displayError(String(describing: error))
+                    self.queryPreviewField.stringValue = "Error: \(error)"
+                }
             }
+        }
+    }
+
+    // MARK: - Run / stop lifecycle (feature-spec 3.20)
+
+    private func beginRunning(_ token: OperationToken) {
+        runningToken = token
+        stoppedByUser = false
+        spinner.startAnimation(nil)
+        stopButton.isHidden = false
+        stopButton.isEnabled = true
+    }
+
+    private func endRunning() {
+        runningToken = nil
+        runningTask = nil
+        spinner.stopAnimation(nil)
+        stopButton.isHidden = true
+    }
+
+    /// ⌘. — kills the operation on the server first, then stops waiting for
+    /// it. Order matters: dropping our own wait first would leave the server
+    /// grinding away on a query nobody is holding a handle to any more.
+    @objc private func stopQuery(_ sender: Any?) {
+        guard let token = runningToken else { return }
+        stoppedByUser = true
+        stopButton.isEnabled = false
+        guard let session = context.session() else { return }
+        Task {
+            await session.stop(token)
+            self.runningTask?.cancel()
         }
     }
 

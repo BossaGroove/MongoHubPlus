@@ -2,6 +2,7 @@ import Foundation
 import Logging
 import MongoCore
 import MongoKitten
+import NIOCore
 
 /// Receives driver + session log lines for the app's log window.
 public typealias MongoLogSink = @Sendable (_ level: String, _ message: String) -> Void
@@ -41,6 +42,42 @@ public struct MongoServiceError: Error, CustomStringConvertible, Sendable {
     }
 }
 
+/// A handle on a running server operation, so the UI can stop it.
+///
+/// Every command issued with a token carries the same logical session id, and
+/// `killSessions` interrupts whatever that session is doing. That is the only
+/// mechanism that reaches the *initial* `find`: `killCursors` needs a cursor
+/// that does not exist yet while the first batch is still being computed,
+/// which is exactly the case when someone runs a query with no usable index.
+/// Measured against MongoDB 8.3: the operation leaves `currentOp` and the
+/// client fails with `Interrupted` (code 11601) in milliseconds.
+///
+/// Abandoning the client-side `await` is *not* enough — the server keeps
+/// running the operation. Killing the client outright did not stop it either
+/// (observed still running 42s later), so nothing here relies on that.
+public struct OperationToken: Sendable, Hashable {
+    let id: UUID
+
+    public init() {
+        self.id = UUID()
+    }
+
+    /// `{ id: UUID }` — the server's logical session id for this operation.
+    var lsid: Document {
+        var bytes = [UInt8](repeating: 0, count: 16)
+        withUnsafeBytes(of: id.uuid) { raw in
+            for index in 0..<16 { bytes[index] = raw[index] }
+        }
+        var document = Document()
+        document["id"] = Binary(subType: .uuid, buffer: ByteBuffer(bytes: bytes))
+        return document
+    }
+
+    /// Tags the operation in `currentOp` and the server log, so a stuck query
+    /// can be identified from outside the app too.
+    var comment: String { "MongoHub Plus \(id.uuidString)" }
+}
+
 /// One live connection to a MongoDB deployment (standalone, replica set,
 /// sharded cluster, or Atlas via `mongodb+srv://`).
 ///
@@ -51,6 +88,14 @@ public struct MongoServiceError: Error, CustomStringConvertible, Sendable {
 public actor ConnectionSession {
     public let settings: ConnectionSettings
     private var cluster: MongoCluster?
+    /// A second connection kept for `stop(_:)` alone. The query connection is
+    /// blocked waiting for its own reply, and MongoKitten hands the same
+    /// connection back to the next caller, so a kill sent through the normal
+    /// path queues behind the very query it is meant to interrupt and times
+    /// out. Measured: same connection = `killSessions` never lands; separate
+    /// connection = it returns in 1ms.
+    private var controlCluster: MongoCluster?
+    private var controlWarmup: Task<Void, Never>?
     private let logger: Logger?
 
     /// Validates and stores the connection string without connecting.
@@ -103,6 +148,12 @@ public actor ConnectionSession {
             }
             self.cluster = cluster
             _ = try await runCommand(["ping": 1], onDatabase: "admin")
+            // Warm the control connection in the background: Stop is pressed
+            // in a hurry, and on Atlas a cold connect (SRV, TLS, SCRAM) would
+            // otherwise land on the one action that has to be immediate.
+            controlWarmup = Task { [weak self] in
+                _ = try? await self?.openControlCluster()
+            }
         } catch let error as MongoServiceError {
             self.cluster = nil
             throw error
@@ -117,10 +168,60 @@ public actor ConnectionSession {
     }
 
     public func disconnect() async {
+        controlWarmup?.cancel()
+        controlWarmup = nil
+        if let controlCluster {
+            await controlCluster.disconnect()
+        }
+        controlCluster = nil
         if let cluster {
             await cluster.disconnect()
         }
         cluster = nil
+    }
+
+    // MARK: - Stopping a running operation (feature-spec 3.20)
+
+    /// Interrupts the operation running under `token`, on the server.
+    ///
+    /// Best effort by design: a query that already finished, or one whose
+    /// session the server has forgotten, is not an error worth surfacing —
+    /// the caller has stopped caring about the result either way.
+    public func stop(_ token: OperationToken) async {
+        let started = Date()
+        do {
+            let control = try await openControlCluster()
+            var kill = Document()
+            var sessions = Document(isArray: true)
+            sessions["0"] = token.lsid
+            kill["killSessions"] = sessions
+            _ = try await execute(kill, on: control, database: "admin")
+            // Logged on success as well as failure: "did the server really
+            // stop, or does the window just say so?" is the whole question
+            // this button has to answer, and without a line here a stop
+            // leaves no trace to check. `acknowledged` is the honest word —
+            // the server accepts the kill and interrupts the operation at its
+            // next interrupt point. The id matches the `comment` the query
+            // carries, so it lines up with $currentOp and the server log.
+            let elapsed = Int(Date().timeIntervalSince(started) * 1000)
+            logger?.info(
+                "Stopped \(token.comment) — server acknowledged killSessions in \(elapsed)ms")
+        } catch {
+            logger?.info("Stop failed for \(token.comment): \(error)")
+        }
+    }
+
+    /// The control connection, built on first use and kept afterwards.
+    private func openControlCluster() async throws -> MongoCluster {
+        if let controlCluster { return controlCluster }
+        let control: MongoCluster
+        if let logger {
+            control = try await MongoCluster(connectingTo: settings, logger: logger)
+        } else {
+            control = try await MongoCluster(connectingTo: settings)
+        }
+        controlCluster = control
+        return control
     }
 
     // MARK: - Raw commands (the escape hatch everything exotic goes through)
@@ -128,8 +229,38 @@ public actor ConnectionSession {
     /// Runs an arbitrary database command and returns the raw reply document.
     /// Throws when the server reports `ok: 0`.
     @discardableResult
-    public func runCommand(_ command: Document, onDatabase database: String) async throws -> Document {
-        let cluster = try requireCluster()
+    public func runCommand(
+        _ command: Document, onDatabase database: String, token: OperationToken? = nil
+    ) async throws -> Document {
+        var command = command
+        if let token {
+            command["lsid"] = token.lsid
+            if command["comment"] == nil {
+                command["comment"] = token.comment
+            }
+        }
+        return try await execute(command, on: try requireCluster(), database: database)
+    }
+
+    /// Runs `body`, and if we stop waiting for its result for any reason —
+    /// the user pressed Stop, the driver hit its own 30-second query timeout,
+    /// the connection dropped — makes sure the server stops too. An abandoned
+    /// operation is not reaped by anything else: killing the client outright
+    /// left one running for 42 seconds and counting.
+    private func stoppingIfAbandoned<T>(
+        _ token: OperationToken, _ body: () async throws -> T
+    ) async throws -> T {
+        do {
+            return try await body()
+        } catch {
+            await stop(token)
+            throw error
+        }
+    }
+
+    private func execute(
+        _ command: Document, on cluster: MongoCluster, database: String
+    ) async throws -> Document {
         let connection = try await cluster.next(for: .basic)
         let reply = try await connection.execute(
             command,
@@ -212,36 +343,73 @@ public actor ConnectionSession {
         }
     }
 
+    /// Runs a `find` and returns every matching document.
+    ///
+    /// Built as a raw command rather than through MongoKitten's query builder
+    /// because `FindCommand` has no `lsid` field, and without one there is no
+    /// session for `stop(_:)` to kill.
     public func find(
         database: String, collection: String, filter: Document,
-        options: FindOptions = FindOptions()
+        options: FindOptions = FindOptions(), token: OperationToken? = nil
     ) async throws -> [Document] {
-        let cluster = try requireCluster()
-        var builder = cluster[database][collection].find(filter)
+        var command = Document()
+        command["find"] = collection
+        command["filter"] = filter
         if let projection = options.projection, !projection.isEmpty {
-            builder = builder.project(projection)
+            command["projection"] = projection
         }
         if let sort = options.sort, !sort.isEmpty {
-            builder = builder.sort(sort)
+            command["sort"] = sort
         }
-        builder = builder.skip(options.skip).limit(options.limit)
-
-        var results: [Document] = []
+        if options.skip > 0 {
+            command["skip"] = options.skip
+        }
+        if options.limit > 0 {
+            command["limit"] = options.limit
+        }
         do {
-            for try await document in builder {
-                results.append(document)
-            }
+            return try await collectCursor(
+                command: command, onDatabase: database,
+                batchSize: options.limit > 0 ? min(options.limit, 1000) : 1000,
+                token: token)
+        } catch let error as MongoServiceError {
+            throw error
         } catch {
             throw MongoServiceError("Find failed: \(error)")
         }
-        return results
     }
 
-    public func count(database: String, collection: String, filter: Document) async throws -> Int {
-        let cluster = try requireCluster()
+    /// Counts matching documents.
+    ///
+    /// Raw command rather than the query builder for the same reason `find` is:
+    /// a count with no usable index is usually the *slowest* part of running a
+    /// query — the find stops at the limit, the count reads everything — so it
+    /// is the operation most in need of an lsid to stop.
+    public func count(
+        database: String, collection: String, filter: Document, token: OperationToken? = nil
+    ) async throws -> Int {
+        var command = Document()
+        command["count"] = collection
+        if !filter.isEmpty {
+            command["query"] = filter
+        }
         do {
-            return try await cluster[database][collection]
-                .count(filter.isEmpty ? nil : filter)
+            let reply: Document
+            if let token {
+                reply = try await stoppingIfAbandoned(token) {
+                    try await runCommand(command, onDatabase: database, token: token)
+                }
+            } else {
+                reply = try await runCommand(command, onDatabase: database)
+            }
+            switch reply["n"] {
+            case let value as Int32: return Int(value)
+            case let value as Int: return value
+            case let value as Double: return Int(value)
+            default: throw MongoServiceError("Malformed count reply")
+            }
+        } catch let error as MongoServiceError {
+            throw error
         } catch {
             throw MongoServiceError("Count failed: \(error)")
         }
@@ -252,10 +420,24 @@ public actor ConnectionSession {
     /// Runs a cursor-returning command (`aggregate`, `listIndexes`, …) and
     /// drains it fully with `getMore`, honoring Task cancellation.
     public func collectCursor(
-        command: Document, onDatabase database: String, batchSize: Int = 1000
+        command: Document, onDatabase database: String, batchSize: Int = 1000,
+        token: OperationToken? = nil
+    ) async throws -> [Document] {
+        guard let token else {
+            return try await drainCursor(
+                command: command, onDatabase: database, batchSize: batchSize, token: nil)
+        }
+        return try await stoppingIfAbandoned(token) {
+            try await drainCursor(
+                command: command, onDatabase: database, batchSize: batchSize, token: token)
+        }
+    }
+
+    private func drainCursor(
+        command: Document, onDatabase database: String, batchSize: Int, token: OperationToken?
     ) async throws -> [Document] {
         var results: [Document] = []
-        var reply = try await runCommand(command, onDatabase: database)
+        var reply = try await runCommand(command, onDatabase: database, token: token)
         while true {
             guard let cursor = reply["cursor"] as? Document else {
                 throw MongoServiceError("Malformed cursor reply")
@@ -276,14 +458,14 @@ public actor ConnectionSession {
                 var ids = Document(isArray: true)
                 ids["0"] = cursorID
                 kill["cursors"] = ids
-                _ = try? await runCommand(kill, onDatabase: database)
+                _ = try? await runCommand(kill, onDatabase: database, token: token)
                 throw CancellationError()
             }
             var getMore = Document()
             getMore["getMore"] = cursorID
             getMore["collection"] = collection
             getMore["batchSize"] = batchSize
-            reply = try await runCommand(getMore, onDatabase: database)
+            reply = try await runCommand(getMore, onDatabase: database, token: token)
         }
     }
 
@@ -408,7 +590,8 @@ public actor ConnectionSession {
 
     /// Runs an aggregation pipeline and returns all result documents.
     public func aggregate(
-        database: String, collection: String, pipeline: Document, options: Document? = nil
+        database: String, collection: String, pipeline: Document, options: Document? = nil,
+        token: OperationToken? = nil
     ) async throws -> [Document] {
         var command = Document()
         command["aggregate"] = collection
@@ -419,7 +602,7 @@ public actor ConnectionSession {
                 command[pair.key] = pair.value
             }
         }
-        return try await collectCursor(command: command, onDatabase: database)
+        return try await collectCursor(command: command, onDatabase: database, token: token)
     }
 
     // MARK: -

@@ -61,6 +61,83 @@ struct IntegrationTests {
     static let localURI = ProcessInfo.processInfo.environment["MONGOHUBPLUS_TEST_URI"]
     static let atlasURI = ProcessInfo.processInfo.environment["MONGOHUBPLUS_TEST_ATLAS_URI"]
 
+    /// Stop must interrupt the operation *on the server*, not merely stop the
+    /// client waiting for it (feature-spec 3.20). Abandoning the client-side
+    /// await leaves the query running — measured at 42s and counting — so the
+    /// assertion that matters is the one made against `$currentOp` after the
+    /// kill, not the fact that our own `find` threw.
+    ///
+    /// The slow query is a COLLSCAN with a blocking sort, which is the shape
+    /// that has no cursor to kill while the first batch is being computed.
+    @Test func stopInterruptsTheOperationOnTheServer() async throws {
+        guard let uri = Self.localURI else { return }
+        let session = try ConnectionSession(connectionString: uri)
+        try await session.connect()
+        let db = "mongohubplus_stop_test"
+        let coll = "slow"
+
+        _ = try? await session.runCommand(["dropDatabase": 1], onDatabase: db)
+        var documents = Document(isArray: true)
+        for i in 0..<400 {
+            var doc = Document()
+            doc["i"] = Int32(i)
+            documents["\(i)"] = doc
+        }
+        try await session.runCommand(
+            ["insert": coll, "documents": documents], onDatabase: db)
+
+        // Server-side JS is what makes this reliably slow; skip where it is off.
+        var filter = Document()
+        filter["$where"] = "sleep(20); return true;"
+        var sort = Document()
+        sort["i"] = Int32(-1)
+
+        let token = OperationToken()
+        let query = Task { () -> (any Error)? in
+            do {
+                _ = try await session.find(
+                    database: db, collection: coll, filter: filter,
+                    options: .init(sort: sort, limit: 5), token: token)
+                return nil
+            } catch {
+                return error
+            }
+        }
+
+        try await Task.sleep(for: .milliseconds(1500))
+        await session.stop(token)
+        let failure = await query.value
+
+        // If the server refused $where the query fails immediately with a
+        // different error and there is nothing to assert about stopping.
+        let message = failure.map { String(describing: $0) } ?? ""
+        guard !message.contains("$where"), !message.contains("not allowed") else { return }
+
+        #expect(failure != nil, "a stopped query must not return results")
+
+        // The real assertion: nothing of ours is still running server-side.
+        try await Task.sleep(for: .milliseconds(1500))
+        var currentOp = Document()
+        currentOp["aggregate"] = Int32(1)
+        var pipeline = Document(isArray: true)
+        var stage = Document()
+        stage["$currentOp"] = Document()
+        pipeline["0"] = stage
+        currentOp["pipeline"] = pipeline
+        currentOp["cursor"] = Document()
+        let reply = try await session.runCommand(currentOp, onDatabase: "admin")
+        let cursor = reply["cursor"] as? Document
+        let batch = cursor?["firstBatch"] as? Document
+        let ops = batch?.values.compactMap { $0 as? Document } ?? []
+        let ours = ops.filter { op in
+            (op["ns"] as? String) == "\(db).\(coll)" && (op["active"] as? Bool) == true
+        }
+        #expect(ours.isEmpty, "the operation kept running on the server after Stop")
+
+        _ = try? await session.runCommand(["dropDatabase": 1], onDatabase: db)
+        await session.disconnect()
+    }
+
     static func exercise(uri: String, allowWrites: Bool) async throws {
         let session = try ConnectionSession(connectionString: uri)
         try await session.connect()

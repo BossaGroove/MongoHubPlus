@@ -1,6 +1,7 @@
 import AppKit
 import BSON
 import ExtendedJSON
+import MongoService
 
 /// The Aggregation sub-tab (feature 3.17, owner request 2026-09-01): a
 /// Compass-style stage builder (stage list + per-stage editor + live
@@ -35,6 +36,11 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
     private var pipelineTextView: NSTextView!
     private var optionsTextView: NSTextView!
     private let spinner = QueryPaneUI.spinner()
+    private lazy var stopButton = QueryPaneUI.stopButton(
+        target: self, action: #selector(stopAggregation(_:)))
+    private var runningToken: OperationToken?
+    private var runningTask: Task<Void, Never>?
+    private var stoppedByUser = false
     private let outline = DocumentOutlineViewController(
         options: .init(
             showsFooter: true, showsRemoveButton: false, showsPagination: false,
@@ -205,7 +211,8 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
         stagesContainer.translatesAutoresizingMaskIntoConstraints = false
         textContainer.translatesAutoresizingMaskIntoConstraints = false
         for subview in [
-            modeControl, explainButton, runButton, spinner, stagesContainer!, textContainer!,
+            modeControl, explainButton, runButton, spinner, stopButton, stagesContainer!,
+            textContainer!,
             optionsLabel, optionsScroll, outlineView,
         ] {
             container.addSubview(subview)
@@ -219,8 +226,12 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
             runButton.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
             explainButton.centerYAnchor.constraint(equalTo: modeControl.centerYAnchor),
             explainButton.trailingAnchor.constraint(equalTo: runButton.leadingAnchor, constant: -8),
+            stopButton.centerYAnchor.constraint(equalTo: modeControl.centerYAnchor),
+            stopButton.trailingAnchor.constraint(
+                equalTo: explainButton.leadingAnchor, constant: -10),
+
             spinner.centerYAnchor.constraint(equalTo: modeControl.centerYAnchor),
-            spinner.trailingAnchor.constraint(equalTo: explainButton.leadingAnchor, constant: -10),
+            spinner.trailingAnchor.constraint(equalTo: stopButton.leadingAnchor, constant: -6),
             spinner.widthAnchor.constraint(equalToConstant: 16),
             spinner.heightAnchor.constraint(equalToConstant: 16),
 
@@ -492,25 +503,61 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
         }
 
         previewTask?.cancel()
-        spinner.startAnimation(nil)
-        Task {
+        let token = OperationToken()
+        beginRunning(token)
+        runningTask = Task {
             do {
                 let documents = try await session.aggregate(
                     database: context.database, collection: context.collection,
-                    pipeline: pipeline, options: options)
-                self.spinner.stopAnimation(nil)
+                    pipeline: pipeline, options: options, token: token)
+                self.endRunning()
                 self.outline.display(
                     documents: documents,
                     label: documents.count == 1
                         ? String(localized: "1 document")
                         : String(localized: "\(documents.count) documents"))
             } catch {
-                self.spinner.stopAnimation(nil)
-                self.outline.displayError(String(describing: error))
-                QueryPaneUI.alertSheet(
-                    in: self.view, title: String(localized: "Aggregation Failed"),
-                    message: String(describing: error))
+                let stopped = self.stoppedByUser
+                self.endRunning()
+                if stopped {
+                    // A kill the user asked for is not a failure to report.
+                    self.outline.setLabel(String(localized: "Query stopped"))
+                } else {
+                    self.outline.displayError(String(describing: error))
+                    QueryPaneUI.alertSheet(
+                        in: self.view, title: String(localized: "Aggregation Failed"),
+                        message: String(describing: error))
+                }
             }
+        }
+    }
+
+    // MARK: - Run / stop lifecycle (feature-spec 3.20)
+
+    private func beginRunning(_ token: OperationToken) {
+        runningToken = token
+        stoppedByUser = false
+        spinner.startAnimation(nil)
+        stopButton.isHidden = false
+        stopButton.isEnabled = true
+    }
+
+    private func endRunning() {
+        runningToken = nil
+        runningTask = nil
+        spinner.stopAnimation(nil)
+        stopButton.isHidden = true
+    }
+
+    /// ⌘. — see FindPaneController.stopQuery: the server is told to drop the
+    /// operation before we stop waiting for it.
+    @objc private func stopAggregation(_ sender: Any?) {
+        guard let token = runningToken, let session = context.session() else { return }
+        stoppedByUser = true
+        stopButton.isEnabled = false
+        Task {
+            await session.stop(token)
+            self.runningTask?.cancel()
         }
     }
 

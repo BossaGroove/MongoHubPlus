@@ -13,6 +13,17 @@ version from the heading, so it must match the tag exactly.
 
 ### Added
 
+- **Stop a running query.** A Stop button appears next to the spinner while a
+  query runs in the Find or Aggregation tab (⌘.), for the moment you realise
+  you just scanned a collection with no usable index. It stays available
+  until the result count finishes too, which on a collection with no useful
+  index is the part that actually takes the time. It stops the query *on
+  the server*, not just in the window: MongoHub Plus runs every query in its
+  own server session and kills that session, which the server confirms by
+  interrupting the operation. Simply giving up on the client does not do
+  this — a query abandoned that way keeps running and keeps consuming the
+  database. The same protection now applies when a query fails for any other
+  reason, so MongoHub Plus no longer leaves work running behind your back.
 - **⌘F searches the document in the JSON editor.** Find… (⌘F), Find Next
   (⌘G), Find Previous (⇧⌘G), Use Selection for Find and Jump to Selection
   (⌘J) now live under Edit ▸ Find, so a long document — a big

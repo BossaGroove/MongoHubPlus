@@ -90,6 +90,32 @@ enum QueryPaneUI {
         return (scrollView, textView)
     }
 
+    /// Stop button for a query that is already running (feature-spec 3.20).
+    /// Lives beside the spinner — the spinner is what tells you something is
+    /// still going, so that is where you look for the way out — and stays
+    /// hidden until there is something to stop. ⌘. is the system-wide cancel,
+    /// which keeps ⌘R meaning Run at every moment.
+    static func stopButton(target: AnyObject, action: Selector) -> NSButton {
+        let button = NSButton(title: String(localized: "Stop"), target: target, action: action)
+        button.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: nil)
+        button.imagePosition = .imageLeading
+        // In the Find row this sits between the query preview and the spinner
+        // with both sides pinned, so without hugging it swallows every spare
+        // point and becomes a button the width of the window.
+        button.setContentHuggingPriority(.required, for: .horizontal)
+        button.setContentCompressionResistancePriority(.required, for: .horizontal)
+        button.keyEquivalent = "."
+        button.keyEquivalentModifierMask = .command
+        button.toolTip = String(localized: "Stop the running query (⌘.)")
+        button.isHidden = true
+        // Both panes position this with constraints, so the synthesized
+        // frame constraints have to go — leaving them on collapsed the
+        // query tab's whole height chain (measured: the window opened
+        // 1202x165 instead of 1400x451, and could not be resized).
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }
+
     static func runButton(title: String, target: AnyObject, action: Selector) -> NSButton {
         let button = NSButton(title: title, target: target, action: action)
         button.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
