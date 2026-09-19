@@ -9,7 +9,7 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
-## 4.3.0 — unreleased
+## 4.3.0 — 2026-09-20
 
 ### Added
 
@@ -42,6 +42,11 @@ version from the heading, so it must match the tag exactly.
   without having to click out of the search box first, Esc closes the search
   bar without closing the window, and the same search works in the Insert
   and Aggregation JSON boxes.
+
+### Changed
+
+- **The Remove tab's query label matches the others** — it read `Query:`
+  while every other tab reads `Query`.
 
 ### Fixed
 
