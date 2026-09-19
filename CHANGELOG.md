@@ -43,6 +43,12 @@ version from the heading, so it must match the tag exactly.
   bar without closing the window, and the same search works in the Insert
   and Aggregation JSON boxes.
 
+### Fixed
+
+- **The Aggregation tab's Options box no longer overlaps the stage buttons.**
+  It is taller than its label, and was being centred on it, so its top edge
+  rode up over the +/− buttons beneath the stage list.
+
 ## 4.2.0 — 2026-09-15
 
 ### Added

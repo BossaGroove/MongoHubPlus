@@ -246,9 +246,12 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
             textContainer.trailingAnchor.constraint(equalTo: stagesContainer.trailingAnchor),
             textContainer.bottomAnchor.constraint(equalTo: stagesContainer.bottomAnchor),
 
-            optionsLabel.topAnchor.constraint(equalTo: stagesContainer.bottomAnchor, constant: 6),
+            // The 40pt options box is what hangs below the stage editor, not
+            // the label: centring the box on the label instead pushed its top
+            // edge ~11pt above the label and over the +/- stage buttons.
+            optionsScroll.topAnchor.constraint(equalTo: stagesContainer.bottomAnchor, constant: 6),
             optionsLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
-            optionsScroll.centerYAnchor.constraint(equalTo: optionsLabel.centerYAnchor),
+            optionsLabel.centerYAnchor.constraint(equalTo: optionsScroll.centerYAnchor),
             optionsScroll.leadingAnchor.constraint(
                 equalTo: optionsLabel.trailingAnchor, constant: 6),
             optionsScroll.trailingAnchor.constraint(
