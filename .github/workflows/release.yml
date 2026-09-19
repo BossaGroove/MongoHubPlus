@@ -22,7 +22,7 @@ jobs:
       HAS_NOTARY: ${{ secrets.APPLE_ID != '' && secrets.APPLE_APP_PASSWORD != '' }}
       HAS_SPARKLE: ${{ secrets.SPARKLE_ED_PRIVATE_KEY != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Fails before the (long) build if the tagged version has no changelog
       # entry — the release notes feed both Sparkle and the GitHub release.
