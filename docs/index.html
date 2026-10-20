@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MongoHub Plus — native macOS MongoDB GUI</title>
+<meta name="description" content="MongoHub Plus is a free, open-source native macOS MongoDB GUI: the modern revival of MongoHub. Query, aggregate, explain, and edit documents with full BSON type fidelity. Works with MongoDB Atlas. Apple Silicon and Intel.">
+<link rel="canonical" href="https://bossagroove.github.io/MongoHubPlus/">
+<meta name="theme-color" content="#0F3D2A">
+<meta name="color-scheme" content="light dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MongoHub Plus">
+<meta property="og:title" content="MongoHub Plus — native macOS MongoDB GUI">
+<meta property="og:description" content="The modern revival of MongoHub. A free, open-source Mac app for MongoDB and Atlas, written in Swift.">
+<meta property="og:url" content="https://bossagroove.github.io/MongoHubPlus/">
+<meta property="og:image" content="https://bossagroove.github.io/MongoHubPlus/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MongoHub Plus app icon next to its query window">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MongoHub Plus",
+  "description": "A native macOS MongoDB GUI: the modern revival of MongoHub.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS 14 or later",
+  "softwareVersion": "4.4.0",
+  "url": "https://bossagroove.github.io/MongoHubPlus/",
+  "downloadUrl": "https://github.com/BossaGroove/MongoHubPlus/releases/latest",
+  "image": "https://bossagroove.github.io/MongoHubPlus/assets/icon-256.png",
+  "screenshot": "https://bossagroove.github.io/MongoHubPlus/assets/query.webp",
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "BossaGroove", "url": "https://github.com/BossaGroove" },
+  "codeRepository": "https://github.com/BossaGroove/MongoHubPlus"
+}
+</script>
+
+<style>
+:root {
+  --brand: #1E5C41;
+  --brand-deep: #0F3D2A;
+  --mango: #F6A821;
+  --mango-ink: #2A1A00;
+
+  --bg: #F7F8F5;
+  --surface: #FFFFFF;
+  --text: #13201A;
+  --muted: #4E5F56;
+  --line: #DDE3DE;
+  --accent: #1E5C41;
+  --code-bg: #EEF2EE;
+  --shadow: 0 1px 2px rgb(15 61 42 / .06), 0 8px 24px rgb(15 61 42 / .07);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1510;
+    --surface: #111F18;
+    --text: #E6EEE9;
+    --muted: #9DB0A5;
+    --line: #22362C;
+    --accent: #7FC79E;
+    --code-bg: #0F1C16;
+    --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1510;
+  --surface: #111F18;
+  --text: #E6EEE9;
+  --muted: #9DB0A5;
+  --line: #22362C;
+  --accent: #7FC79E;
+  --code-bg: #0F1C16;
+  --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+.story > *, .show > *, .dl > *, .grid > * { min-width: 0; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace; }
+code { font-size: .9em; background: var(--code-bg); padding: .1em .35em; border-radius: 5px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 600px) { .wrap { padding: 0 16px; } }
+
+/* Header */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: rgb(15 61 42 / .92);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid rgb(255 255 255 / .08);
+}
+.top .wrap { display: flex; align-items: center; gap: 24px; height: 56px; }
+.brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 650; letter-spacing: -.01em; }
+.brand img { width: 28px; height: 28px; }
+.top nav { margin-left: auto; display: flex; gap: 22px; }
+.top nav a { color: rgb(255 255 255 / .82); text-decoration: none; font-size: 15px; }
+.top nav a:hover { color: #fff; }
+@media (max-width: 640px) { .top nav a:not(.gh) { display: none; } }
+
+/* Hero */
+.hero {
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgb(246 168 33 / .16), transparent 60%),
+    linear-gradient(180deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: #F2F7F3;
+  padding: 72px 0 0;
+  overflow: hidden;
+  text-align: center;
+}
+.hero-icon { width: 128px; height: 128px; margin: 0 auto 20px; filter: drop-shadow(0 12px 28px rgb(0 0 0 / .35)); }
+.hero h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.05; letter-spacing: -.03em; margin: 0 0 16px; font-weight: 750; }
+.hero .lead { font-size: clamp(18px, 2.4vw, 22px); color: rgb(242 247 243 / .86); max-width: 680px; margin: 0 auto 32px; line-height: 1.45; }
+.cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 22px; border-radius: 12px;
+  font-weight: 650; font-size: 16px; text-decoration: none;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--mango); color: var(--mango-ink); box-shadow: 0 6px 20px rgb(246 168 33 / .35); }
+.btn-primary:hover { background: #FFB838; }
+.btn-ghost { color: #fff; border: 1px solid rgb(255 255 255 / .28); }
+.btn-ghost:hover { background: rgb(255 255 255 / .08); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.hero .meta { margin: 18px 0 0; font-size: 14px; color: rgb(242 247 243 / .7); }
+.hero-shot { margin: 48px auto -2px; max-width: 1040px; }
+.hero-shot img { width: 100%; }
+
+section { padding: 88px 0; }
+section + section { border-top: 1px solid var(--line); }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -.02em; margin: 0 0 16px; font-weight: 720; }
+h3 { font-size: 18px; margin: 0 0 6px; letter-spacing: -.01em; }
+.sub { color: var(--muted); max-width: 720px; margin: 0 0 40px; font-size: 18px; }
+@media (max-width: 600px) { section { padding: 64px 0; } }
+
+/* Story */
+.story { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: start; }
+.story p { color: var(--muted); margin: 0 0 16px; }
+.pillars { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.pillars li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+.pillars strong { display: block; margin-bottom: 2px; }
+.pillars span { color: var(--muted); font-size: 15px; }
+@media (max-width: 860px) { .story { grid-template-columns: 1fr; gap: 32px; } }
+
+/* Features */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+.card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.card .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 14px; background: rgb(30 92 65 / .12); color: var(--accent); }
+.card .ic svg { width: 20px; height: 20px; }
+.card .new { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--mango-ink); background: var(--mango); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: 2px; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+/* Showcase */
+.show { display: grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items: center; margin-bottom: 72px; }
+.show:last-child { margin-bottom: 0; }
+.show.flip { grid-template-columns: 1.5fr 1fr; }
+.show.flip .txt { order: 2; }
+.show .txt p { color: var(--muted); margin: 0; }
+.show ul { color: var(--muted); padding-left: 20px; margin: 12px 0 0; }
+.show ul li { margin: 4px 0; }
+@media (max-width: 860px) {
+  .show, .show.flip { grid-template-columns: 1fr; gap: 20px; }
+  .show.flip .txt { order: 0; }
+}
+
+/* Code */
+.code-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.code-pair figure { margin: 0; min-width: 0; }
+.code-pair figcaption { font-size: 14px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+pre {
+  margin: 0; padding: 18px 20px; border-radius: 14px;
+  background: #0E1A14; color: #DCE7E0; border: 1px solid #1E3329;
+  font-size: 14px; line-height: 1.6; overflow-x: auto;
+}
+pre .k { color: #8FD3AE; }
+pre .s { color: #F6C46A; }
+pre .f { color: #9CC4FF; }
+pre .n { color: #F59E8B; }
+@media (max-width: 760px) { .code-pair { grid-template-columns: 1fr; } }
+
+/* Download */
+.dl { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
+.dl ol { padding-left: 20px; margin: 0 0 24px; color: var(--muted); }
+.dl ol li { margin: 6px 0; }
+.req { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px 24px; box-shadow: var(--shadow); }
+.req dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; font-size: 15px; }
+.req dt { color: var(--muted); }
+.req dd { margin: 0; font-weight: 550; overflow-wrap: anywhere; }
+.dl .btn-ghost { color: var(--text); border-color: var(--line); }
+.dl .btn-ghost:hover { background: var(--code-bg); }
+@media (max-width: 860px) { .dl { grid-template-columns: 1fr; } }
+
+/* FAQ */
+.faq { max-width: 820px; }
+.faq details { border-bottom: 1px solid var(--line); padding: 18px 0; }
+.faq summary { cursor: pointer; font-weight: 620; font-size: 17px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 22px; line-height: 1; }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { color: var(--muted); margin: 10px 0 0; }
+
+/* Footer */
+footer { background: var(--brand-deep); color: rgb(230 238 233 / .75); padding: 48px 0; font-size: 14px; }
+footer a { color: #fff; }
+footer .row { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+footer p { margin: 0 0 8px; }
+footer .fine { margin-top: 20px; font-size: 12.5px; color: rgb(230 238 233 / .55); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="assets/icon-256.png" alt="" width="28" height="28">MongoHub Plus</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#queries">Queries</a>
+      <a href="#download">Download</a>
+      <a href="#faq">FAQ</a>
+      <a class="gh" href="https://github.com/BossaGroove/MongoHubPlus">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <img class="hero-icon" src="assets/icon-256.png" alt="MongoHub Plus app icon" width="128" height="128">
+    <h1>MongoHub Plus</h1>
+    <p class="lead">The native macOS MongoDB GUI. MongoHub, rebuilt from scratch in Swift for today's Mac, with Atlas support and a decade of new features.</p>
+    <div class="cta">
+      <a class="btn btn-primary js-dmg" href="https://github.com/BossaGroove/MongoHubPlus/releases/latest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+        Download for macOS
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/BossaGroove/MongoHubPlus">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <p class="meta"><span class="js-version">Version 4.4.0</span> · Free &amp; open source (MIT) · macOS 14+ · Apple Silicon &amp; Intel</p>
+    <div class="hero-shot">
+      <img src="assets/query.webp" width="2000" height="1260" alt="MongoHub Plus query window: a collection's documents shown as an expandable BSON tree with each value's type" fetchpriority="high">
+    </div>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap story">
+    <div>
+      <p class="eyebrow">The revival</p>
+      <h2>MongoHub is back, on a modern Mac.</h2>
+      <p><a href="https://github.com/jeromelebel/MongoHub-Mac">MongoHub</a> was a well-loved Mac client for MongoDB from 2010 to 2015, created by Syd Xu and later maintained by Jérôme Lebel. It was abandoned a decade ago. It targets OS X 10.8, runs on Intel only, and no longer builds on any current Mac.</p>
+      <p>MongoHub Plus is a from-scratch rewrite with the same window layout and workflows. If you used MongoHub, you'll know where everything is. Underneath it's new: Swift 6, AppKit and the pure-Swift MongoKitten driver.</p>
+    </div>
+    <ul class="pillars">
+      <li><strong>Native, not a web view</strong><span>Swift 6 and AppKit, with system dark and light appearance and the keyboard shortcuts you expect.</span></li>
+      <li><strong>Universal, signed, sandboxed</strong><span>One download for Apple Silicon and Intel. Developer ID-signed, notarized by Apple, and runs in the App Sandbox.</span></li>
+      <li><strong>Your data stays exact</strong><span>Key order and BSON types are kept end to end. Edits are verified byte by byte, so a Decimal never quietly turns into a Double.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <p class="eyebrow">Features</p>
+    <h2>Everything you do with MongoDB, in one native app.</h2>
+    <p class="sub">The original's full toolset is here, plus features it never had.</p>
+    <div class="grid">
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 100-9 6 6 0 00-11.6 2A3.5 3.5 0 006.5 19z"/></svg></div>
+        <h3>MongoDB Atlas <span class="new">New</span></h3>
+        <p><code>mongodb+srv://</code> seed lists, TLS and SCRAM auth. Paste a connection string and go. Replica sets, sharded clusters and SSH tunnels work too.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>
+        <h3>Find, insert, update, remove</h3>
+        <p>Query history, projection, sort and paging. The Update tab previews the matched documents with the change marked before you run it.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+        <h3>Aggregation builder <span class="new">New</span></h3>
+        <p>Build pipelines stage by stage: drag to reorder, toggle stages on and off, and preview the results after any stage. Switch to text at any time.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+        <h3>Explain plans <span class="new">New</span></h3>
+        <p>One click on any query or pipeline shows whether it used an index or scanned the collection, with execution stats and index suggestions.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></div>
+        <h3>Edit with type fidelity</h3>
+        <p>Edit values in place in the results tree, or in a syntax-colored JSON editor. Every save is round-trip checked so types never change silently.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"/></svg></div>
+        <h3>Live change-stream Tail <span class="new">New</span></h3>
+        <p>Watch inserts, updates and deletes arrive on a collection in real time, on replica sets and Atlas.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <h3>Index insight</h3>
+        <p>Create and drop indexes, see each one's size and usage count, and spot the ones that have never been used.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg></div>
+        <h3>Import &amp; export</h3>
+        <p>JSON Lines in canonical Extended JSON, spreadsheet-friendly CSV, and BSON folders that <code>mongorestore</code> reads directly.</p>
+      </article>
+      <article class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg></div>
+        <h3>Six languages</h3>
+        <p>English, 日本語, Deutsch, 繁體中文, 简体中文 and Français, switchable in Settings. Updates arrive automatically through Sparkle.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="tour">
+  <div class="wrap">
+    <div class="show">
+      <div class="txt">
+        <p class="eyebrow">Aggregation</p>
+        <h2>See every stage of your pipeline.</h2>
+        <p>Pick a stage and the preview shows the documents as they leave it. Find the stage that drops your data without copying the pipeline into a shell.</p>
+      </div>
+      <img src="assets/aggregation.webp" width="2000" height="1260" loading="lazy" alt="Aggregation stage builder with a live preview of the documents after the selected stage">
+    </div>
+    <div class="show flip">
+      <div class="txt">
+        <p class="eyebrow">Explain</p>
+        <h2>Know if your query uses an index.</h2>
+        <p>The verdict comes first: index scan or collection scan. Below it are the winning plan, documents examined against returned, and an index suggestion when one would help.</p>
+      </div>
+      <img src="assets/explain.webp" width="2000" height="1203" loading="lazy" alt="Explain plan sheet showing an index verdict, the winning plan chain and execution stats">
+    </div>
+    <div class="show">
+      <div class="txt">
+        <p class="eyebrow">Connections</p>
+        <h2>All your clusters, one window.</h2>
+        <p>Local servers, Atlas, replica sets and sharded clusters side by side. Pin favorites and search by name. Passwords live in the macOS Keychain, never in a settings file.</p>
+      </div>
+      <img src="assets/connections.webp" width="1864" height="914" loading="lazy" alt="Connection manager showing saved connections as cards, including Atlas and replica sets">
+    </div>
+  </div>
+</section>
+
+<section id="queries">
+  <div class="wrap">
+    <p class="eyebrow">Queries</p>
+    <h2>Type queries the way you already do.</h2>
+    <p class="sub">Paste official MongoDB Extended JSON straight from Compass or <code>mongoexport</code>, or type mongosh shorthand with unquoted keys and <code>ObjectId(…)</code>. Mix them freely. Paste a bare id and it looks up that document.</p>
+    <div class="code-pair">
+      <figure>
+        <figcaption>mongosh shorthand</figcaption>
+<pre>{ <span class="k">price</span>: { <span class="k">$gt</span>: <span class="f">NumberDecimal</span>(<span class="s">'20'</span>) },
+  <span class="k">published</span>: { <span class="k">$lt</span>: <span class="f">ISODate</span>(<span class="s">'2000-01-01'</span>) } }</pre>
+      </figure>
+      <figure>
+        <figcaption>Extended JSON v2</figcaption>
+<pre>{ <span class="s">"price"</span>: { <span class="s">"$gt"</span>: { <span class="s">"$numberDecimal"</span>: <span class="s">"20"</span> } },
+  <span class="s">"published"</span>: { <span class="s">"$lt"</span>: { <span class="s">"$date"</span>: <span class="s">"2000-01-01T00:00:00Z"</span> } } }</pre>
+      </figure>
+    </div>
+    <p style="color:var(--muted);margin:0">Exports are always standard Extended JSON, so Compass, <code>mongoimport</code> and every driver can read them. <a href="https://github.com/BossaGroove/MongoHubPlus#writing-queries">Full syntax reference</a></p>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap dl">
+    <div>
+      <p class="eyebrow">Download</p>
+      <h2>Free, and yours to keep.</h2>
+      <ol>
+        <li>Download the latest <code>MongoHubPlus.dmg</code>.</li>
+        <li>Open it and drag <strong>MongoHub Plus</strong> into Applications.</li>
+        <li>That's it. The app updates itself (Settings → Software Update).</li>
+      </ol>
+      <div class="cta" style="justify-content:flex-start">
+        <a class="btn btn-primary js-dmg" href="https://github.com/BossaGroove/MongoHubPlus/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+          Download for macOS
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/BossaGroove/MongoHubPlus/blob/master/CHANGELOG.md">What's new</a>
+      </div>
+    </div>
+    <div class="req">
+      <dl>
+        <dt>Version</dt><dd class="js-version-plain">4.4.0</dd>
+        <dt>Requires</dt><dd>macOS 14 Sonoma or later</dd>
+        <dt>Runs on</dt><dd>Apple Silicon and Intel</dd>
+        <dt>MongoDB</dt><dd>6.0 and later, including Atlas</dd>
+        <dt>Price</dt><dd>Free, MIT licensed</dd>
+        <dt>Source</dt><dd><a href="https://github.com/BossaGroove/MongoHubPlus">github.com/BossaGroove/MongoHubPlus</a></dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap faq">
+    <p class="eyebrow">FAQ</p>
+    <h2>Questions</h2>
+    <details>
+      <summary>Is this the original MongoHub?</summary>
+      <p>No. It's a new app written from scratch that follows the original's design and workflows. The original MongoHub hasn't been updated since 2015 and doesn't run on current macOS. MongoHub Plus continues its version line from 4.0.</p>
+    </details>
+    <details>
+      <summary>Does it work with MongoDB Atlas?</summary>
+      <p>Yes. Paste your <code>mongodb+srv://</code> connection string from the Atlas console. TLS and SCRAM authentication are supported, and change-stream Tail works on Atlas clusters.</p>
+    </details>
+    <details>
+      <summary>Which MongoDB versions are supported?</summary>
+      <p>MongoDB 6.0 and later are supported and tested. Older servers may work but aren't tested.</p>
+    </details>
+    <details>
+      <summary>Does it run on Apple Silicon?</summary>
+      <p>Yes. The app is a universal binary that runs natively on both Apple Silicon and Intel Macs with macOS 14 or later.</p>
+    </details>
+    <details>
+      <summary>Is it free? Where is my password stored?</summary>
+      <p>It's free and open source under the MIT license. Connection passwords are stored in the macOS Keychain, and the app runs in Apple's App Sandbox.</p>
+    </details>
+    <details>
+      <summary>How does it compare with MongoDB Compass?</summary>
+      <p>Compass is MongoDB's own cross-platform app built on Electron. MongoHub Plus is a native Mac app, so it's smaller and starts quickly, and it reads and writes the same Extended JSON that Compass does.</p>
+    </details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <p><strong style="color:#fff">MongoHub Plus</strong> · MIT License · <a href="https://github.com/BossaGroove/MongoHubPlus">GitHub</a> · <a href="https://github.com/BossaGroove/MongoHubPlus/issues">Report an issue</a></p>
+        <p>With thanks to <a href="https://github.com/bububa">Syd Xu</a> and <a href="https://github.com/jeromelebel">Jérôme Lebel</a>, who created and maintained the original <a href="https://github.com/jeromelebel/MongoHub-Mac">MongoHub</a>.</p>
+      </div>
+    </div>
+    <p class="fine">MongoHub Plus is an independent project and is not affiliated with or endorsed by MongoDB, Inc. MongoDB and Atlas are trademarks of MongoDB, Inc. Mango artwork by <a href="https://uxwing.com">UXWing</a>.</p>
+  </div>
+</footer>
+
+<script>
+// Point the download buttons straight at the latest DMG and show its version.
+// The static links (Releases page, 4.4.0) remain if the API is unreachable.
+(async () => {
+  try {
+    const r = await fetch("https://api.github.com/repos/BossaGroove/MongoHubPlus/releases/latest");
+    if (!r.ok) return;
+    const rel = await r.json();
+    const dmg = (rel.assets || []).find(a => a.name.endsWith(".dmg"));
+    const version = (rel.tag_name || "").replace(/^v/, "");
+    if (dmg) document.querySelectorAll(".js-dmg").forEach(a => { a.href = dmg.browser_download_url; });
+    if (version) {
+      document.querySelectorAll(".js-version").forEach(el => { el.textContent = "Version " + version; });
+      document.querySelectorAll(".js-version-plain").forEach(el => { el.textContent = version; });
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>
