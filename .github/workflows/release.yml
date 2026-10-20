@@ -50,6 +50,19 @@ jobs:
           fi
           cat release-notes.md
 
+      # The landing page (GitHub Pages, served from docs/ on master) states
+      # the current version; fail here too rather than publish a release the
+      # site doesn't mention.
+      - name: Check the landing page shows this version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          scripts/update-site-version.sh "$VERSION"
+          if ! git diff --exit-code -- docs; then
+            echo "docs/ doesn't show $VERSION — run" \
+              "scripts/update-site-version.sh $VERSION, commit, and retag." >&2
+            exit 1
+          fi
+
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
