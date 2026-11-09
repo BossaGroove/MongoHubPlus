@@ -9,6 +9,15 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.4.1 — unreleased
+
+### Changed
+
+- **Dates in the results show their time zone.** In the Compact results view a
+  date now reads `2026-11-09 02:30:00 +09:00` instead of
+  `2026-11-09 02:30:00`, so it is clear the time is your Mac's local time and
+  not the UTC value stored in the database.
+
 ## 4.4.0 — 2026-09-20
 
 ### Added

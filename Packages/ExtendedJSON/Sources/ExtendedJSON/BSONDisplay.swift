@@ -46,13 +46,23 @@ public enum BSONDisplay {
         }
     }
 
-    // Legacy displayed dates in the local time zone (issue #174).
-    private static let dateFormatter: DateFormatter = {
+    // Legacy displayed dates in the local time zone (issue #174). The offset
+    // goes with it so the reader can tell which zone that is — "+09:00", and
+    // "+00:00" rather than "Z" so every row has the same shape.
+    private static func makeDateFormatter(timeZone: TimeZone?) -> DateFormatter {
         let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        f.dateFormat = "yyyy-MM-dd HH:mm:ss xxxxx"
         f.locale = Locale(identifier: "en_US_POSIX")
+        if let timeZone { f.timeZone = timeZone }
         return f
-    }()
+    }
+
+    private static let dateFormatter = makeDateFormatter(timeZone: nil)
+
+    /// The Value-column date string in an explicit zone (tests pin one).
+    static func dateString(_ date: Date, timeZone: TimeZone) -> String {
+        makeDateFormatter(timeZone: timeZone).string(from: date)
+    }
 
     public static func valueString(_ value: Primitive) -> String {
         switch value {
