@@ -35,13 +35,52 @@ final class MCPController {
 
     var endpointURL: String { "http://127.0.0.1:\(Preferences.mcpPort)\(MCPEndpoint.path)" }
 
-    /// The one-time Terminal command that adds this server to Claude Code,
-    /// for every project (user scope).
-    /// nil when the token can't be read.
-    var claudeCommand: String? {
+    /// The assistants Settings ▸ MCP shows a setup for (owner request
+    /// 2026-11-19; formats from each one's MCP documentation).
+    enum Client: String, CaseIterable, Identifiable {
+        case claudeCode, codex, antigravity
+
+        var id: Self { self }
+
+        var displayName: String {
+            switch self {
+            case .claudeCode: return "Claude Code"
+            case .codex: return "Codex"
+            case .antigravity: return "Antigravity"
+            }
+        }
+    }
+
+    /// What adds this server to `client`, for every project: a Terminal
+    /// command for Claude Code (user scope), a table for Codex's
+    /// ~/.codex/config.toml, an mcp_config.json entry for Antigravity. nil
+    /// when the token can't be read.
+    func setup(for client: Client) -> String? {
         guard let token else { return nil }
-        return
-            #"claude mcp add --scope user --transport http \#(Self.serverName) \#(endpointURL) --header "Authorization: Bearer \#(token)""#
+        switch client {
+        case .claudeCode:
+            return
+                #"claude mcp add --scope user --transport http \#(Self.serverName) \#(endpointURL) --header "Authorization: Bearer \#(token)""#
+        case .codex:
+            return """
+                [mcp_servers.\(Self.serverName)]
+                url = "\(endpointURL)"
+                http_headers = { "Authorization" = "Bearer \(token)" }
+                """
+        case .antigravity:
+            return """
+                {
+                  "mcpServers": {
+                    "\(Self.serverName)": {
+                      "serverUrl": "\(endpointURL)",
+                      "headers": {
+                        "Authorization": "Bearer \(token)"
+                      }
+                    }
+                  }
+                }
+                """
+        }
     }
 
     /// The token, created on first use. nil when the Keychain can't be read,

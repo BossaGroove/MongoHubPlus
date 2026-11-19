@@ -285,6 +285,13 @@ enum Preferences {
 
     static let mcpDefaultPort = 47017
 
+    /// The assistant Settings ▸ MCP shows the setup for
+    /// (`MCPController.Client` raw value).
+    static var mcpClient: String {
+        get { defaults.string(forKey: "mcpClient") ?? "claudeCode" }
+        set { defaults.set(newValue, forKey: "mcpClient") }
+    }
+
     static var mcpPort: Int {
         get {
             let port = defaults.integer(forKey: "mcpPort")

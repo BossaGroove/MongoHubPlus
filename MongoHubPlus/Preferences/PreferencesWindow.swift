@@ -374,6 +374,8 @@ private struct MCPSettings: View {
     @State private var port = Preferences.mcpPort
     @State private var portWarning = ""
     @State private var status = MCPController.shared.status
+    @State private var client =
+        MCPController.Client(rawValue: Preferences.mcpClient) ?? .claudeCode
     @State private var command = ""
     @State private var copied = false
     @State private var confirmingNewToken = false
@@ -408,22 +410,29 @@ private struct MCPSettings: View {
 
             if enabled {
                 Section {
+                    Picker("Assistant:", selection: $client) {
+                        ForEach(MCPController.Client.allCases) { client in
+                            Text(verbatim: client.displayName).tag(client)
+                        }
+                    }
+                    .onChange(of: client) { _, newValue in
+                        Preferences.mcpClient = newValue.rawValue
+                        refreshCommand()
+                    }
                     Text(verbatim: command)
                         .font(.system(.callout, design: .monospaced))
                         .textSelection(.enabled)
                         .fixedSize(horizontal: false, vertical: true)
                     HStack {
-                        Button(copied ? "Copied" : "Copy Command") { copyCommand() }
+                        Button(copied ? "Copied" : copyTitle) { copyCommand() }
                         Button("New Token…") { confirmingNewToken = true }
                     }
                 } header: {
-                    Text("Add to Claude Code")
+                    Text("Add to an Assistant")
                 } footer: {
-                    Text(
-                        "Run this once in Terminal. It adds MongoHub Plus to Claude Code for all your projects. The command contains the token, so treat it like a password."
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    Text(setupHelp)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -445,7 +454,7 @@ private struct MCPSettings: View {
             }
         } message: {
             Text(
-                "Assistants using the current token will be refused until you run the new command."
+                "Assistants using the current token will be refused until you set them up again with the new one."
             )
         }
     }
@@ -464,10 +473,36 @@ private struct MCPSettings: View {
         return false
     }
 
+    private var copyTitle: String {
+        client == .claudeCode
+            ? String(localized: "Copy Command") : String(localized: "Copy Config")
+    }
+
+    /// Where the setup goes, for the chosen assistant.
+    private var setupHelp: String {
+        switch client {
+        case .claudeCode:
+            return String(
+                localized:
+                    "Run this once in Terminal. It adds MongoHub Plus to Claude Code for all your projects. The command contains the token, so treat it like a password."
+            )
+        case .codex:
+            return String(
+                localized:
+                    "Add this to ~/.codex/config.toml (create the file if it doesn't exist), then restart Codex. It adds MongoHub Plus for all your projects. It contains the token, so treat it like a password."
+            )
+        case .antigravity:
+            return String(
+                localized:
+                    "In Antigravity, click … at the top of the agent panel, then MCP Servers ▸ Manage MCP Servers ▸ View raw config. Paste this in; if other servers are already listed, add just the \"mongohubplus\" entry inside \"mcpServers\". It contains the token, so treat it like a password."
+            )
+        }
+    }
+
     private func refreshCommand() {
         copied = false
-        // Reading the command creates the token, so only do it once enabled.
-        command = enabled ? MCPController.shared.claudeCommand ?? "" : ""
+        // Reading the setup creates the token, so only do it once enabled.
+        command = enabled ? MCPController.shared.setup(for: client) ?? "" : ""
     }
 
     private func copyCommand() {
