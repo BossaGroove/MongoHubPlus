@@ -24,6 +24,7 @@
 		5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */; };
 		610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 092AB847135892A39A41C92B /* MCPConnections.swift */; };
 		619B81B021CF16C45216711D /* MCPWriteTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */; };
+		64840F3EA6EB0EFE01AAB64C /* MCPIndexTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = A72CAC1591AEE3FDB9A500CF /* MCPIndexTools.swift */; };
 		68B0B773D2C194EF7BDF09DC /* MCPAggregationTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B87EF83915927B16F87B3D7 /* MCPAggregationTools.swift */; };
 		6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C4BDB065238D92127A7108 /* Preferences.swift */; };
 		6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F283322B6230E66016034C0 /* Changelog.swift */; };
@@ -97,6 +98,7 @@
 		96EF8F83C6F8EB795296554B /* PendingActionWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingActionWindowController.swift; sourceTree = "<group>"; };
 		A1E522505CB2C92033153CC7 /* MCPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPController.swift; sourceTree = "<group>"; };
 		A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitorTabController.swift; sourceTree = "<group>"; };
+		A72CAC1591AEE3FDB9A500CF /* MCPIndexTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPIndexTools.swift; sourceTree = "<group>"; };
 		B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONEditorWindowController.swift; sourceTree = "<group>"; };
 		B7E828940898163A28CCB599 /* QueryPaneSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPaneSupport.swift; sourceTree = "<group>"; };
 		B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindow.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				2B87EF83915927B16F87B3D7 /* MCPAggregationTools.swift */,
 				092AB847135892A39A41C92B /* MCPConnections.swift */,
 				A1E522505CB2C92033153CC7 /* MCPController.swift */,
+				A72CAC1591AEE3FDB9A500CF /* MCPIndexTools.swift */,
 				5285C8B28C30551C90A04A98 /* MCPTools.swift */,
 				FAEDB2E4059504AE735DFD4D /* MCPViewTools.swift */,
 				15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */,
@@ -430,6 +433,7 @@
 				68B0B773D2C194EF7BDF09DC /* MCPAggregationTools.swift in Sources */,
 				610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */,
 				F59C6600895175F967AF53C0 /* MCPController.swift in Sources */,
+				64840F3EA6EB0EFE01AAB64C /* MCPIndexTools.swift in Sources */,
 				A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */,
 				83B538831B88364E3675C571 /* MCPViewTools.swift in Sources */,
 				619B81B021CF16C45216711D /* MCPWriteTools.swift in Sources */,
