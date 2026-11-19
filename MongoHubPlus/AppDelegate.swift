@@ -47,6 +47,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.mainMenu = buildMainMenu()
         openConnectionListWindow(nil)
         NSApp.activate()
+        // Starts the MCP server only if Settings ▸ MCP has it on.
+        MCPController.shared.reload()
 
         // UI-verification hooks (used by automated screenshot checks):
         //   open …/MongoHub Plus.app --args -MAEditFirstConnection YES

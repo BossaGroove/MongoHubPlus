@@ -25,7 +25,7 @@ final class PreferencesWindowController: NSWindowController {
 }
 
 private enum SettingsSection: String, CaseIterable, Identifiable {
-    case general, results, syntax, editor, connection
+    case general, results, syntax, editor, connection, mcp
     case softwareUpdate = "update"
 
     var id: String { rawValue }
@@ -37,6 +37,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         case .syntax: return String(localized: "Syntax")
         case .editor: return String(localized: "Editor")
         case .connection: return String(localized: "Connection")
+        case .mcp: return String(localized: "MCP")
         case .softwareUpdate: return String(localized: "Software Update")
         }
     }
@@ -48,6 +49,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         case .syntax: return "textformat"
         case .editor: return "curlybraces"
         case .connection: return "network"
+        case .mcp: return "point.3.connected.trianglepath.dotted"
         case .softwareUpdate: return "arrow.triangle.2.circlepath"
         }
     }
@@ -87,6 +89,7 @@ private struct SettingsRootView: View {
                 case .syntax: SyntaxSettings()
                 case .editor: EditorSettings()
                 case .connection: ConnectionSettings()
+                case .mcp: MCPSettings()
                 case .softwareUpdate: UpdateSettings()
                 }
             }
@@ -361,6 +364,128 @@ private struct ConnectionSettings: View {
         timeoutWarning = ""
         Preferences.connectTimeoutMS = connectTimeout
         Preferences.socketTimeoutMS = socketTimeout
+    }
+}
+
+// MARK: - MCP (AI assistants; internal mcp-tools.md)
+
+private struct MCPSettings: View {
+    @State private var enabled = Preferences.mcpEnabled
+    @State private var port = Preferences.mcpPort
+    @State private var portWarning = ""
+    @State private var status = MCPController.shared.status
+    @State private var command = ""
+    @State private var copied = false
+    @State private var confirmingNewToken = false
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Allow AI assistants to connect", isOn: $enabled)
+                    .onChange(of: enabled) { _, newValue in
+                        Preferences.mcpEnabled = newValue
+                        MCPController.shared.reload()
+                        refreshCommand()
+                    }
+                TextField("Port:", value: $port, format: .number.grouping(.never))
+                    .onSubmit { commitPort() }
+                LabeledContent("Status:") {
+                    Text(statusText)
+                        .foregroundStyle(isFailed ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
+                }
+            } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    if !portWarning.isEmpty {
+                        Text(portWarning).foregroundStyle(.red)
+                    }
+                    Text(
+                        "Runs an MCP server on this Mac only (127.0.0.1). Assistants can list your saved connections by name. They never see hosts, connection strings or passwords."
+                    )
+                    .foregroundStyle(.secondary)
+                }
+                .font(.caption)
+            }
+
+            if enabled {
+                Section {
+                    Text(verbatim: command)
+                        .font(.system(.callout, design: .monospaced))
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack {
+                        Button(copied ? "Copied" : "Copy Command") { copyCommand() }
+                        Button("New Token…") { confirmingNewToken = true }
+                    }
+                } header: {
+                    Text("Add to Claude Code")
+                } footer: {
+                    Text(
+                        "Run this once in Terminal. It adds MongoHub Plus to Claude Code for all your projects. The command contains the token, so treat it like a password."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .onAppear {
+            enabled = Preferences.mcpEnabled
+            port = Preferences.mcpPort
+            status = MCPController.shared.status
+            refreshCommand()
+        }
+        .onDisappear { commitPort() }
+        .onReceive(NotificationCenter.default.publisher(for: .mcpStatusDidChange)) { _ in
+            status = MCPController.shared.status
+        }
+        .alert("Create a new token?", isPresented: $confirmingNewToken) {
+            Button("Cancel", role: .cancel) {}
+            Button("New Token") {
+                MCPController.shared.regenerateToken()
+                refreshCommand()
+            }
+        } message: {
+            Text(
+                "Assistants using the current token will be refused until you run the new command."
+            )
+        }
+    }
+
+    private var statusText: String {
+        switch status {
+        case .off: return String(localized: "Off")
+        case .starting: return String(localized: "Starting…")
+        case .running(let port): return String(localized: "Listening on 127.0.0.1:\(String(port))")
+        case .failed(let message): return message
+        }
+    }
+
+    private var isFailed: Bool {
+        if case .failed = status { return true }
+        return false
+    }
+
+    private func refreshCommand() {
+        copied = false
+        // Reading the command creates the token, so only do it once enabled.
+        command = enabled ? MCPController.shared.claudeCommand : ""
+    }
+
+    private func copyCommand() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(command, forType: .string)
+        copied = true
+    }
+
+    private func commitPort() {
+        guard (1024...65535).contains(port) else {
+            portWarning = String(localized: "The port must be between 1024 and 65535.")
+            return
+        }
+        portWarning = ""
+        guard port != Preferences.mcpPort else { return }
+        Preferences.mcpPort = port
+        MCPController.shared.reload()
+        refreshCommand()
     }
 }
 

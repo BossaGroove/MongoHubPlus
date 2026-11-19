@@ -41,10 +41,14 @@ enum Keychain {
     }()
 
     private static func baseQuery(_ id: UUID, _ kind: Kind) -> [String: Any] {
+        baseQuery(account: account(id, kind))
+    }
+
+    private static func baseQuery(account: String) -> [String: Any] {
         var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: account(id, kind),
+            kSecAttrAccount as String: account,
         ]
         if dataProtectionAvailable {
             query[kSecUseDataProtectionKeychain as String] = true
@@ -91,6 +95,47 @@ enum Keychain {
     static func deleteAll(for id: UUID) {
         deletePassword(for: id, kind: .mongo)
         deletePassword(for: id, kind: .ssh)
+    }
+
+    // MARK: - App secrets
+
+    /// Secrets that belong to the app rather than a connection, e.g. the MCP
+    /// server's token. Named so they can't collide with connection accounts
+    /// (which are UUID-prefixed).
+    enum AppSecret: String {
+        case mcpToken = "app.mcp-token"
+
+        var label: String {
+            switch self {
+            case .mcpToken: return "MongoHub Plus MCP token"
+            }
+        }
+    }
+
+    static func secret(_ secret: AppSecret) -> String? {
+        var query = baseQuery(account: secret.rawValue)
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess, let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func setSecret(_ value: String, for secret: AppSecret) throws {
+        let data = Data(value.utf8)
+        let query = baseQuery(account: secret.rawValue)
+        let status = SecItemUpdate(
+            query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        if status == errSecItemNotFound {
+            var add = query
+            add[kSecValueData as String] = data
+            add[kSecAttrLabel as String] = secret.label
+            let addStatus = SecItemAdd(add as CFDictionary, nil)
+            guard addStatus == errSecSuccess else { throw KeychainError(status: addStatus) }
+        } else if status != errSecSuccess {
+            throw KeychainError(status: status)
+        }
     }
 }
 

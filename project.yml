@@ -13,6 +13,8 @@ packages:
     path: Packages/MongoService
   SSHTunnel:
     path: Packages/SSHTunnel
+  MCPServer:
+    path: Packages/MCPServer
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: 2.9.6
@@ -40,6 +42,7 @@ targets:
       - package: ExtendedJSON
       - package: MongoService
       - package: SSHTunnel
+      - package: MCPServer
       - package: Sparkle
     info:
       path: MongoHubPlus/Info.plist

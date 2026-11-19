@@ -273,6 +273,29 @@ enum Preferences {
         return uri + (uri.contains("?") ? "&" : "?") + options.joined(separator: "&")
     }
 
+    /// The MCP server for AI assistants (internal mcp-tools.md). Off by
+    /// default; `MCPController` starts and stops it.
+    static var mcpEnabled: Bool {
+        get { defaults.bool(forKey: "mcpEnabled") }
+        set {
+            defaults.set(newValue, forKey: "mcpEnabled")
+            post()
+        }
+    }
+
+    static let mcpDefaultPort = 47017
+
+    static var mcpPort: Int {
+        get {
+            let port = defaults.integer(forKey: "mcpPort")
+            return (1024...65535).contains(port) ? port : mcpDefaultPort
+        }
+        set {
+            defaults.set(newValue, forKey: "mcpPort")
+            post()
+        }
+    }
+
     private static func post() {
         NotificationCenter.default.post(name: .preferencesDidChange, object: nil)
     }
