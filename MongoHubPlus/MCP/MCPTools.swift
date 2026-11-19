@@ -12,6 +12,7 @@ enum MCPTools {
         let id: UUID
         let name: String
         let type: String
+        let access: String
     }
 
     static let listConnections = MCPTool(
@@ -19,9 +20,13 @@ enum MCPTools {
         title: "List connections",
         description: """
             Lists the connections saved in MongoHub Plus, in the order the app shows them. \
-            Each has an id, a name and a type: standalone, replicaSet, shardedCluster, srv \
-            (a DNS seed list, as Atlas uses) or connectionString. Hosts, connection strings \
-            and passwords are never included.
+            Each has an id, a name, a type (standalone, replicaSet, shardedCluster, srv for a \
+            DNS seed list as Atlas uses, or connectionString) and access: what the user lets \
+            assistants do with it. access is off (no tool can use the connection), readOnly, \
+            or readWrite (reads and inserts; updates and deletes only ever become pending \
+            actions the user applies in the app). Only the user can change access, in the \
+            app's connection editor. Hosts, connection strings and passwords are never \
+            included.
             """,
         inputSchema: [
             "type": "object",
@@ -32,7 +37,9 @@ enum MCPTools {
         run: { _ in
             let connections = await MainActor.run {
                 ConnectionStore.shared.connections.map {
-                    ConnectionSummary(id: $0.id, name: $0.alias, type: $0.kind.rawValue)
+                    ConnectionSummary(
+                        id: $0.id, name: $0.alias, type: $0.kind.rawValue,
+                        access: $0.effectiveAssistantAccess.rawValue)
                 }
             }
             let result: JSONValue = [
@@ -42,6 +49,7 @@ enum MCPTools {
                             "id": .string($0.id.uuidString),
                             "name": .string($0.name),
                             "type": .string($0.type),
+                            "access": .string($0.access),
                         ]
                     })
             ]

@@ -399,7 +399,7 @@ private struct MCPSettings: View {
                         Text(portWarning).foregroundStyle(.red)
                     }
                     Text(
-                        "Runs an MCP server on this Mac only (127.0.0.1). Assistants can list your saved connections by name. They never see hosts, connection strings or passwords."
+                        "Runs an MCP server on this Mac only (127.0.0.1). Assistants can list your saved connections by name, but can use one only if you allow it in that connection's AI Access setting. New connections have no access. Assistants never see hosts, connection strings or passwords."
                     )
                     .foregroundStyle(.secondary)
                 }

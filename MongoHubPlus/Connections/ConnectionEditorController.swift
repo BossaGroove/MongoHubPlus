@@ -47,6 +47,8 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
     private let sshKeyField = NSTextField(string: "")
     private let sshKeyButton = NSButton(title: String(localized: "Select…"), target: nil, action: nil)
 
+    private let assistantAccessPopup = NSPopUpButton(frame: .zero, pullsDown: false)
+
     private let saveButton = NSButton(title: String(localized: "Add"), target: nil, action: nil)
     private var typeTabsHeight: NSLayoutConstraint!
     private var typeGrids: [String: NSGridView] = [:]
@@ -191,6 +193,17 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         let sshKeyRow = NSStackView(views: [sshKeyField, sshKeyButton])
         sshKeyRow.orientation = .horizontal
 
+        // AI assistant access (internal mcp-tools.md §4).
+        assistantAccessPopup.addItems(
+            withTitles: MongoConnection.AssistantAccess.allCases.map(\.displayName))
+        let assistantAccessNote = NSTextField(
+            wrappingLabelWithString: String(
+                localized:
+                    "For AI assistants using MCP (Settings ▸ MCP). Read & Write also allows inserts. Updates and deletes always wait for you to apply them, one at a time."
+            ))
+        assistantAccessNote.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        assistantAccessNote.textColor = .secondaryLabelColor
+
         let tlsRow = NSStackView(views: [tlsCheckbox, weakCertCheckbox])
         tlsRow.orientation = .horizontal
         tlsRow.spacing = 16
@@ -219,6 +232,8 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
             [label(String(localized: "User:")), sshUserField],
             [label(String(localized: "Password:")), sshPasswordField],
             [label(String(localized: "Key file:")), sshKeyRow],
+            [label(String(localized: "AI Access:")), assistantAccessPopup],
+            [NSView(), assistantAccessNote],
         ])
         let mainGrid = NSStackView(views: [topGrid, typeTabs, bottomGrid])
         mainGrid.orientation = .vertical
@@ -324,6 +339,9 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
         if case .edit(let existing) = mode {
             sshPasswordField.stringValue = Keychain.password(for: existing.id, kind: .ssh) ?? ""
         }
+        assistantAccessPopup.selectItem(
+            at: MongoConnection.AssistantAccess.allCases.firstIndex(
+                of: connection.effectiveAssistantAccess) ?? 0)
         typeChanged(nil)
         updateSSHControls()
     }
@@ -577,6 +595,10 @@ final class ConnectionEditorController: NSWindowController, NSTextFieldDelegate 
                     focus: sshPasswordField)
             }
         }
+
+        let access = MongoConnection.AssistantAccess.allCases[
+            assistantAccessPopup.indexOfSelectedItem]
+        connection.assistantAccess = access == .off ? nil : access
 
         // Final check: the driver must accept the URI (legacy did the same).
         let uri = connection.connectionString(password: password.isEmpty ? nil : password)

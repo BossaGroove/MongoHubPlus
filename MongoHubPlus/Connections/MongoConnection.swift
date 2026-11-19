@@ -37,6 +37,32 @@ struct MongoConnection: Codable, Identifiable, Equatable, Sendable {
         }
     }
 
+    /// What AI assistants may do with a connection through the MCP server
+    /// (internal mcp-tools.md §4). Updates and deletes are never run
+    /// directly at any level: they only become pending actions the user
+    /// applies in the app (§0).
+    enum AssistantAccess: String, Codable, CaseIterable, Sendable {
+        case off
+        case readOnly
+        /// Reads, plus inserts.
+        case readWrite
+
+        var displayName: String {
+            switch self {
+            case .off: return String(localized: "No Access")
+            case .readOnly: return String(localized: "Read Only")
+            case .readWrite: return String(localized: "Read & Write")
+            }
+        }
+
+        /// A value this build doesn't know (written by a newer one) reads as
+        /// `off`: the safe direction, and the store still loads.
+        init(from decoder: Decoder) throws {
+            let raw = try decoder.singleValueContainer().decode(String.self)
+            self = AssistantAccess(rawValue: raw) ?? .off
+        }
+    }
+
     var id: UUID = UUID()
     var alias: String = ""
     var kind: Kind = .standalone
@@ -68,6 +94,12 @@ struct MongoConnection: Codable, Identifiable, Equatable, Sendable {
     var sshKeyBookmark: Data? = nil
     /// Trust-on-first-use SSH host key (wire-format blob).
     var sshKnownHostKey: Data? = nil
+
+    /// Optional so earlier stores keep decoding; nil means off, the default
+    /// for every connection.
+    var assistantAccess: AssistantAccess? = nil
+
+    var effectiveAssistantAccess: AssistantAccess { assistantAccess ?? .off }
 
     var serverList: [String] {
         servers.split(separator: ",")
