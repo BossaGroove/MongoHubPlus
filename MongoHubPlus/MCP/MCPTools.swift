@@ -7,7 +7,7 @@ import MCPServer
 /// that touch a database go through `MCPConnections`, which checks the
 /// connection's AI Access first.
 enum MCPTools {
-    static let all: [MCPTool] = [listConnections, listDatabases]
+    static let all: [MCPTool] = [listConnections, listDatabases, listCollections]
 
     // MARK: - list_connections
 
@@ -103,6 +103,62 @@ enum MCPTools {
                 return .success(String(decoding: result.encoded(pretty: true), as: UTF8.self))
             }
         })
+
+    // MARK: - list_collections
+
+    static let listCollections = MCPTool(
+        name: "list_collections",
+        title: "List collections",
+        description: """
+            Lists the collections in one database on one of the user's saved connections, \
+            with each one's type: collection, view or timeseries. The connection's access \
+            must be readOnly or readWrite. A database that doesn't exist has no collections.
+            """,
+        inputSchema: [
+            "type": "object",
+            "properties": [
+                "connection": MCPConnections.connectionArgumentSchema,
+                "database": ["type": "string", "description": "The database name."],
+            ],
+            "required": ["connection", "database"],
+            "additionalProperties": false,
+        ],
+        readOnly: true,
+        run: { arguments in
+            guard let database = nonEmptyString(arguments["database"]) else {
+                return .failure("database is required: a database name from list_databases.")
+            }
+            return await MCPConnections.run(arguments, need: .read) { connection, session in
+                // nameOnly still returns the type and needs fewer privileges;
+                // authorizedCollections lets a limited user see its own.
+                let entries = try await session.collectCursor(
+                    command: [
+                        "listCollections": 1, "nameOnly": true, "authorizedCollections": true,
+                    ],
+                    onDatabase: database)
+                let collections: [JSONValue] =
+                    entries
+                    .compactMap { entry -> (name: String, type: String)? in
+                        guard let name = entry["name"] as? String else { return nil }
+                        return (name, entry["type"] as? String ?? "collection")
+                    }
+                    .sorted { $0.name < $1.name }
+                    .map { ["name": .string($0.name), "type": .string($0.type)] }
+                let result: JSONValue = [
+                    "connection": .string(connection.alias),
+                    "database": .string(database),
+                    "collections": .array(collections),
+                ]
+                return .success(String(decoding: result.encoded(pretty: true), as: UTF8.self))
+            }
+        })
+
+    private static func nonEmptyString(_ value: JSONValue?) -> String? {
+        guard let string = value?.stringValue?.trimmingCharacters(in: .whitespaces),
+            !string.isEmpty
+        else { return nil }
+        return string
+    }
 
     /// A BSON number as an Int (servers send sizes as int32, int64 or double).
     private static func integer(_ value: Primitive?) -> Int? {
