@@ -9,6 +9,9 @@ enum MCPConnections {
     /// What a tool needs the connection's AI Access to allow.
     enum Need: Sendable {
         case read
+        /// Inserting: the one write assistants may run directly, and only on
+        /// Read & Write connections (internal mcp-tools.md §0).
+        case insert
     }
 
     /// A reason to refuse, worded for the assistant.
@@ -121,7 +124,14 @@ enum MCPConnections {
                     the user can change that: in MongoHub Plus, edit the connection and set AI \
                     Access to Read Only or Read & Write.
                     """)
-        case (.read, .readOnly), (.read, .readWrite):
+        case (.insert, .readOnly):
+            throw Refusal(
+                message: """
+                    "\(alias)" has AI Access set to Read Only, so assistants can read it but not \
+                    insert. Only the user can change that: in MongoHub Plus, edit the connection \
+                    and set AI Access to Read & Write.
+                    """)
+        case (.read, .readOnly), (.read, .readWrite), (.insert, .readWrite):
             break
         }
         return connection

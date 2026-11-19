@@ -11,11 +11,15 @@ public struct MCPTool: Sendable {
     public var inputSchema: JSONValue
     /// Sent as the `readOnlyHint` annotation.
     public var readOnly: Bool
+    /// Sent as the `destructiveHint` annotation for tools that write. MCP's
+    /// own default for a writing tool is destructive, so this defaults to
+    /// true and a tool opts out (an insert adds, it doesn't destroy).
+    public var destructive: Bool
     public var run: @Sendable (_ arguments: [String: JSONValue]) async -> MCPToolResult
 
     public init(
         name: String, title: String, description: String, inputSchema: JSONValue,
-        readOnly: Bool,
+        readOnly: Bool, destructive: Bool = true,
         run: @escaping @Sendable (_ arguments: [String: JSONValue]) async -> MCPToolResult
     ) {
         self.name = name
@@ -23,6 +27,7 @@ public struct MCPTool: Sendable {
         self.description = description
         self.inputSchema = inputSchema
         self.readOnly = readOnly
+        self.destructive = destructive
         self.run = run
     }
 }
@@ -219,12 +224,18 @@ public struct MCPDispatcher: Sendable {
     }
 
     private static func describe(_ tool: MCPTool) -> JSONValue {
-        [
+        var annotations: [String: JSONValue] = [
+            "title": .string(tool.title), "readOnlyHint": .bool(tool.readOnly),
+        ]
+        if !tool.readOnly {
+            annotations["destructiveHint"] = .bool(tool.destructive)
+        }
+        return [
             "name": .string(tool.name),
             "title": .string(tool.title),
             "description": .string(tool.description),
             "inputSchema": tool.inputSchema,
-            "annotations": ["title": .string(tool.title), "readOnlyHint": .bool(tool.readOnly)],
+            "annotations": .object(annotations),
         ]
     }
 

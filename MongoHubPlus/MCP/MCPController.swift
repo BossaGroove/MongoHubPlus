@@ -129,9 +129,10 @@ final class MCPController {
             instructions: """
                 MongoHub Plus is the user's MongoDB GUI on this Mac. Its tools act on the \
                 connections the user saved in the app, named as list_connections returns \
-                them. Each connection has an access level that only the user sets in the app; \
-                tools refuse connections whose access is off. The app never shares hosts, \
-                connection strings or passwords.
+                them. Each connection has an access level that only the user sets in the app: \
+                off (no tool can use it), readOnly (reading), or readWrite (reading and \
+                inserting). Updates and deletes are never run directly. The app never shares \
+                hosts, connection strings or passwords.
                 """,
             tools: MCPTools.all,
             log: { event in

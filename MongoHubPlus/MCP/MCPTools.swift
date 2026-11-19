@@ -11,7 +11,7 @@ import MongoService
 /// connection's AI Access first.
 enum MCPTools {
     static let all: [MCPTool] = [
-        listConnections, listDatabases, listCollections, find, openQuery,
+        listConnections, listDatabases, listCollections, find, openQuery, insertDocuments,
     ]
 
     // MARK: - list_connections
@@ -347,6 +347,178 @@ enum MCPTools {
                     """)
             }
         })
+
+    // MARK: - insert_documents
+
+    static let maxInsertDocuments = 100
+
+    static let insertDocuments = MCPTool(
+        name: "insert_documents",
+        title: "Insert documents",
+        description: """
+            Inserts new documents into a collection on one of the user's saved connections. \
+            The connection's access must be readWrite. Inserting is the only write assistants \
+            may run directly; updates and deletes are never run directly.
+
+            documents is text in MongoDB Extended JSON or mongosh syntax: one document, or an \
+            array of up to \(maxInsertDocuments), for example \
+            [{name: "Dee Test", createdAt: ISODate("2026-11-19T00:00:00Z"), visits: NumberInt(1)}]. \
+            Pass text, not JSON objects, so field order and BSON types survive. A document \
+            without an _id gets a new ObjectId. Documents are inserted in order, stopping at \
+            the first failure; the result lists the _ids inserted and any errors. Inserting \
+            into a collection that doesn't exist creates it.
+            """,
+        inputSchema: [
+            "type": "object",
+            "properties": [
+                "connection": MCPConnections.connectionArgumentSchema,
+                "database": ["type": "string", "description": "The database name."],
+                "collection": ["type": "string", "description": "The collection name."],
+                "documents": [
+                    "type": "string",
+                    "description":
+                        "One document or an array of documents, as Extended JSON or mongosh text.",
+                ],
+            ],
+            "required": ["connection", "database", "collection", "documents"],
+            "additionalProperties": false,
+        ],
+        readOnly: false,
+        destructive: false,
+        run: { arguments in
+            guard let database = nonEmptyString(arguments["database"]) else {
+                return .failure("database is required: a database name from list_databases.")
+            }
+            guard let collection = nonEmptyString(arguments["collection"]) else {
+                return .failure("collection is required: a collection name from list_collections.")
+            }
+            let documents: [Document]
+            switch parseInsertDocuments(arguments["documents"]) {
+            case .success(let parsed): documents = parsed
+            case .failure(let refusal): return .failure(refusal.message)
+            }
+
+            return await MCPConnections.run(arguments, need: .insert) { connection, session in
+                var batch = Document(isArray: true)
+                for document in documents {
+                    batch.append(document)
+                }
+                var command = Document()
+                command["insert"] = collection
+                command["documents"] = batch
+                command["ordered"] = true
+                let reply = try await session.runCommand(command, onDatabase: database)
+                return insertResult(
+                    reply, documents: documents, connection: connection.alias,
+                    database: database, collection: collection)
+            }
+        })
+
+    /// The Insert pane's rules: a bare document is wrapped in [ ], and every
+    /// element must be a document. A missing _id is added first, as drivers
+    /// do, so the result can name every inserted document.
+    static func parseInsertDocuments(_ value: JSONValue?) -> Result<
+        [Document], MCPConnections.Refusal
+    > {
+        func fail(_ message: String) -> Result<[Document], MCPConnections.Refusal> {
+            .failure(MCPConnections.Refusal(message: message))
+        }
+        let raw: String
+        switch value {
+        case .string(let text)?: raw = text
+        case nil, .null?:
+            return fail("documents is required: one document or an array, as Extended JSON text.")
+        default:
+            return fail(
+                "documents must be text in Extended JSON or mongosh syntax, such as [{name: \"Dee\"}], not JSON objects: field order and BSON types would be lost."
+            )
+        }
+        var text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return fail("documents is empty.") }
+        if !text.hasPrefix("[") {
+            text = "[\(text)]"
+        }
+        let parsed: Document
+        do {
+            parsed = try ExtendedJSON.parseDocument(text)
+        } catch {
+            return fail("documents isn't valid Extended JSON or mongosh syntax: \(error)")
+        }
+        guard parsed.isArray, !parsed.isEmpty else {
+            return fail("Provide a document or an array of documents.")
+        }
+        guard parsed.count <= maxInsertDocuments else {
+            return fail(
+                "That's \(parsed.count) documents; insert at most \(maxInsertDocuments) per call.")
+        }
+        var documents: [Document] = []
+        for (index, value) in parsed.values.enumerated() {
+            guard let document = value as? Document, !document.isArray else {
+                return fail("Element \(index) isn't a document; every element must be a document.")
+            }
+            if document["_id"] != nil {
+                documents.append(document)
+            } else {
+                var withID = Document()
+                withID["_id"] = ObjectId()
+                withID.append(contentsOf: document)
+                documents.append(withID)
+            }
+        }
+        return .success(documents)
+    }
+
+    /// Reports what the server inserted. Per-document failures (a duplicate
+    /// key, a validation rule) arrive as writeErrors in an ok reply.
+    private static func insertResult(
+        _ reply: Document, documents: [Document], connection: String, database: String,
+        collection: String
+    ) -> MCPToolResult {
+        let inserted = integer(reply["n"]) ?? 0
+        let writeErrors =
+            (reply["writeErrors"] as? Document)?.values.compactMap {
+                $0 as? Document
+            } ?? []
+        var errors: [String] = []
+        for error in writeErrors {
+            let index = integer(error["index"]).map(String.init) ?? "?"
+            let code = integer(error["code"]).map(String.init) ?? "?"
+            let message = error["errmsg"] as? String ?? "unknown error"
+            errors.append(
+                "{\"index\": \(index), \"code\": \(code), \"message\": \(jsonString(message))}")
+        }
+        if let concern = reply["writeConcernError"] as? Document {
+            let message = concern["errmsg"] as? String ?? "write concern error"
+            errors.append("{\"writeConcern\": true, \"message\": \(jsonString(message))}")
+        }
+
+        // Ordered: everything before the first failure went in.
+        let format = EJSONFormat(mode: .editor, pretty: false, keyOrder: .document)
+        let ids = documents.prefix(inserted).map { document -> String in
+            (try? ExtendedJSON.stringifyValue(document["_id"] ?? Null(), format: format))
+                ?? "null"
+        }
+        var lines = [
+            "{",
+            "  \"connection\": \(jsonString(connection)),",
+            "  \"database\": \(jsonString(database)),",
+            "  \"collection\": \(jsonString(collection)),",
+            "  \"inserted\": \(inserted),",
+            "  \"notInserted\": \(documents.count - inserted),",
+            "  \"insertedIds\": [\(ids.joined(separator: ", "))],",
+        ]
+        lines.append(
+            errors.isEmpty
+                ? "  \"errors\": []"
+                : "  \"errors\": [\n    " + errors.joined(separator: ",\n    ") + "\n  ]")
+        lines.append("}")
+        let text = lines.joined(separator: "\n")
+        return errors.isEmpty ? .success(text) : .failure(text)
+    }
+
+    private static func jsonString(_ value: String) -> String {
+        String(decoding: JSONValue.string(value).encoded(), as: UTF8.self)
+    }
 
     /// The find arguments, parsed and checked before connecting.
     struct FindQuery: Sendable {

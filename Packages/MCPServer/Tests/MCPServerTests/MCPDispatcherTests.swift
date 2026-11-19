@@ -115,9 +115,31 @@ struct MCPDispatcherTests {
                 [
                     "name": "fail", "title": "Fail", "description": "Always fails.",
                     "inputSchema": ["type": "object"],
-                    "annotations": ["title": "Fail", "readOnlyHint": false],
+                    "annotations": [
+                        "title": "Fail", "readOnlyHint": false, "destructiveHint": true,
+                    ],
                 ],
             ])
+    }
+
+    @Test func aWritingToolCanSayItIsNotDestructive() async throws {
+        let adding = MCPTool(
+            name: "add", title: "Add", description: "Adds.", inputSchema: ["type": "object"],
+            readOnly: false, destructive: false, run: { _ in .success("ok") })
+        let dispatcher = MCPDispatcher(serverName: "S", serverVersion: "1", tools: [adding])
+        let response = try #require(
+            await send(#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#, to: dispatcher))
+        #expect(
+            response["result"]?["tools"]
+                == [
+                    [
+                        "name": "add", "title": "Add", "description": "Adds.",
+                        "inputSchema": ["type": "object"],
+                        "annotations": [
+                            "title": "Add", "readOnlyHint": false, "destructiveHint": false,
+                        ],
+                    ]
+                ])
     }
 
     @Test func toolsCallRunsTheToolWithItsArguments() async throws {
