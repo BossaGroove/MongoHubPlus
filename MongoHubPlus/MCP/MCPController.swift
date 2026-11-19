@@ -37,16 +37,29 @@ final class MCPController {
 
     /// The one-time Terminal command that adds this server to Claude Code,
     /// for every project (user scope).
-    var claudeCommand: String {
-        #"claude mcp add --scope user --transport http \#(Self.serverName) \#(endpointURL) --header "Authorization: Bearer \#(token)""#
+    /// nil when the token can't be read.
+    var claudeCommand: String? {
+        guard let token else { return nil }
+        return
+            #"claude mcp add --scope user --transport http \#(Self.serverName) \#(endpointURL) --header "Authorization: Bearer \#(token)""#
     }
 
-    /// The token, created on first use.
-    var token: String {
+    /// The token, created on first use. nil when the Keychain can't be read,
+    /// for example when its access prompt was dismissed: the stored token is
+    /// then left alone, never replaced, so assistants already set up with it
+    /// work again once the app can read it.
+    var token: String? {
         if let cachedToken { return cachedToken }
-        if let stored = Keychain.secret(.mcpToken), !stored.isEmpty {
-            cachedToken = stored
-            return stored
+        do {
+            if let stored = try Keychain.secret(.mcpToken), !stored.isEmpty {
+                cachedToken = stored
+                return stored
+            }
+        } catch {
+            LogStore.shared.add(
+                level: "error", domain: "MCP",
+                message: "Couldn't read the token from the Keychain: \(error)")
+            return nil
         }
         return storeNewToken()
     }
@@ -88,10 +101,17 @@ final class MCPController {
         server = nil
         let enabled = Preferences.mcpEnabled
         let port = Preferences.mcpPort
-        let token = enabled ? self.token : ""
+        let token = enabled ? self.token : nil
         status = enabled ? .starting : .off
         if !enabled {
             PendingActions.shared.withdrawAll("MCP was turned off in Settings")
+        }
+        if enabled, token == nil {
+            status = .failed(
+                String(
+                    localized:
+                        "Couldn't read the token from the Keychain. Turn this off and on again to retry."
+                ))
         }
 
         Task {
@@ -99,7 +119,7 @@ final class MCPController {
                 await oldServer.stop()
                 LogStore.shared.add(level: "info", domain: "MCP", message: "Server stopped")
             }
-            guard enabled, generation == self.generation else { return }
+            guard enabled, let token, generation == self.generation else { return }
             do {
                 let newServer = try await MCPHTTPServer.start(port: port) { boundPort in
                     MCPEndpoint(port: boundPort, token: token, dispatcher: Self.dispatcher())

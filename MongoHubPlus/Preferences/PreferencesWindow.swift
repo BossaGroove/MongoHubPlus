@@ -467,7 +467,7 @@ private struct MCPSettings: View {
     private func refreshCommand() {
         copied = false
         // Reading the command creates the token, so only do it once enabled.
-        command = enabled ? MCPController.shared.claudeCommand : ""
+        command = enabled ? MCPController.shared.claudeCommand ?? "" : ""
     }
 
     private func copyCommand() {

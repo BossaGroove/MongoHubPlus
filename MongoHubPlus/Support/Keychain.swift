@@ -78,7 +78,8 @@ enum Keychain {
         if status == errSecItemNotFound {
             var add = baseQuery(id, kind)
             add[kSecValueData as String] = data
-            add[kSecAttrLabel as String] = "MongoHub Plus \(kind == .mongo ? "MongoDB" : "SSH") password"
+            add[kSecAttrLabel as String] =
+                "MongoHub Plus \(kind == .mongo ? "MongoDB" : "SSH") password"
             let addStatus = SecItemAdd(add as CFDictionary, nil)
             guard addStatus == errSecSuccess else {
                 throw KeychainError(status: addStatus)
@@ -112,13 +113,19 @@ enum Keychain {
         }
     }
 
-    static func secret(_ secret: AppSecret) -> String? {
+    /// The stored secret, or nil when none is stored. Any other failure,
+    /// such as a dismissed Keychain access prompt, throws: the caller must
+    /// not take it as "none stored" and replace the secret.
+    static func secret(_ secret: AppSecret) throws -> String? {
         var query = baseQuery(account: secret.rawValue)
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess, let data = result as? Data else { return nil }
+        if status == errSecItemNotFound { return nil }
+        guard status == errSecSuccess, let data = result as? Data else {
+            throw KeychainError(status: status)
+        }
         return String(data: data, encoding: .utf8)
     }
 
