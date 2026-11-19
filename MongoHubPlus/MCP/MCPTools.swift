@@ -11,8 +11,9 @@ import MongoService
 /// connection's AI Access first.
 enum MCPTools {
     static let all: [MCPTool] = [
-        listConnections, listDatabases, listCollections, find, openQuery, getCurrentView,
-        insertDocuments, updateDocuments, deleteDocuments, waitForDecision,
+        listConnections, listDatabases, listCollections, find, countDocuments, aggregate,
+        openQuery, getCurrentView, insertDocuments, updateDocuments, deleteDocuments,
+        waitForDecision,
     ]
 
     // MARK: - list_connections
@@ -666,7 +667,7 @@ enum MCPTools {
     }
 
     /// A BSON number as an Int (servers send sizes as int32, int64 or double).
-    private static func integer(_ value: Primitive?) -> Int? {
+    static func integer(_ value: Primitive?) -> Int? {
         switch value {
         case let value as Int: return value
         case let value as Int32: return Int(value)
