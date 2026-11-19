@@ -332,14 +332,19 @@ public actor ConnectionSession {
         public var sort: Document?
         public var skip: Int
         public var limit: Int
+        /// The server stops the query after this long (`maxTimeMS`), failing
+        /// it with code 50. nil leaves it to the driver's own timeout.
+        public var maxTimeMS: Int?
 
         public init(
-            projection: Document? = nil, sort: Document? = nil, skip: Int = 0, limit: Int = 30
+            projection: Document? = nil, sort: Document? = nil, skip: Int = 0, limit: Int = 30,
+            maxTimeMS: Int? = nil
         ) {
             self.projection = projection
             self.sort = sort
             self.skip = skip
             self.limit = limit
+            self.maxTimeMS = maxTimeMS
         }
     }
 
@@ -366,6 +371,9 @@ public actor ConnectionSession {
         }
         if options.limit > 0 {
             command["limit"] = options.limit
+        }
+        if let maxTimeMS = options.maxTimeMS, maxTimeMS > 0 {
+            command["maxTimeMS"] = maxTimeMS
         }
         do {
             return try await collectCursor(

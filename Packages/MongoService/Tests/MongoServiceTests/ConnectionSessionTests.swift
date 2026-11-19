@@ -138,6 +138,48 @@ struct IntegrationTests {
         await session.disconnect()
     }
 
+    /// `maxTimeMS` must stop a slow find on the server, with the server's
+    /// MaxTimeMSExpired code (50), well before the driver's own timeout.
+    @Test func maxTimeMSStopsASlowFindOnTheServer() async throws {
+        guard let uri = Self.localURI else { return }
+        let session = try ConnectionSession(connectionString: uri)
+        try await session.connect()
+        let db = "mongohubplus_maxtime_test"
+        let coll = "slow"
+
+        _ = try? await session.runCommand(["dropDatabase": 1], onDatabase: db)
+        var documents = Document(isArray: true)
+        for i in 0..<200 {
+            var doc = Document()
+            doc["i"] = Int32(i)
+            documents["\(i)"] = doc
+        }
+        try await session.runCommand(
+            ["insert": coll, "documents": documents], onDatabase: db)
+
+        var filter = Document()
+        filter["$where"] = "sleep(20); return true;"
+        let started = ContinuousClock.now
+        var failure: (any Error)?
+        do {
+            _ = try await session.find(
+                database: db, collection: coll, filter: filter,
+                options: .init(limit: 5, maxTimeMS: 500))
+        } catch {
+            failure = error
+        }
+        let elapsed = ContinuousClock.now - started
+        _ = try? await session.runCommand(["dropDatabase": 1], onDatabase: db)
+        await session.disconnect()
+
+        // Where server-side JS is off there is nothing slow to stop.
+        let message = failure.map { String(describing: $0) } ?? ""
+        guard !message.contains("$where"), !message.contains("not allowed") else { return }
+
+        #expect((failure as? MongoServiceError)?.code == 50, "got \(message)")
+        #expect(elapsed < .seconds(10))
+    }
+
     static func exercise(uri: String, allowWrites: Bool) async throws {
         let session = try ConnectionSession(connectionString: uri)
         try await session.connect()
