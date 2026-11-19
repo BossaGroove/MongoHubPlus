@@ -12,6 +12,7 @@ import MongoService
 enum MCPTools {
     static let all: [MCPTool] = [
         listConnections, listDatabases, listCollections, find, openQuery, insertDocuments,
+        updateDocuments, waitForDecision,
     ]
 
     // MARK: - list_connections
@@ -657,7 +658,7 @@ enum MCPTools {
         return .success(lines.joined(separator: "\n"))
     }
 
-    private static func nonEmptyString(_ value: JSONValue?) -> String? {
+    static func nonEmptyString(_ value: JSONValue?) -> String? {
         guard let string = value?.stringValue?.trimmingCharacters(in: .whitespaces),
             !string.isEmpty
         else { return nil }

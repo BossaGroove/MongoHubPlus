@@ -12,6 +12,9 @@ enum MCPConnections {
         /// Inserting: the one write assistants may run directly, and only on
         /// Read & Write connections (internal mcp-tools.md §0).
         case insert
+        /// Asking for an update: Read & Write only, and it never runs until
+        /// the user applies it in the app (§0).
+        case update
     }
 
     /// A reason to refuse, worded for the assistant.
@@ -27,24 +30,36 @@ enum MCPConnections {
 
     /// Runs `body` on a fresh session for the connection named in
     /// `arguments["connection"]`, if its AI Access allows `need`.
-    ///
-    /// Connection failures reach the assistant only in general terms: the
-    /// driver's message can name hosts, which the app never shares. The full
-    /// error goes to Window ▸ Logs.
     static func run(
         _ arguments: [String: JSONValue], need: Need,
         _ body: @Sendable (MongoConnection, ConnectionSession) async throws -> MCPToolResult
     ) async -> MCPToolResult {
+        switch await withSession(arguments["connection"], need: need, body) {
+        case .success(let result): return result
+        case .failure(let refusal): return .failure(refusal.message)
+        }
+    }
+
+    /// The general form of `run`: connects, runs `body`, disconnects, and
+    /// hands back its value, or why it couldn't.
+    ///
+    /// Connection failures reach the assistant only in general terms: the
+    /// driver's message can name hosts, which the app never shares. The full
+    /// error goes to Window ▸ Logs.
+    static func withSession<T: Sendable>(
+        _ connectionArgument: JSONValue?, need: Need,
+        _ body: @Sendable (MongoConnection, ConnectionSession) async throws -> T
+    ) async -> Result<T, Refusal> {
         let connection: MongoConnection
         let uri: String
         do {
             (connection, uri) = try await MainActor.run {
-                try prepare(arguments["connection"], need: need)
+                try prepare(connectionArgument, need: need)
             }
         } catch let refusal as Refusal {
-            return .failure(refusal.message)
+            return .failure(refusal)
         } catch {
-            return .failure(String(describing: error))
+            return .failure(Refusal(message: String(describing: error)))
         }
 
         let alias = connection.alias
@@ -58,15 +73,17 @@ enum MCPConnections {
             LogStore.log(
                 level: "error", domain: "MCP", message: "Couldn't connect to \(alias): \(error)")
             return .failure(
-                "Couldn't connect to \"\(alias)\". The details are in MongoHub Plus, Window ▸ Logs."
-            )
+                Refusal(
+                    message:
+                        "Couldn't connect to \"\(alias)\". The details are in MongoHub Plus, Window ▸ Logs."
+                ))
         }
 
-        let result: MCPToolResult
+        let result: Result<T, Refusal>
         do {
-            result = try await body(connection, session)
+            result = .success(try await body(connection, session))
         } catch {
-            result = .failure("MongoDB error: \(error)")
+            result = .failure(Refusal(message: "MongoDB error: \(error)"))
         }
         await session.disconnect()
         return result
@@ -124,6 +141,13 @@ enum MCPConnections {
                     the user can change that: in MongoHub Plus, edit the connection and set AI \
                     Access to Read Only or Read & Write.
                     """)
+        case (.update, .readOnly):
+            throw Refusal(
+                message: """
+                    "\(alias)" has AI Access set to Read Only, so assistants can read it but not \
+                    ask for changes. Only the user can change that: in MongoHub Plus, edit the \
+                    connection and set AI Access to Read & Write.
+                    """)
         case (.insert, .readOnly):
             throw Refusal(
                 message: """
@@ -131,7 +155,7 @@ enum MCPConnections {
                     insert. Only the user can change that: in MongoHub Plus, edit the connection \
                     and set AI Access to Read & Write.
                     """)
-        case (.read, .readOnly), (.read, .readWrite), (.insert, .readWrite):
+        case (.read, .readOnly), (.read, .readWrite), (.insert, .readWrite), (.update, .readWrite):
             break
         }
         return connection

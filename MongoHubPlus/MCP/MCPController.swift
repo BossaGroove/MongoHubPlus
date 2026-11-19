@@ -90,6 +90,9 @@ final class MCPController {
         let port = Preferences.mcpPort
         let token = enabled ? self.token : ""
         status = enabled ? .starting : .off
+        if !enabled {
+            PendingActions.shared.withdrawAll("MCP was turned off in Settings")
+        }
 
         Task {
             if let oldServer {

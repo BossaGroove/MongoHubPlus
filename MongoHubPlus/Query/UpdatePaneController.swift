@@ -176,7 +176,8 @@ final class UpdatePaneController: NSViewController {
             previewScroll.bottomAnchor.constraint(equalTo: resultLabel.topAnchor, constant: -8),
 
             resultLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            resultLabel.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor, constant: 8),
+            resultLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: container.leadingAnchor, constant: 8),
             resultLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12),
         ])
         view = container
@@ -220,7 +221,8 @@ final class UpdatePaneController: NSViewController {
         newRow.field.fillsRowWidth()
         newRow.stack.translatesAutoresizingMaskIntoConstraints = false
 
-        let insertIndex = row.flatMap { r in rows.firstIndex(where: { $0 === r }).map { $0 + 1 } } ?? rows.count
+        let insertIndex =
+            row.flatMap { r in rows.firstIndex(where: { $0 === r }).map { $0 + 1 } } ?? rows.count
         rows.insert(newRow, at: insertIndex)
         rowsStack.insertArrangedSubview(newRow.stack, at: insertIndex)
         newRow.stack.leadingAnchor.constraint(equalTo: rowsStack.leadingAnchor).isActive = true
@@ -261,9 +263,10 @@ final class UpdatePaneController: NSViewController {
         for row in rows {
             var index = row.popup.indexOfSelectedItem
             if index < 0 || used.contains(index) || operatorKey(forMenuIndex: index) == nil {
-                index = (0..<Self.operators.count).first {
-                    operatorKey(forMenuIndex: $0) != nil && !used.contains($0)
-                } ?? -1
+                index =
+                    (0..<Self.operators.count).first {
+                        operatorKey(forMenuIndex: $0) != nil && !used.contains($0)
+                    } ?? -1
                 row.popup.selectItem(at: index)
             }
             if index >= 0 { used.insert(index) }
@@ -332,11 +335,14 @@ final class UpdatePaneController: NSViewController {
         schedulePreviewRefresh()
         var sets: [String] = []
         for row in rows {
-            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
+            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else {
+                continue
+            }
             let value = row.field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
             sets.append("\(key): \(value.isEmpty ? "{ }" : value)")
         }
-        var preview = "db.\(context.collection).update(\(normalizedCriteria), {\(sets.joined(separator: ", "))}"
+        var preview =
+            "db.\(context.collection).update(\(normalizedCriteria), {\(sets.joined(separator: ", "))}"
         if upsertCheckbox.state == .on || multiCheckbox.state == .on {
             var flags: [String] = []
             if upsertCheckbox.state == .on { flags.append("upsert: true") }
@@ -369,7 +375,9 @@ final class UpdatePaneController: NSViewController {
     private func composedUpdate() -> ComposedUpdate {
         var update = Document()
         for row in rows {
-            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
+            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else {
+                continue
+            }
             let text = QueryNormalizer.normalizeOperand(row.field.stringValue)
             do {
                 update[key] = try ExtendedJSON.parseDocument(text)
@@ -465,32 +473,7 @@ final class UpdatePaneController: NSViewController {
             view.removeFromSuperview()
         }
         for document in documents {
-            let card = NSView()
-            card.translatesAutoresizingMaskIntoConstraints = false
-            card.wantsLayer = true
-            card.layer?.backgroundColor = theme.background.cgColor
-            card.layer?.cornerRadius = 6
-            card.layer?.borderWidth = 1
-            card.layer?.borderColor = NSColor.white.withAlphaComponent(0.18).cgColor
-
-            let label = NSTextField(labelWithAttributedString: document)
-            label.isSelectable = true
-            label.allowsEditingTextAttributes = true
-            // Selecting hands the text to the window's shared field editor,
-            // which redraws it with the field's own font and colour — the
-            // system defaults — unless the field is marked as carrying
-            // attributed text. Without this, clicking a card turned the whole
-            // document white in the system font.
-            label.font = theme.font
-            label.textColor = theme.text
-            label.translatesAutoresizingMaskIntoConstraints = false
-            card.addSubview(label)
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: card.topAnchor, constant: 8),
-                label.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 10),
-                label.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -10),
-                label.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8),
-            ])
+            let card = UpdatePreviewRenderer.card(for: document, theme: theme)
             previewStack.addArrangedSubview(card)
             card.widthAnchor.constraint(
                 equalTo: previewStack.widthAnchor, constant: -20
@@ -525,14 +508,18 @@ final class UpdatePaneController: NSViewController {
             criteria = try ExtendedJSON.parseDocument(normalizedCriteria)
         } catch {
             QueryPaneUI.flash(resultLabel, text: "Error!", success: false)
-            QueryPaneUI.alertSheet(in: view, title: String(localized: "Error In Query"), message: String(describing: error))
+            QueryPaneUI.alertSheet(
+                in: view, title: String(localized: "Error In Query"),
+                message: String(describing: error))
             view.window?.makeFirstResponder(criteriaField)
             return
         }
 
         var update = Document()
         for row in rows {
-            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else { continue }
+            guard let key = operatorKey(forMenuIndex: row.popup.indexOfSelectedItem) else {
+                continue
+            }
             let text = QueryNormalizer.normalizeOperand(row.field.stringValue)
             do {
                 update[key] = try ExtendedJSON.parseDocument(text)
@@ -572,7 +559,9 @@ final class UpdatePaneController: NSViewController {
             } catch {
                 self.spinner.stopAnimation(nil)
                 QueryPaneUI.flash(self.resultLabel, text: "Error!", success: false)
-                QueryPaneUI.alertSheet(in: self.view, title: String(localized: "Update Failed"), message: String(describing: error))
+                QueryPaneUI.alertSheet(
+                    in: self.view, title: String(localized: "Update Failed"),
+                    message: String(describing: error))
             }
         }
     }

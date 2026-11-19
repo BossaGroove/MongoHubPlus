@@ -26,6 +26,39 @@ enum UpdatePreviewRenderer {
         return output
     }
 
+    /// One bordered card per document, the way Compass separates them — a
+    /// blank line between two JSON blobs reads as part of the document.
+    /// Shared by the Update pane and the MCP pending-update window.
+    static func card(for document: NSAttributedString, theme: JSONTheme) -> NSView {
+        let card = NSView()
+        card.translatesAutoresizingMaskIntoConstraints = false
+        card.wantsLayer = true
+        card.layer?.backgroundColor = theme.background.cgColor
+        card.layer?.cornerRadius = 6
+        card.layer?.borderWidth = 1
+        card.layer?.borderColor = NSColor.white.withAlphaComponent(0.18).cgColor
+
+        let label = NSTextField(labelWithAttributedString: document)
+        label.isSelectable = true
+        label.allowsEditingTextAttributes = true
+        // Selecting hands the text to the window's shared field editor,
+        // which redraws it with the field's own font and colour — the
+        // system defaults — unless the field is marked as carrying
+        // attributed text. Without this, clicking a card turned the whole
+        // document white in the system font.
+        label.font = theme.font
+        label.textColor = theme.text
+        label.translatesAutoresizingMaskIntoConstraints = false
+        card.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: card.topAnchor, constant: 8),
+            label.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 10),
+            label.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -10),
+            label.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8),
+        ])
+        return card
+    }
+
     // MARK: - Document body
 
     private static func append(
@@ -86,15 +119,25 @@ enum UpdatePreviewRenderer {
         where effect.path.count == path.count + 1
             && Array(effect.path.dropLast()) == path
         {
-            guard case .added(let added) = effect.kind,
-                container[effect.path[effect.path.count - 1]] == nil
-            else { continue }
-            output.append(plain(pad, theme: theme))
-            output.append(
-                attributed(
-                    effect.path[effect.path.count - 1] + ": ", color: theme.key, theme: theme))
-            output.append(inserted(added, theme: theme))
-            output.append(plain("\n", theme: theme))
+            let name = effect.path[effect.path.count - 1]
+            guard container[name] == nil else { continue }
+            switch effect.kind {
+            case .added(let added):
+                output.append(plain(pad, theme: theme))
+                output.append(attributed(name + ": ", color: theme.key, theme: theme))
+                output.append(inserted(added, theme: theme))
+                output.append(plain("\n", theme: theme))
+            case .opaque(old: nil):
+                // A field the update creates with a value only the server
+                // knows ($currentDate, $bit): still shown, so the preview
+                // never leaves out a field that will appear.
+                output.append(plain(pad, theme: theme))
+                output.append(attributed(name + ": ", color: theme.key, theme: theme))
+                output.append(willChange(theme: theme))
+                output.append(plain("\n", theme: theme))
+            default:
+                continue
+            }
         }
     }
 

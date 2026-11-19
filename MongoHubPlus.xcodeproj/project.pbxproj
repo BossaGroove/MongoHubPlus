@@ -23,6 +23,7 @@
 		5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022957575C63463D1137A66C /* ExplainSheetController.swift */; };
 		5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */; };
 		610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 092AB847135892A39A41C92B /* MCPConnections.swift */; };
+		619B81B021CF16C45216711D /* MCPWriteTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */; };
 		6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C4BDB065238D92127A7108 /* Preferences.swift */; };
 		6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F283322B6230E66016034C0 /* Changelog.swift */; };
 		6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FE36E484CA51E82513320 /* ConnectionStore.swift */; };
@@ -37,6 +38,7 @@
 		964D6A491C2F503CFB0052E4 /* InsertPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */; };
 		9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC20B2BAAAAF56545546006 /* AggregationStages.swift */; };
 		9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */; };
+		9ECB7C6F0209EEA83DF42160 /* PendingUpdateWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */; };
 		A5895644C0F71FB21C449763 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 947290413378D99E62F73675 /* CHANGELOG.md */; };
 		A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */; };
 		A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285C8B28C30551C90A04A98 /* MCPTools.swift */; };
@@ -47,6 +49,7 @@
 		B61F3BB7141B33827BC5D406 /* UpdatePreviewRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F8FBD8BA014DB63F78C8DA /* UpdatePreviewRenderer.swift */; };
 		BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92E582F84FF8EAA1ABB0F02 /* PreferencesWindow.swift */; };
 		D5729E21AA3979AF12EB5146 /* MCPServer in Frameworks */ = {isa = PBXBuildFile; productRef = 5A19FB58C9016B8B5210CD11 /* MCPServer */; };
+		E40E3D13D26823AD29C3A4A9 /* PendingActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934AA052910E40E8AC423B9D /* PendingActions.swift */; };
 		E5DA901CD9879202A870C0E0 /* CollectionsTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D63E2C1DE8A9DE81104837C /* CollectionsTabController.swift */; };
 		F26F78F7987802EC71EC24A9 /* IndexPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5913B3354CBEF31E294BEDA /* IndexPaneController.swift */; };
 		F59C6600895175F967AF53C0 /* MCPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E522505CB2C92033153CC7 /* MCPController.swift */; };
@@ -64,6 +67,7 @@
 		0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionListWindowController.swift; sourceTree = "<group>"; };
 		14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertPaneController.swift; sourceTree = "<group>"; };
+		15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPWriteTools.swift; sourceTree = "<group>"; };
 		2330074180538B933B57B552 /* FindBarScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindBarScrollView.swift; sourceTree = "<group>"; };
 		26430A6A8BB6D3D0C8C760F6 /* TabHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHost.swift; sourceTree = "<group>"; };
 		27EABF645F31078ED86DD974 /* DocumentOutlineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentOutlineViewController.swift; sourceTree = "<group>"; };
@@ -85,8 +89,10 @@
 		8EC11B8C4D2EB4D991DEE652 /* StatusTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTabController.swift; sourceTree = "<group>"; };
 		8F96695CC0A3DD24B07EB7B8 /* MongoService */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MongoService; path = Packages/MongoService; sourceTree = SOURCE_ROOT; };
 		91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindow.swift; sourceTree = "<group>"; };
+		934AA052910E40E8AC423B9D /* PendingActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingActions.swift; sourceTree = "<group>"; };
 		947290413378D99E62F73675 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		A1E522505CB2C92033153CC7 /* MCPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPController.swift; sourceTree = "<group>"; };
+		A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingUpdateWindowController.swift; sourceTree = "<group>"; };
 		A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitorTabController.swift; sourceTree = "<group>"; };
 		B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONEditorWindowController.swift; sourceTree = "<group>"; };
 		B7E828940898163A28CCB599 /* QueryPaneSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPaneSupport.swift; sourceTree = "<group>"; };
@@ -186,6 +192,9 @@
 				092AB847135892A39A41C92B /* MCPConnections.swift */,
 				A1E522505CB2C92033153CC7 /* MCPController.swift */,
 				5285C8B28C30551C90A04A98 /* MCPTools.swift */,
+				15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */,
+				934AA052910E40E8AC423B9D /* PendingActions.swift */,
+				A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */,
 			);
 			path = MCP;
 			sourceTree = "<group>";
@@ -415,7 +424,10 @@
 				610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */,
 				F59C6600895175F967AF53C0 /* MCPController.swift in Sources */,
 				A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */,
+				619B81B021CF16C45216711D /* MCPWriteTools.swift in Sources */,
 				5397914585817A467379ABF9 /* MongoConnection.swift in Sources */,
+				E40E3D13D26823AD29C3A4A9 /* PendingActions.swift in Sources */,
+				9ECB7C6F0209EEA83DF42160 /* PendingUpdateWindowController.swift in Sources */,
 				6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */,
 				BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */,
 				FFF3552BEF555E19947BE72F /* QueryHistoryStore.swift in Sources */,
