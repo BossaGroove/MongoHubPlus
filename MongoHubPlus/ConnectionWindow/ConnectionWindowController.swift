@@ -576,6 +576,31 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         return true
     }
 
+    /// What the window shows, for an assistant (MCP get_current_view,
+    /// internal mcp-tools.md §7 step 10).
+    struct ViewState {
+        enum ConnectionState: String {
+            case connecting, connected, failed
+        }
+        let connectionState: ConnectionState
+        let sidebarDatabase: String?
+        let sidebarCollection: String?
+        let tabs: [String]
+        let currentTab: String?
+        let query: QueryTabController.ViewState?
+    }
+
+    var viewState: ViewState {
+        let state: ViewState.ConnectionState =
+            connectionFailed ? .failed : session == nil ? .connecting : .connected
+        let selected = tabHost.selectedTab
+        return ViewState(
+            connectionState: state, sidebarDatabase: selectedDatabaseNode?.name,
+            sidebarCollection: selectedCollectionNode?.name,
+            tabs: tabHost.tabs.map { $0.title ?? "" }, currentTab: selected?.title,
+            query: (selected as? QueryTabController)?.viewState)
+    }
+
     func openQueryTab(for collection: CollectionNode) {
         if let existing = queryTabs[collection.absoluteName] {
             tabHost.select(tab: existing)

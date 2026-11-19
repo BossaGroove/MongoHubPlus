@@ -450,6 +450,15 @@ final class DocumentOutlineViewController: NSViewController, NSMenuItemValidatio
         !outlineView.selectedRowIndexes.isEmpty
     }
 
+    /// The selected rows themselves, top-level or nested (MCP
+    /// get_current_view).
+    var selectedNodes: [OutlineNode] {
+        outlineView.selectedRowIndexes.compactMap { outlineView.item(atRow: $0) as? OutlineNode }
+    }
+
+    /// The line under the results, e.g. "Total Results: 12 (0.01s)".
+    var statusText: String { feedbackLabel.stringValue }
+
     // MARK: - Actions
 
     @objc private func expandPopupAction(_ sender: Any?) {

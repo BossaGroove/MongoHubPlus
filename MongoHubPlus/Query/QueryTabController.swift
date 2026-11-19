@@ -162,6 +162,22 @@ final class QueryTabController: TabItemViewController {
         select(segment)
     }
 
+    /// What the tab shows, for an assistant (MCP get_current_view): the pane,
+    /// and the Find pane's query and selection when Find is showing.
+    struct ViewState {
+        let database: String
+        let collection: String
+        let pane: String
+        let find: FindPaneController.ViewState?
+    }
+
+    var viewState: ViewState {
+        let segment = Segment(rawValue: segmentedControl.selectedSegment) ?? .find
+        return ViewState(
+            database: context.database, collection: context.collection, pane: segment.label,
+            find: segment == .find && isViewLoaded ? findPane.viewState : nil)
+    }
+
     /// Shows a query an assistant asked for (MCP open_query): the Find pane,
     /// filled in and run.
     func showQuery(criteria: String, fields: String, sort: String, skip: Int?, limit: Int?) {

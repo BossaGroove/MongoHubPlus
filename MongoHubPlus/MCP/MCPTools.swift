@@ -11,8 +11,8 @@ import MongoService
 /// connection's AI Access first.
 enum MCPTools {
     static let all: [MCPTool] = [
-        listConnections, listDatabases, listCollections, find, openQuery, insertDocuments,
-        updateDocuments, deleteDocuments, waitForDecision,
+        listConnections, listDatabases, listCollections, find, openQuery, getCurrentView,
+        insertDocuments, updateDocuments, deleteDocuments, waitForDecision,
     ]
 
     // MARK: - list_connections

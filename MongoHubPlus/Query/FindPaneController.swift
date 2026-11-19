@@ -65,6 +65,37 @@ final class FindPaneController: NSViewController {
 
     var initialFirstResponder: NSView { criteriaCombo }
 
+    /// What the pane shows, for an assistant (MCP get_current_view, internal
+    /// mcp-tools.md §7 step 10). Field text is as the user typed it.
+    struct ViewState {
+        let filter: String
+        let projection: String
+        let sort: String
+        /// The query the pane builds from the fields: normalized, with the
+        /// default sort, skip and limit filled in.
+        let query: String
+        let shownCount: Int
+        let status: String
+        /// The selected results, whole documents as fetched (with the
+        /// pane's projection), in display order.
+        let selectedDocuments: [Document]
+        /// Selected rows inside a document, as dotted paths.
+        let selectedFields: [String]
+    }
+
+    var viewState: ViewState {
+        composePreview()
+        return ViewState(
+            filter: criteriaCombo.stringValue, projection: fieldsField.stringValue,
+            sort: sortField.stringValue, query: queryPreviewField.stringValue,
+            shownCount: resultsOutline.nodes.filter { $0.rootDocument != nil }.count,
+            status: resultsOutline.statusText,
+            selectedDocuments: resultsOutline.selectedRootNodes.compactMap(\.rootDocument),
+            selectedFields: resultsOutline.selectedNodes.filter { !$0.path.isEmpty }.map {
+                $0.path.joined(separator: ".")
+            })
+    }
+
     override func loadView() {
         let container = NSView()
 

@@ -154,6 +154,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return controller
     }
 
+    /// Every open connection window, front to back (MCP get_current_view).
+    var connectionWindowsFrontToBack: [ConnectionWindowController] {
+        let order = NSApp.orderedWindows
+        func rank(_ controller: ConnectionWindowController) -> Int {
+            controller.window.flatMap { window in order.firstIndex { $0 === window } } ?? Int.max
+        }
+        return connectionWindowControllers.values.flatMap { $0 }.sorted { rank($0) < rank($1) }
+    }
+
     func hasConnectionWindow(for id: UUID) -> Bool {
         !(connectionWindowControllers[id] ?? []).isEmpty
     }
