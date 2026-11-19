@@ -15,8 +15,16 @@ import MongoService
 final class PendingActions {
     static let shared = PendingActions()
 
-    /// An update an assistant asked for, exactly as it will run if applied.
-    struct UpdateRequest: Sendable {
+    /// A change an assistant asked for, exactly as it will run if applied.
+    struct Request: Sendable {
+        enum Kind: Sendable {
+            /// An update-operator document, as the assistant wrote it and as
+            /// it runs.
+            case update(text: String, update: Document)
+            case delete
+        }
+
+        let kind: Kind
         let connectionID: UUID
         let connectionName: String
         let database: String
@@ -24,16 +32,24 @@ final class PendingActions {
         /// The filter as the user reads it, and the document that runs.
         let filterText: String
         let filter: Document
-        let updateText: String
-        let update: Document
+        /// Every matching document, or only the first.
         let multi: Bool
         /// When the request was made; the server may have changed since.
         let matchCount: Int?
         let samples: [Document]
+
+        /// What the request is called in messages: "update", "deletion".
+        nonisolated var noun: String {
+            switch kind {
+            case .update: return "update"
+            case .delete: return "deletion"
+            }
+        }
     }
 
     enum Outcome: Sendable, Equatable {
-        case applied(matched: Int, modified: Int, errors: [String])
+        case updated(matched: Int, modified: Int, errors: [String])
+        case deleted(count: Int, errors: [String])
         case failed(String)
         case rejected
         case expired
@@ -64,15 +80,15 @@ final class PendingActions {
     @MainActor
     final class Action {
         let id: String
-        let request: UpdateRequest
+        let request: Request
         let expiresAt: Date
         fileprivate(set) var outcome: Outcome?
         fileprivate var waiters: [UUID: CheckedContinuation<Outcome?, Never>] = [:]
-        fileprivate var window: PendingUpdateWindowController?
+        fileprivate var window: PendingActionWindowController?
         fileprivate var attentionRequest: Int?
         fileprivate var applying = false
 
-        fileprivate init(request: UpdateRequest, expiresAt: Date) {
+        fileprivate init(request: Request, expiresAt: Date) {
             self.id = String(UUID().uuidString.prefix(8)).lowercased()
             self.request = request
             self.expiresAt = expiresAt
@@ -88,7 +104,7 @@ final class PendingActions {
 
     /// Shows the request to the user. Returns nil when another action is
     /// still waiting: one at a time.
-    func submit(_ request: UpdateRequest) -> Action? {
+    func submit(_ request: Request) -> Action? {
         guard current == nil else { return nil }
         let action = Action(
             request: request, expiresAt: Date().addingTimeInterval(Self.seconds(Self.expiry)))
@@ -96,13 +112,17 @@ final class PendingActions {
         recent.append(action)
         if recent.count > 20 { recent.removeFirst(recent.count - 20) }
 
+        var details = "filter \(request.filterText)"
+        if case .update(let text, _) = request.kind {
+            details += ", update \(text)"
+        }
         LogStore.shared.add(
             level: "warning", domain: "MCP",
             message:
-                "Pending update \(action.id) on \(request.connectionName) \(request.database).\(request.collection): filter \(request.filterText), update \(request.updateText), \(request.multi ? "every match" : "first match only"). Waiting for the user."
+                "Pending \(request.noun) \(action.id) on \(request.connectionName) \(request.database).\(request.collection): \(details), \(request.multi ? "every match" : "first match only"). Waiting for the user."
         )
 
-        let window = PendingUpdateWindowController(action: action)
+        let window = PendingActionWindowController(action: action)
         action.window = window
         // The app doesn't take focus; the Dock keeps bouncing until the user
         // switches to it (owner decision 2026-11-19).
@@ -124,7 +144,7 @@ final class PendingActions {
     }
 
     /// Waits up to `limit` for the user's decision (and, if applied, for the
-    /// update to finish). nil means still waiting.
+    /// change to finish). nil means still waiting.
     func outcome(of action: Action, waitingUpTo limit: Duration) async -> Outcome? {
         if let outcome = action.outcome { return outcome }
         let token = UUID()
@@ -139,9 +159,9 @@ final class PendingActions {
 
     // MARK: - What the tools see
 
-    /// update_documents: shows the request, then waits a while for the
-    /// decision.
-    func submitAndWait(_ request: UpdateRequest) async -> MCPToolResult {
+    /// update_documents, delete_documents: shows the request, then waits a
+    /// while for the decision.
+    func submitAndWait(_ request: Request) async -> MCPToolResult {
         guard let action = submit(request) else {
             return .failure(
                 "Another change is already waiting for the user's decision in MongoHub Plus. Wait for that one (wait_for_decision) before asking for another."
@@ -154,12 +174,14 @@ final class PendingActions {
     func wait(forRequest id: String) async -> MCPToolResult {
         guard let action = action(id: id) else {
             return .failure(
-                "There is no recent request \"\(id)\". Use the id update_documents returned.")
+                "There is no recent request \"\(id)\". Use the id update_documents or delete_documents returned."
+            )
         }
         return Self.result(action, await outcome(of: action, waitingUpTo: Self.waitPerCall))
     }
 
     private static func result(_ action: Action, _ outcome: Outcome?) -> MCPToolResult {
+        let noun = action.request.noun
         var result: [String: JSONValue] = ["request": .string(action.id)]
         let isError: Bool
         switch outcome {
@@ -170,7 +192,7 @@ final class PendingActions {
                 "The user hasn't decided yet, and nothing has changed. Call wait_for_decision with this request id to keep waiting. Without an answer the request is rejected at \(expires), the user's local time."
             )
             isError = false
-        case .applied(let matched, let modified, let errors)?:
+        case .updated(let matched, let modified, let errors)?:
             result["status"] = "applied"
             result["matched"] = .int(matched)
             result["modified"] = .int(modified)
@@ -182,14 +204,26 @@ final class PendingActions {
                     ? "The user applied the update."
                     : "The user applied the update, but MongoDB reported errors.")
             isError = !errors.isEmpty
+        case .deleted(let count, let errors)?:
+            result["status"] = "applied"
+            result["deleted"] = .int(count)
+            if !errors.isEmpty {
+                result["errors"] = .array(errors.map { .string($0) })
+            }
+            result["message"] = .string(
+                errors.isEmpty
+                    ? "The user applied the deletion."
+                    : "The user applied the deletion, but MongoDB reported errors.")
+            isError = !errors.isEmpty
         case .failed(let message)?:
             result["status"] = "failed"
-            result["message"] = .string("The user applied the update, but it failed: \(message)")
+            result["message"] = .string(
+                "The user applied the \(noun), but it failed: \(message)")
             isError = true
         case .rejected?:
             result["status"] = "rejected"
-            result["message"] =
-                "The user rejected the update in MongoHub Plus. Nothing was changed."
+            result["message"] = .string(
+                "The user rejected the \(noun) in MongoHub Plus. Nothing was changed.")
             isError = true
         case .expired?:
             result["status"] = "expired"
@@ -217,30 +251,20 @@ final class PendingActions {
         cancelAttention(action)
         LogStore.shared.add(
             level: "warning", domain: "MCP",
-            message: "Pending update \(action.id): applied by the user")
+            message: "Pending \(action.request.noun) \(action.id): applied by the user")
 
         let request = action.request
         Task {
             let result = await MCPConnections.withSession(
-                .string(request.connectionID.uuidString), need: .update
+                .string(request.connectionID.uuidString), need: .change
             ) { _, session in
-                var spec = Document()
-                spec["q"] = request.filter
-                spec["u"] = request.update
-                spec["upsert"] = false
-                spec["multi"] = request.multi
-                var updates = Document(isArray: true)
-                updates.append(spec)
-                var command = Document()
-                command["update"] = request.collection
-                command["updates"] = updates
-                command["ordered"] = true
-                return try await session.runCommand(command, onDatabase: request.database)
+                try await session.runCommand(
+                    Self.command(for: request), onDatabase: request.database)
             }
             let outcome: Outcome
             switch result {
             case .success(let reply):
-                outcome = Self.updateOutcome(reply)
+                outcome = Self.outcome(of: request, reply: reply)
             case .failure(let refusal):
                 outcome = .failed(refusal.message)
             }
@@ -252,6 +276,14 @@ final class PendingActions {
     func reject(_ action: Action) {
         guard action.outcome == nil, !action.applying else { return }
         finish(action, .rejected)
+    }
+
+    /// The window closed. Without a decision that's a rejection (the close
+    /// button); either way the window is let go once it's off screen, so
+    /// recent actions don't keep their windows.
+    func windowClosed(_ action: Action) {
+        reject(action)
+        Task { @MainActor in action.window = nil }
     }
 
     /// MCP was switched off: nothing may be applied any more.
@@ -273,7 +305,7 @@ final class PendingActions {
         action.window?.show(outcome)
         LogStore.shared.add(
             level: "warning", domain: "MCP",
-            message: "Pending update \(action.id): \(Self.logText(outcome))")
+            message: "Pending \(action.request.noun) \(action.id): \(Self.logText(outcome))")
     }
 
     private func cancelAttention(_ action: Action) {
@@ -290,7 +322,32 @@ final class PendingActions {
         return TimeInterval(seconds) + TimeInterval(attoseconds) / 1e18
     }
 
-    private static func updateOutcome(_ reply: Document) -> Outcome {
+    /// The write command for a request: one statement, never an upsert.
+    nonisolated private static func command(for request: Request) -> Document {
+        var spec = Document()
+        spec["q"] = request.filter
+        var statements = Document(isArray: true)
+        var command = Document()
+        switch request.kind {
+        case .update(_, let update):
+            spec["u"] = update
+            spec["upsert"] = false
+            spec["multi"] = request.multi
+            statements.append(spec)
+            command["update"] = request.collection
+            command["updates"] = statements
+        case .delete:
+            // 0 deletes every match, 1 only the first.
+            spec["limit"] = Int32(request.multi ? 0 : 1)
+            statements.append(spec)
+            command["delete"] = request.collection
+            command["deletes"] = statements
+        }
+        command["ordered"] = true
+        return command
+    }
+
+    nonisolated private static func outcome(of request: Request, reply: Document) -> Outcome {
         func integer(_ value: Primitive?) -> Int {
             switch value {
             case let value as Int: return value
@@ -307,14 +364,23 @@ final class PendingActions {
         if let concern = reply["writeConcernError"] as? Document {
             errors.append("write concern: \(concern["errmsg"] as? String ?? "error")")
         }
-        return .applied(
-            matched: integer(reply["n"]), modified: integer(reply["nModified"]), errors: errors)
+        switch request.kind {
+        case .update:
+            return .updated(
+                matched: integer(reply["n"]), modified: integer(reply["nModified"]),
+                errors: errors)
+        case .delete:
+            return .deleted(count: integer(reply["n"]), errors: errors)
+        }
     }
 
     private static func logText(_ outcome: Outcome) -> String {
         switch outcome {
-        case .applied(let matched, let modified, let errors):
+        case .updated(let matched, let modified, let errors):
             return "done, matched \(matched), modified \(modified)"
+                + (errors.isEmpty ? "" : ", errors: \(errors.joined(separator: "; "))")
+        case .deleted(let count, let errors):
+            return "done, deleted \(count)"
                 + (errors.isEmpty ? "" : ", errors: \(errors.joined(separator: "; "))")
         case .failed(let message): return "failed: \(message)"
         case .rejected: return "rejected by the user"

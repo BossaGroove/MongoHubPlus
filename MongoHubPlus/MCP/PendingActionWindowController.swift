@@ -2,38 +2,49 @@ import AppKit
 import BSON
 import ExtendedJSON
 
-/// The window that shows an update an assistant asked for (internal
-/// mcp-tools.md §0, §7 step 8): exactly what will run, how many documents it
-/// touches, and a before/after preview. Nothing runs until the user clicks
-/// Apply Update with the pointer:
-/// - Apply is never the default button, has no key equivalent, and refuses
-///   keyboard focus, so neither Return nor Space (with keyboard navigation
-///   on) can press it.
+/// The window that shows a change an assistant asked for (internal
+/// mcp-tools.md §0, §7 steps 8 and 9): exactly what will run, how many
+/// documents it touches, and a preview, before and after for an update, the
+/// documents themselves for a deletion. Nothing runs until the user clicks
+/// Apply Update or Delete with the pointer:
+/// - That button is never the default button, has no key equivalent, and
+///   refuses keyboard focus, so neither Return nor Space (with keyboard
+///   navigation on) can press it.
 /// - Esc, Reject and the close button all reject.
-/// - A filter that matches every document keeps Apply disabled until the
-///   user types the collection's name.
+/// - A filter that matches every document keeps it disabled until the user
+///   types the collection's name.
 @MainActor
-final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
+final class PendingActionWindowController: NSWindowController, NSWindowDelegate,
     NSTextFieldDelegate
 {
     private let action: PendingActions.Action
     private let rejectButton = NSButton(
         title: String(localized: "Reject"), target: nil, action: nil)
-    private let applyButton = NSButton(
-        title: String(localized: "Apply Update"), target: nil, action: nil)
+    private let applyButton = NSButton(title: "", target: nil, action: nil)
     private let closeButton = NSButton(title: String(localized: "Close"), target: nil, action: nil)
     private let confirmField = NSTextField(string: "")
     private let statusLabel = NSTextField(wrappingLabelWithString: "")
     private var needsTypedConfirmation: Bool { action.request.filter.isEmpty }
+
+    private var isDelete: Bool {
+        if case .delete = action.request.kind { return true }
+        return false
+    }
+    private var applyTitle: String {
+        isDelete ? String(localized: "Delete") : String(localized: "Apply Update")
+    }
 
     init(action: PendingActions.Action) {
         self.action = action
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 480),
             styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        window.title = String(localized: "Update Requested by an AI Assistant")
-        window.isReleasedWhenClosed = false
         super.init(window: window)
+        window.title =
+            isDelete
+            ? String(localized: "Deletion Requested by an AI Assistant")
+            : String(localized: "Update Requested by an AI Assistant")
+        window.isReleasedWhenClosed = false
         window.delegate = self
         buildContent()
         window.center()
@@ -49,15 +60,22 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         let request = action.request
 
         let headline = NSTextField(
-            labelWithString: String(localized: "An AI assistant wants to update documents"))
+            labelWithString: isDelete
+                ? String(localized: "An AI assistant wants to delete documents")
+                : String(localized: "An AI assistant wants to update documents"))
         headline.font = .boldSystemFont(ofSize: 15)
 
         let expires = action.expiresAt.formatted(date: .omitted, time: .shortened)
         let subline = NSTextField(
-            wrappingLabelWithString: String(
-                localized:
-                    "Nothing changes unless you click Apply Update. If you don't answer, the request is rejected at \(expires)."
-            ))
+            wrappingLabelWithString: isDelete
+                ? String(
+                    localized:
+                        "Nothing is deleted unless you click Delete. Deleted documents can't be recovered. If you don't answer, the request is rejected at \(expires)."
+                )
+                : String(
+                    localized:
+                        "Nothing changes unless you click Apply Update. If you don't answer, the request is rejected at \(expires)."
+                ))
         subline.textColor = .secondaryLabelColor
 
         func label(_ text: String) -> NSTextField {
@@ -88,17 +106,25 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         }
         let affectsField = value(affects)
         affectsField.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
+        if isDelete { affectsField.textColor = .systemRed }
 
-        let grid = NSGridView(views: [
+        var gridRows: [[NSView]] = [
             [label(String(localized: "Connection:")), value(request.connectionName)],
             [
                 label(String(localized: "Collection:")),
                 value("\(request.database).\(request.collection)", monospaced: true),
             ],
             [label(String(localized: "Filter:")), value(request.filterText, monospaced: true)],
-            [label(String(localized: "Update:")), value(request.updateText, monospaced: true)],
-            [label(String(localized: "Affects:")), affectsField],
-        ])
+        ]
+        if case .update(let text, _) = request.kind {
+            gridRows.append([label(String(localized: "Update:")), value(text, monospaced: true)])
+        }
+        gridRows.append(
+            [
+                label(isDelete ? String(localized: "Deletes:") : String(localized: "Affects:")),
+                affectsField,
+            ])
+        let grid = NSGridView(views: gridRows)
         grid.rowSpacing = 6
         grid.columnSpacing = 8
         grid.column(at: 0).xPlacement = .trailing
@@ -112,7 +138,7 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
             let warning = NSTextField(
                 wrappingLabelWithString: String(
                     localized:
-                        "This filter matches every document in the collection. Type the collection's name, \(request.collection), to enable Apply Update:"
+                        "This filter matches every document in the collection. Type the collection's name, \(request.collection), to enable \(applyTitle):"
                 ))
             warning.textColor = .systemRed
             // Not the name itself: a greyed-out "orders" reads as already typed.
@@ -130,6 +156,7 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         rejectButton.action = #selector(rejectAction(_:))
         rejectButton.keyEquivalent = "\u{1b}"
 
+        applyButton.title = applyTitle
         applyButton.target = self
         applyButton.action = #selector(applyAction(_:))
         applyButton.hasDestructiveAction = true
@@ -173,8 +200,9 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         window.setContentSize(content.fittingSize)
     }
 
-    /// The Update pane's preview: each sampled document with the change
-    /// marked on it, old value struck through in red, new value in green.
+    /// The sampled documents: for an update, the Update pane's preview (the
+    /// change marked on each, old value struck through in red, new value in
+    /// green); for a deletion, the documents as they are, in red-edged cards.
     private func previewViews() -> [NSView] {
         let request = action.request
         guard !request.samples.isEmpty else {
@@ -189,29 +217,50 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
 
         let theme = JSONTheme.current
         var cards: [NSView] = []
-        for sample in request.samples {
-            do {
-                var effects = try UpdatePreview.effects(of: request.update, on: sample)
-                effects += UpdatePreview.renameAdditions(of: request.update, on: sample)
+        let header: NSTextField
+        switch request.kind {
+        case .update(_, let update):
+            for sample in request.samples {
+                do {
+                    var effects = try UpdatePreview.effects(of: update, on: sample)
+                    effects += UpdatePreview.renameAdditions(of: update, on: sample)
+                    cards.append(
+                        UpdatePreviewRenderer.card(
+                            for: UpdatePreviewRenderer.render(
+                                document: sample, effects: effects, theme: theme),
+                            theme: theme))
+                } catch {
+                    let problem = NSTextField(
+                        wrappingLabelWithString: String(
+                            localized:
+                                "The preview can't be drawn: \(String(describing: error))"))
+                    problem.textColor = .systemRed
+                    return [problem]
+                }
+            }
+            header = NSTextField(
+                labelWithString: String(
+                    localized:
+                        "Before and after, for the first \(request.samples.count) matching documents:"
+                ))
+            header.textColor = .secondaryLabelColor
+        case .delete:
+            for sample in request.samples {
                 cards.append(
                     UpdatePreviewRenderer.card(
                         for: UpdatePreviewRenderer.render(
-                            document: sample, effects: effects, theme: theme),
-                        theme: theme))
-            } catch {
-                let problem = NSTextField(
-                    wrappingLabelWithString: String(
-                        localized: "The preview can't be drawn: \(String(describing: error))"))
-                problem.textColor = .systemRed
-                return [problem]
+                            document: sample, effects: [], theme: theme),
+                        theme: theme, border: .systemRed))
             }
+            header = NSTextField(
+                labelWithString: request.multi
+                    ? String(
+                        localized:
+                            "Documents that will be deleted, the first \(request.samples.count) shown:"
+                    )
+                    : String(localized: "The first matching document right now:"))
+            header.textColor = .systemRed
         }
-
-        let header = NSTextField(
-            labelWithString: String(
-                localized:
-                    "Before and after, for the first \(request.samples.count) matching documents:"))
-        header.textColor = .secondaryLabelColor
 
         let cardStack = NSStackView(views: cards)
         cardStack.orientation = .vertical
@@ -248,7 +297,8 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         rejectButton.isEnabled = false
         applyButton.isEnabled = false
         confirmField.isEnabled = false
-        statusLabel.stringValue = String(localized: "Applying…")
+        statusLabel.stringValue =
+            isDelete ? String(localized: "Deleting…") : String(localized: "Applying…")
         statusLabel.textColor = .labelColor
         statusLabel.isHidden = false
         PendingActions.shared.apply(action)
@@ -267,8 +317,7 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
     }
 
     func windowWillClose(_ notification: Notification) {
-        // Closing without a decision is a rejection.
-        PendingActions.shared.reject(action)
+        PendingActions.shared.windowClosed(action)
     }
 
     /// Called once the action is decided.
@@ -276,13 +325,22 @@ final class PendingUpdateWindowController: NSWindowController, NSWindowDelegate,
         switch outcome {
         case .rejected, .expired, .withdrawn:
             close()
-        case .applied(let matched, let modified, let errors):
+        case .updated(let matched, let modified, let errors):
             showResult(
                 errors.isEmpty
                     ? String(localized: "Applied: \(matched) matched, \(modified) modified.")
                     : String(
                         localized:
                             "Applied with errors: \(matched) matched, \(modified) modified. \(errors.joined(separator: " "))"
+                    ),
+                failed: !errors.isEmpty)
+        case .deleted(let count, let errors):
+            showResult(
+                errors.isEmpty
+                    ? String(localized: "Applied: \(count) deleted.")
+                    : String(
+                        localized:
+                            "Applied with errors: \(count) deleted. \(errors.joined(separator: " "))"
                     ),
                 failed: !errors.isEmpty)
         case .failed(let message):

@@ -154,8 +154,10 @@ final class MCPController {
                 connections the user saved in the app, named as list_connections returns \
                 them. Each connection has an access level that only the user sets in the app: \
                 off (no tool can use it), readOnly (reading), or readWrite (reading and \
-                inserting). Updates and deletes are never run directly. The app never shares \
-                hosts, connection strings or passwords.
+                inserting). Updates and deletes are never run directly: update_documents and \
+                delete_documents, on readWrite connections, ask the user, who applies or \
+                rejects each one in the app. The app never shares hosts, connection strings or \
+                passwords.
                 """,
             tools: MCPTools.all,
             log: { event in

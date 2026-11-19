@@ -12,9 +12,9 @@ enum MCPConnections {
         /// Inserting: the one write assistants may run directly, and only on
         /// Read & Write connections (internal mcp-tools.md §0).
         case insert
-        /// Asking for an update: Read & Write only, and it never runs until
-        /// the user applies it in the app (§0).
-        case update
+        /// Asking for an update or a delete: Read & Write only, and it never
+        /// runs until the user applies it in the app (§0).
+        case change
     }
 
     /// A reason to refuse, worded for the assistant.
@@ -141,7 +141,7 @@ enum MCPConnections {
                     the user can change that: in MongoHub Plus, edit the connection and set AI \
                     Access to Read Only or Read & Write.
                     """)
-        case (.update, .readOnly):
+        case (.change, .readOnly):
             throw Refusal(
                 message: """
                     "\(alias)" has AI Access set to Read Only, so assistants can read it but not \
@@ -155,7 +155,7 @@ enum MCPConnections {
                     insert. Only the user can change that: in MongoHub Plus, edit the connection \
                     and set AI Access to Read & Write.
                     """)
-        case (.read, .readOnly), (.read, .readWrite), (.insert, .readWrite), (.update, .readWrite):
+        case (.read, .readOnly), (.read, .readWrite), (.insert, .readWrite), (.change, .readWrite):
             break
         }
         return connection

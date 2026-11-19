@@ -34,11 +34,11 @@
 		7C19C29D306229182FE4414C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B9DDB148E6C8CD242987F9A5 /* Localizable.xcstrings */; };
 		880615A60926A8B87DF86E89 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 524016CC5DC5617670159682 /* Sparkle */; };
 		89AD77259C971DF05617A2CB /* ExtendedJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 754CEB7E126D0DC777E736C1 /* ExtendedJSON */; };
+		8A6E8E1BDAD43682CC496448 /* PendingActionWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF8F83C6F8EB795296554B /* PendingActionWindowController.swift */; };
 		8EF2CAC7A518D3CC331D7FEC /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADE8D847F217115820A3CEF /* ImportExport.swift */; };
 		964D6A491C2F503CFB0052E4 /* InsertPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489DC9E909B2F92434B49C1 /* InsertPaneController.swift */; };
 		9A3069243677AA38CAA7D7AA /* AggregationStages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC20B2BAAAAF56545546006 /* AggregationStages.swift */; };
 		9BF80ED25AD78B3A2221EEC0 /* FindPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */; };
-		9ECB7C6F0209EEA83DF42160 /* PendingUpdateWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */; };
 		A5895644C0F71FB21C449763 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 947290413378D99E62F73675 /* CHANGELOG.md */; };
 		A6B73302D48D11E9F055F661 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14233BDDB0E9540CFCBCDD3A /* AppDelegate.swift */; };
 		A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285C8B28C30551C90A04A98 /* MCPTools.swift */; };
@@ -91,8 +91,8 @@
 		91A36ED7E869A1C0B1CA9537 /* LogWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWindow.swift; sourceTree = "<group>"; };
 		934AA052910E40E8AC423B9D /* PendingActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingActions.swift; sourceTree = "<group>"; };
 		947290413378D99E62F73675 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		96EF8F83C6F8EB795296554B /* PendingActionWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingActionWindowController.swift; sourceTree = "<group>"; };
 		A1E522505CB2C92033153CC7 /* MCPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPController.swift; sourceTree = "<group>"; };
-		A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingUpdateWindowController.swift; sourceTree = "<group>"; };
 		A53A26564624146CE25AF64E /* ActivityMonitorTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitorTabController.swift; sourceTree = "<group>"; };
 		B0112E4F9657FC483A84AA30 /* JSONEditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONEditorWindowController.swift; sourceTree = "<group>"; };
 		B7E828940898163A28CCB599 /* QueryPaneSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPaneSupport.swift; sourceTree = "<group>"; };
@@ -194,7 +194,7 @@
 				5285C8B28C30551C90A04A98 /* MCPTools.swift */,
 				15543204B5FF97E5A6B8DD8E /* MCPWriteTools.swift */,
 				934AA052910E40E8AC423B9D /* PendingActions.swift */,
-				A4C9E905A88540CF45034D44 /* PendingUpdateWindowController.swift */,
+				96EF8F83C6F8EB795296554B /* PendingActionWindowController.swift */,
 			);
 			path = MCP;
 			sourceTree = "<group>";
@@ -426,8 +426,8 @@
 				A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */,
 				619B81B021CF16C45216711D /* MCPWriteTools.swift in Sources */,
 				5397914585817A467379ABF9 /* MongoConnection.swift in Sources */,
+				8A6E8E1BDAD43682CC496448 /* PendingActionWindowController.swift in Sources */,
 				E40E3D13D26823AD29C3A4A9 /* PendingActions.swift in Sources */,
-				9ECB7C6F0209EEA83DF42160 /* PendingUpdateWindowController.swift in Sources */,
 				6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */,
 				BD5EE4594515DA27A6ED3238 /* PreferencesWindow.swift in Sources */,
 				FFF3552BEF555E19947BE72F /* QueryHistoryStore.swift in Sources */,

@@ -28,15 +28,18 @@ enum UpdatePreviewRenderer {
 
     /// One bordered card per document, the way Compass separates them — a
     /// blank line between two JSON blobs reads as part of the document.
-    /// Shared by the Update pane and the MCP pending-update window.
-    static func card(for document: NSAttributedString, theme: JSONTheme) -> NSView {
+    /// Shared by the Update pane and the MCP pending-action window, which
+    /// edges documents about to be deleted in `border`.
+    static func card(
+        for document: NSAttributedString, theme: JSONTheme, border: NSColor? = nil
+    ) -> NSView {
         let card = NSView()
         card.translatesAutoresizingMaskIntoConstraints = false
         card.wantsLayer = true
         card.layer?.backgroundColor = theme.background.cgColor
         card.layer?.cornerRadius = 6
-        card.layer?.borderWidth = 1
-        card.layer?.borderColor = NSColor.white.withAlphaComponent(0.18).cgColor
+        card.layer?.borderWidth = border == nil ? 1 : 2
+        card.layer?.borderColor = (border ?? NSColor.white.withAlphaComponent(0.18)).cgColor
 
         let label = NSTextField(labelWithAttributedString: document)
         label.isSelectable = true

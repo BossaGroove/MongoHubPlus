@@ -12,7 +12,7 @@ import MongoService
 enum MCPTools {
     static let all: [MCPTool] = [
         listConnections, listDatabases, listCollections, find, openQuery, insertDocuments,
-        updateDocuments, waitForDecision,
+        updateDocuments, deleteDocuments, waitForDecision,
     ]
 
     // MARK: - list_connections
