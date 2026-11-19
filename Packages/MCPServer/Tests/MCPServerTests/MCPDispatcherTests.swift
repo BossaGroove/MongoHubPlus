@@ -66,6 +66,29 @@ struct MCPDispatcherTests {
             events.all == [MCPLogEvent(.info, "claude-code 2.1 connected (protocol 2025-06-18)")])
     }
 
+    @Test func toolCallsAreLoggedWithTheirArguments() async throws {
+        let events = LockedEvents()
+        let dispatcher = MCPDispatcher(
+            serverName: "S", serverVersion: "1", tools: [echoTool], log: { events.append($0) })
+        _ = try await send(
+            #"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"echo","arguments":{"connection":"Local"}}}"#,
+            to: dispatcher)
+        _ = try await send(
+            #"{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"echo"}}"#,
+            to: dispatcher)
+        #expect(
+            events.all == [
+                MCPLogEvent(.info, #"Tool call: echo {"connection":"Local"}"#),
+                MCPLogEvent(.info, "Tool call: echo"),
+            ])
+    }
+
+    @Test func longArgumentsAreCutShortInTheLog() {
+        let summary = MCPDispatcher.logSummary(["x": .string(String(repeating: "a", count: 1000))])
+        #expect(summary.count == 1 + 500 + 1)
+        #expect(summary.hasSuffix("…"))
+    }
+
     @Test func notificationsGetNoResponse() async throws {
         #expect(try await send(#"{"jsonrpc":"2.0","method":"notifications/initialized"}"#) == nil)
     }

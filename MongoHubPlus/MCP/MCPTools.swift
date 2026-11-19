@@ -1,10 +1,13 @@
+import BSON
 import Foundation
 import MCPServer
 
 /// The tools the MCP server offers, added one at a time (internal
-/// mcp-tools.md). Every tool runs its app work on the main actor.
+/// mcp-tools.md). Every tool runs its app work on the main actor; tools
+/// that touch a database go through `MCPConnections`, which checks the
+/// connection's AI Access first.
 enum MCPTools {
-    static let all: [MCPTool] = [listConnections]
+    static let all: [MCPTool] = [listConnections, listDatabases]
 
     // MARK: - list_connections
 
@@ -55,4 +58,59 @@ enum MCPTools {
             ]
             return .success(String(decoding: result.encoded(pretty: true), as: UTF8.self))
         })
+
+    // MARK: - list_databases
+
+    static let listDatabases = MCPTool(
+        name: "list_databases",
+        title: "List databases",
+        description: """
+            Lists the databases on one of the user's saved connections, with each one's size \
+            on disk in bytes and whether it is empty. The connection's access must be readOnly \
+            or readWrite. A database user without the right to list every database gets only \
+            the databases it may use.
+            """,
+        inputSchema: [
+            "type": "object",
+            "properties": ["connection": MCPConnections.connectionArgumentSchema],
+            "required": ["connection"],
+            "additionalProperties": false,
+        ],
+        readOnly: true,
+        run: { arguments in
+            await MCPConnections.run(arguments, need: .read) { connection, session in
+                let reply = try await session.runCommand(["listDatabases": 1], onDatabase: "admin")
+                guard let databases = reply["databases"] as? Document else {
+                    return .failure("The server's listDatabases reply had no databases list.")
+                }
+                let entries: [JSONValue] = databases.values.compactMap { value in
+                    guard let database = value as? Document,
+                        let name = database["name"] as? String
+                    else { return nil }
+                    var entry: [String: JSONValue] = ["name": .string(name)]
+                    if let size = integer(database["sizeOnDisk"]) {
+                        entry["sizeOnDisk"] = .int(size)
+                    }
+                    if let empty = database["empty"] as? Bool {
+                        entry["empty"] = .bool(empty)
+                    }
+                    return .object(entry)
+                }
+                let result: JSONValue = [
+                    "connection": .string(connection.alias),
+                    "databases": .array(entries),
+                ]
+                return .success(String(decoding: result.encoded(pretty: true), as: UTF8.self))
+            }
+        })
+
+    /// A BSON number as an Int (servers send sizes as int32, int64 or double).
+    private static func integer(_ value: Primitive?) -> Int? {
+        switch value {
+        case let value as Int: return value
+        case let value as Int32: return Int(value)
+        case let value as Double where value.isFinite: return Int(value)
+        default: return nil
+        }
+    }
 }

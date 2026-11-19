@@ -22,6 +22,7 @@
 		597ACC5267BEA1372500722C /* TailPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B64B9C8B7F8BBA85F9BB4 /* TailPaneController.swift */; };
 		5A33D457BD3AB3C8024912F0 /* ExplainSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022957575C63463D1137A66C /* ExplainSheetController.swift */; };
 		5BC607BA65BF84BBB52E3BA9 /* RemovePaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B2C31351A9637A18BC85D0 /* RemovePaneController.swift */; };
+		610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 092AB847135892A39A41C92B /* MCPConnections.swift */; };
 		6AE20CFC233DC4FDF96A37F0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C4BDB065238D92127A7108 /* Preferences.swift */; };
 		6C41513DFE408A4B7D17F426 /* Changelog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F283322B6230E66016034C0 /* Changelog.swift */; };
 		6DB0635D67AD66A3E84C4C3F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0FE36E484CA51E82513320 /* ConnectionStore.swift */; };
@@ -57,6 +58,7 @@
 		022957575C63463D1137A66C /* ExplainSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplainSheetController.swift; sourceTree = "<group>"; };
 		082ED8D05853574FBDEDD7C8 /* FindPaneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindPaneController.swift; sourceTree = "<group>"; };
 		0835B66D8869EDF653E132E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		092AB847135892A39A41C92B /* MCPConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPConnections.swift; sourceTree = "<group>"; };
 		0ADE8D847F217115820A3CEF /* ImportExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
 		0C0FE36E484CA51E82513320 /* ConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStore.swift; sourceTree = "<group>"; };
 		0F20E69505C930C0BD9ACA8E /* ConnectionListWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionListWindowController.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 		AFD5D8A7FC3603CF65551290 /* MCP */ = {
 			isa = PBXGroup;
 			children = (
+				092AB847135892A39A41C92B /* MCPConnections.swift */,
 				A1E522505CB2C92033153CC7 /* MCPController.swift */,
 				5285C8B28C30551C90A04A98 /* MCPTools.swift */,
 			);
@@ -409,6 +412,7 @@
 				5363545CEA3DB1A8E01DF110 /* JSONHighlighter.swift in Sources */,
 				6F11FF2D4F5A5301B95E1B13 /* Keychain.swift in Sources */,
 				7688EF9EB247C9967EBF68EC /* LogWindow.swift in Sources */,
+				610EE452187B6A343C6599D1 /* MCPConnections.swift in Sources */,
 				F59C6600895175F967AF53C0 /* MCPController.swift in Sources */,
 				A812C1266FCEFE1721F5D94C /* MCPTools.swift in Sources */,
 				5397914585817A467379ABF9 /* MongoConnection.swift in Sources */,

@@ -196,7 +196,7 @@ public struct MCPDispatcher: Sendable {
                 id: id, code: -32602, message: "Tool arguments must be an object")
         }
 
-        log(MCPLogEvent(.info, "Tool call: \(name)"))
+        log(MCPLogEvent(.info, "Tool call: \(name)\(Self.logSummary(arguments))"))
         let result = await tool.run(arguments)
         if result.isError {
             log(MCPLogEvent(.warning, "Tool \(name) failed: \(result.text)"))
@@ -207,6 +207,15 @@ public struct MCPDispatcher: Sendable {
                 "content": [["type": "text", "text": .string(result.text)]],
                 "isError": .bool(result.isError),
             ])
+    }
+
+    /// The arguments as compact JSON for the activity log, cut short so a
+    /// large argument can't flood it.
+    static func logSummary(_ arguments: [String: JSONValue]) -> String {
+        guard !arguments.isEmpty else { return "" }
+        let json = String(decoding: JSONValue.object(arguments).encoded(), as: UTF8.self)
+        let limit = 500
+        return " " + (json.count > limit ? json.prefix(limit) + "…" : json)
     }
 
     private static func describe(_ tool: MCPTool) -> JSONValue {
