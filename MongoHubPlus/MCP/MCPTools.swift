@@ -1,3 +1,4 @@
+import AppKit
 import BSON
 import ExtendedJSON
 import Foundation
@@ -9,7 +10,9 @@ import MongoService
 /// that touch a database go through `MCPConnections`, which checks the
 /// connection's AI Access first.
 enum MCPTools {
-    static let all: [MCPTool] = [listConnections, listDatabases, listCollections, find]
+    static let all: [MCPTool] = [
+        listConnections, listDatabases, listCollections, find, openQuery,
+    ]
 
     // MARK: - list_connections
 
@@ -240,6 +243,108 @@ enum MCPTools {
                     )
                 }
                 return render(query, connection: connection.alias, documents: documents)
+            }
+        })
+
+    // MARK: - open_query
+
+    static let openQuery = MCPTool(
+        name: "open_query",
+        title: "Show a query in MongoHub Plus",
+        description: """
+            Shows a query to the user in MongoHub Plus, so you both look at the same results: \
+            opens the connection's window (or brings an open one forward), opens the \
+            collection's tab on Find, fills in the query and runs it. The results appear on \
+            the user's screen and are not returned here; use find to read them. The \
+            connection's access must be readOnly or readWrite.
+
+            filter, projection and sort are text, exactly as for find. limit is how many \
+            documents the app lists (the app's default is 30). The collection's tab is reused, \
+            so this replaces the query the user had in it.
+            """,
+        inputSchema: [
+            "type": "object",
+            "properties": [
+                "connection": MCPConnections.connectionArgumentSchema,
+                "database": ["type": "string", "description": "The database name."],
+                "collection": ["type": "string", "description": "The collection name."],
+                "filter": [
+                    "type": "string",
+                    "description": "The query filter, as Extended JSON or mongosh text.",
+                ],
+                "projection": [
+                    "type": "string",
+                    "description": "Fields to show, as Extended JSON or mongosh text.",
+                ],
+                "sort": [
+                    "type": "string",
+                    "description": "Sort order, as Extended JSON or mongosh text. Defaults to _id.",
+                ],
+                "skip": ["type": "integer", "minimum": 0],
+                "limit": ["type": "integer", "minimum": 1],
+            ],
+            "required": ["connection", "database", "collection"],
+            "additionalProperties": false,
+        ],
+        readOnly: true,
+        run: { arguments in
+            // The text must parse exactly as it would for find. The limit is
+            // only how many rows the app lists, so find's cap doesn't apply.
+            var checked = arguments
+            checked["limit"] = nil
+            let query: FindQuery
+            do {
+                query = try FindQuery(checked)
+            } catch let refusal as MCPConnections.Refusal {
+                return .failure(refusal.message)
+            } catch {
+                return .failure(String(describing: error))
+            }
+            let limit: Int?
+            switch arguments["limit"] {
+            case nil, .null?: limit = nil
+            case .int(let value)? where value >= 1: limit = value
+            default: return .failure("limit must be a whole number of at least 1.")
+            }
+            func typed(_ name: String) -> String {
+                arguments[name]?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            }
+            let shown = ConnectionWindowController.ShownQuery(
+                database: query.database, collection: query.collection,
+                criteria: typed("filter"), fields: typed("projection"), sort: typed("sort"),
+                skip: query.skip > 0 ? query.skip : nil, limit: limit)
+            let sortShown = typed("sort").isEmpty ? "the app's default (_id)" : query.sortText
+
+            return await MainActor.run { () -> MCPToolResult in
+                let connection: MongoConnection
+                do {
+                    connection = try MCPConnections.resolve(arguments["connection"], need: .read)
+                } catch let refusal as MCPConnections.Refusal {
+                    return .failure(refusal.message)
+                } catch {
+                    return .failure(String(describing: error))
+                }
+                guard let app = NSApp.delegate as? AppDelegate else {
+                    return .failure("MongoHub Plus can't show windows right now.")
+                }
+                let wasOpen = app.hasConnectionWindow(for: connection.id)
+                guard app.openConnection(connection).show(shown) else {
+                    return .failure(
+                        "The \"\(connection.alias)\" window in MongoHub Plus couldn't connect, so nothing was shown. The user can close that window, and then you can try again."
+                    )
+                }
+                // Don't take focus from whatever the user is doing: one Dock
+                // bounce says where to look.
+                NSApp.requestUserAttention(.informationalRequest)
+                let state =
+                    wasOpen ? "already open" : "opened now; it connects, then runs the query"
+                return .success(
+                    """
+                    Showing the query in MongoHub Plus, in the "\(connection.alias)" window \
+                    (\(state)): \(query.database).\(query.collection) on the Find tab, filter \
+                    \(query.filterText), sort \(sortShown). The results are on the user's \
+                    screen, not returned here; use find to read them.
+                    """)
             }
         })
 

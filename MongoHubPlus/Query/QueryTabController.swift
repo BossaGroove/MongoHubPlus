@@ -162,6 +162,13 @@ final class QueryTabController: TabItemViewController {
         select(segment)
     }
 
+    /// Shows a query an assistant asked for (MCP open_query): the Find pane,
+    /// filled in and run.
+    func showQuery(criteria: String, fields: String, sort: String, skip: Int?, limit: Int?) {
+        select(.find)
+        findPane.showQuery(criteria: criteria, fields: fields, sort: sort, skip: skip, limit: limit)
+    }
+
     /// Kept for the -MAOpenQuery verification hook.
     func runQuery(_ sender: Any?) {
         findPane.runQuery(sender)

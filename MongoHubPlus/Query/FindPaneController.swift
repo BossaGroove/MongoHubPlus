@@ -256,6 +256,18 @@ final class FindPaneController: NSViewController {
     }
 
     /// UI-verification hooks: preset the query fields / export without panels.
+    /// Fills the query fields with text as a user would type it, then runs
+    /// the query: how an assistant shows a query through MCP (open_query,
+    /// internal mcp-tools.md §7). An empty field keeps the pane's default.
+    func showQuery(criteria: String, fields: String, sort: String, skip: Int?, limit: Int?) {
+        criteriaCombo.stringValue = criteria
+        fieldsField.stringValue = fields
+        sortField.stringValue = sort
+        skipField.stringValue = skip.map(String.init) ?? ""
+        limitField.stringValue = limit.map(String.init) ?? ""
+        runQuery(nil)
+    }
+
     func debugSetQuery(criteria: String?, fields: String?, sort: String? = nil) {
         if let criteria { criteriaCombo.stringValue = criteria }
         if let fields { fieldsField.stringValue = fields }

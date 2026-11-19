@@ -40,6 +40,22 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
     private var activityTab: ActivityMonitorTabController?
     private var queryTabs: [String: QueryTabController] = [:]
 
+    /// A query an assistant asked to show (MCP open_query, internal
+    /// mcp-tools.md §7). Field text is as a user would type it.
+    struct ShownQuery {
+        let database: String
+        let collection: String
+        let criteria: String
+        let fields: String
+        let sort: String
+        let skip: Int?
+        let limit: Int?
+    }
+
+    /// Waiting for the connection to finish opening.
+    private var pendingShownQuery: ShownQuery?
+    private var connectionFailed = false
+
     init(connection: MongoConnection) {
         self.connection = connection
         let window = NSWindow(
@@ -263,6 +279,10 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
                 self.window?.title = self.connection.alias
                 self.showServerStatusTab()
                 await self.reloadDatabaseList()
+                if let pending = self.pendingShownQuery {
+                    self.pendingShownQuery = nil
+                    self.show(pending)
+                }
 
                 if UserDefaults.standard.bool(forKey: "MAShowMonitor") {
                     self.showActivityMonitorAction(nil)
@@ -354,6 +374,8 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
                     }
                 }
             } catch {
+                self.connectionFailed = true
+                self.pendingShownQuery = nil
                 self.window?.title = "\(self.connection.alias) — connection failed"
                 LogStore.shared.add(
                     level: "error", domain: "\(alias)", message: String(describing: error))
@@ -534,6 +556,24 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
 
     private var sessionProvider: () -> ConnectionSession? {
         { [weak self] in self?.session }
+    }
+
+    /// Opens the collection's query tab with `query` and runs it, waiting
+    /// for the connection if it is still opening. Returns false when this
+    /// window's connection failed, so nothing can be shown.
+    @discardableResult
+    func show(_ query: ShownQuery) -> Bool {
+        guard !connectionFailed else { return false }
+        guard session != nil else {
+            pendingShownQuery = query
+            return true
+        }
+        let node = CollectionNode(database: query.database, name: query.collection)
+        openQueryTab(for: node)
+        queryTabs[node.absoluteName]?.showQuery(
+            criteria: query.criteria, fields: query.fields, sort: query.sort, skip: query.skip,
+            limit: query.limit)
+        return true
     }
 
     func openQueryTab(for collection: CollectionNode) {

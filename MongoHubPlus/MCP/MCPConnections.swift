@@ -75,6 +75,27 @@ enum MCPConnections {
     private static func prepare(_ argument: JSONValue?, need: Need) throws -> (
         MongoConnection, String
     ) {
+        let connection = try resolve(argument, need: need)
+
+        // The tunnel's host-key prompt needs a window; not supported yet.
+        // (open_query is fine: the app's own window handles the prompt.)
+        if connection.useSSH, connection.supportsSSHTunnel {
+            throw Refusal(
+                message:
+                    "\"\(connection.alias)\" connects through an SSH tunnel, which MCP tools don't support yet."
+            )
+        }
+
+        let uri = Preferences.applyingTimeouts(
+            to: connection.connectionString(
+                password: Keychain.password(for: connection.id, kind: .mongo)))
+        return (connection, uri)
+    }
+
+    /// Finds the connection named in a tool's `connection` argument (a name
+    /// or an id) and checks that its AI Access allows `need`. No connecting.
+    @MainActor
+    static func resolve(_ argument: JSONValue?, need: Need) throws -> MongoConnection {
         guard let reference = argument?.stringValue?.trimmingCharacters(in: .whitespaces),
             !reference.isEmpty
         else {
@@ -103,18 +124,6 @@ enum MCPConnections {
         case (.read, .readOnly), (.read, .readWrite):
             break
         }
-
-        // The tunnel's host-key prompt needs a window; not supported yet.
-        if connection.useSSH, connection.supportsSSHTunnel {
-            throw Refusal(
-                message:
-                    "\"\(alias)\" connects through an SSH tunnel, which MCP tools don't support yet."
-            )
-        }
-
-        let uri = Preferences.applyingTimeouts(
-            to: connection.connectionString(
-                password: Keychain.password(for: connection.id, kind: .mongo)))
-        return (connection, uri)
+        return connection
     }
 }

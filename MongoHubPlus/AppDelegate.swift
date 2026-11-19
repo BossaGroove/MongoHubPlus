@@ -127,11 +127,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Re-opening focuses the existing window; `forceNewWindow` opens
     /// another one for the same connection (M4d, feature-spec 1.11).
-    func openConnection(_ connection: MongoConnection, forceNewWindow: Bool = false) {
+    @discardableResult
+    func openConnection(
+        _ connection: MongoConnection, forceNewWindow: Bool = false
+    ) -> ConnectionWindowController {
         if !forceNewWindow, let existing = connectionWindowControllers[connection.id]?.first {
             existing.showWindow(nil)
             existing.window?.makeKeyAndOrderFront(nil)
-            return
+            return existing
         }
         let controller = ConnectionWindowController(connection: connection)
         controller.onClose = { [weak self, weak controller] in
@@ -148,6 +151,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 y: reference.frame.maxY - window.frame.height - 28)
             window.setFrameOrigin(origin)
         }
+        return controller
+    }
+
+    func hasConnectionWindow(for id: UUID) -> Bool {
+        !(connectionWindowControllers[id] ?? []).isEmpty
     }
 
     // MARK: - Dock menu (legacy: one entry per connection)
