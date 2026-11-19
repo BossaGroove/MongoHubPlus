@@ -12,8 +12,8 @@ import MongoService
 enum MCPTools {
     static let all: [MCPTool] = [
         listConnections, listDatabases, listCollections, listIndexes, find, countDocuments,
-        aggregate, openQuery, getCurrentView, insertDocuments, updateDocuments,
-        deleteDocuments, waitForDecision,
+        aggregate, openQuery, openAggregation, getCurrentView, insertDocuments,
+        updateDocuments, deleteDocuments, waitForDecision,
     ]
 
     // MARK: - list_connections
@@ -313,42 +313,55 @@ enum MCPTools {
             }
             let shown = ConnectionWindowController.ShownQuery(
                 database: query.database, collection: query.collection,
-                criteria: typed("filter"), fields: typed("projection"), sort: typed("sort"),
-                skip: query.skip > 0 ? query.skip : nil, limit: limit)
+                pane: .find(
+                    criteria: typed("filter"), fields: typed("projection"), sort: typed("sort"),
+                    skip: query.skip > 0 ? query.skip : nil, limit: limit))
             let sortShown = typed("sort").isEmpty ? "the app's default (_id)" : query.sortText
 
-            return await MainActor.run { () -> MCPToolResult in
-                let connection: MongoConnection
-                do {
-                    connection = try MCPConnections.resolve(arguments["connection"], need: .read)
-                } catch let refusal as MCPConnections.Refusal {
-                    return .failure(refusal.message)
-                } catch {
-                    return .failure(String(describing: error))
-                }
-                guard let app = NSApp.delegate as? AppDelegate else {
-                    return .failure("MongoHub Plus can't show windows right now.")
-                }
-                let wasOpen = app.hasConnectionWindow(for: connection.id)
-                guard app.openConnection(connection).show(shown) else {
-                    return .failure(
-                        "The \"\(connection.alias)\" window in MongoHub Plus couldn't connect, so nothing was shown. The user can close that window, and then you can try again."
-                    )
-                }
-                // Don't take focus from whatever the user is doing: one Dock
-                // bounce says where to look.
-                NSApp.requestUserAttention(.informationalRequest)
-                let state =
-                    wasOpen ? "already open" : "opened now; it connects, then runs the query"
-                return .success(
+            return await MainActor.run {
+                show(shown, connectionArgument: arguments["connection"]) { alias, state in
                     """
-                    Showing the query in MongoHub Plus, in the "\(connection.alias)" window \
-                    (\(state)): \(query.database).\(query.collection) on the Find tab, filter \
+                    Showing the query in MongoHub Plus, in the "\(alias)" window (\(state)): \
+                    \(query.database).\(query.collection) on the Find tab, filter \
                     \(query.filterText), sort \(sortShown). The results are on the user's \
                     screen, not returned here; use find to read them.
-                    """)
+                    """
+                }
             }
         })
+
+    /// Shows a query in the connection's window (open_query,
+    /// open_aggregation): opens the window or reuses an open one, without
+    /// taking focus from whatever the user is doing.
+    @MainActor
+    static func show(
+        _ shown: ConnectionWindowController.ShownQuery, connectionArgument: JSONValue?,
+        message: (_ connection: String, _ state: String) -> String
+    ) -> MCPToolResult {
+        let connection: MongoConnection
+        do {
+            connection = try MCPConnections.resolve(connectionArgument, need: .read)
+        } catch let refusal as MCPConnections.Refusal {
+            return .failure(refusal.message)
+        } catch {
+            return .failure(String(describing: error))
+        }
+        guard let app = NSApp.delegate as? AppDelegate else {
+            return .failure("MongoHub Plus can't show windows right now.")
+        }
+        let wasOpen = app.hasConnectionWindow(for: connection.id)
+        guard app.openConnection(connection).show(shown) else {
+            return .failure(
+                "The \"\(connection.alias)\" window in MongoHub Plus couldn't connect, so nothing was shown. The user can close that window, and then you can try again."
+            )
+        }
+        // One Dock bounce says where to look.
+        NSApp.requestUserAttention(.informationalRequest)
+        return .success(
+            message(
+                connection.alias,
+                wasOpen ? "already open" : "opened now; it connects, then runs the query"))
+    }
 
     // MARK: - insert_documents
 

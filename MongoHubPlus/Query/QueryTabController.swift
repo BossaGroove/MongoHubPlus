@@ -157,7 +157,10 @@ final class QueryTabController: TabItemViewController {
 
     /// Programmatic segment selection (UI-verification hooks).
     func selectSegment(named name: String) {
-        guard let segment = Segment.allCases.first(where: { $0.label.lowercased() == name.lowercased() })
+        guard
+            let segment = Segment.allCases.first(where: {
+                $0.label.lowercased() == name.lowercased()
+            })
         else { return }
         select(segment)
     }
@@ -183,6 +186,13 @@ final class QueryTabController: TabItemViewController {
     func showQuery(criteria: String, fields: String, sort: String, skip: Int?, limit: Int?) {
         select(.find)
         findPane.showQuery(criteria: criteria, fields: fields, sort: sort, skip: skip, limit: limit)
+    }
+
+    /// Shows a pipeline an assistant asked for (MCP open_aggregation): the
+    /// Aggregation pane, filled in and run.
+    func showAggregation(pipeline: String) {
+        select(.aggregation)
+        aggregationPane.showPipeline(pipeline)
     }
 
     /// Kept for the -MAOpenQuery verification hook.

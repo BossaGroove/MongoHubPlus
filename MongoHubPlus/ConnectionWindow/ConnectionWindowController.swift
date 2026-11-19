@@ -40,16 +40,17 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
     private var activityTab: ActivityMonitorTabController?
     private var queryTabs: [String: QueryTabController] = [:]
 
-    /// A query an assistant asked to show (MCP open_query, internal
-    /// mcp-tools.md §7). Field text is as a user would type it.
+    /// A query an assistant asked to show (MCP open_query and
+    /// open_aggregation, internal mcp-tools.md §7). Text is as a user would
+    /// type it.
     struct ShownQuery {
+        enum Pane {
+            case find(criteria: String, fields: String, sort: String, skip: Int?, limit: Int?)
+            case aggregation(pipeline: String)
+        }
         let database: String
         let collection: String
-        let criteria: String
-        let fields: String
-        let sort: String
-        let skip: Int?
-        let limit: Int?
+        let pane: Pane
     }
 
     /// Waiting for the connection to finish opening.
@@ -128,8 +129,12 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         iconItem.image = NSImage(systemSymbolName: "plus", accessibilityDescription: "Add")?
             .withSymbolConfiguration(symbolConfig)
         addMenu.addItem(iconItem)
-        addMenu.addItem(withTitle: String(localized: "Add Database…"), action: #selector(createDatabaseAction(_:)), keyEquivalent: "")
-        addMenu.addItem(withTitle: String(localized: "Add Collection…"), action: #selector(createCollectionAction(_:)), keyEquivalent: "")
+        addMenu.addItem(
+            withTitle: String(localized: "Add Database…"),
+            action: #selector(createDatabaseAction(_:)), keyEquivalent: "")
+        addMenu.addItem(
+            withTitle: String(localized: "Add Collection…"),
+            action: #selector(createCollectionAction(_:)), keyEquivalent: "")
         for item in addMenu.items { item.target = self }
         addPopup.menu = addMenu
         addPopup.toolTip = String(localized: "Add a database or collection")
@@ -167,7 +172,8 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
 
             addPopup.widthAnchor.constraint(equalToConstant: 28),
             removeButton.widthAnchor.constraint(equalToConstant: 28),
-            bottomBar.leadingAnchor.constraint(equalTo: sidebarContainer.leadingAnchor, constant: 8),
+            bottomBar.leadingAnchor.constraint(
+                equalTo: sidebarContainer.leadingAnchor, constant: 8),
             bottomBar.bottomAnchor.constraint(equalTo: sidebarContainer.bottomAnchor),
             bottomBar.heightAnchor.constraint(equalToConstant: 26),
         ])
@@ -417,7 +423,8 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
             SSHForwardTarget(host: $0.host, port: $0.port)
         }
         let mapping = try await tunnel.start(
-            forwarding: targets.isEmpty ? [SSHForwardTarget(host: "127.0.0.1", port: 27017)] : targets)
+            forwarding: targets.isEmpty
+                ? [SSHForwardTarget(host: "127.0.0.1", port: 27017)] : targets)
         for (target, port) in mapping {
             LogStore.shared.add(
                 level: "info", domain: "\(alias).ssh",
@@ -514,7 +521,9 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
             databases = nodes.sorted { $0.name < $1.name }
             sidebarOutline.reloadData()
         } catch {
-            presentError(title: String(localized: "Could Not List Databases"), message: String(describing: error))
+            presentError(
+                title: String(localized: "Could Not List Databases"),
+                message: String(describing: error))
         }
     }
 
@@ -570,9 +579,13 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
         }
         let node = CollectionNode(database: query.database, name: query.collection)
         openQueryTab(for: node)
-        queryTabs[node.absoluteName]?.showQuery(
-            criteria: query.criteria, fields: query.fields, sort: query.sort, skip: query.skip,
-            limit: query.limit)
+        let tab = queryTabs[node.absoluteName]
+        switch query.pane {
+        case .find(let criteria, let fields, let sort, let skip, let limit):
+            tab?.showQuery(criteria: criteria, fields: fields, sort: sort, skip: skip, limit: limit)
+        case .aggregation(let pipeline):
+            tab?.showAggregation(pipeline: pipeline)
+        }
         return true
     }
 
@@ -631,7 +644,8 @@ final class ConnectionWindowController: NSWindowController, NSWindowDelegate {
     }
 
     @objc private func sidebarDoubleAction(_ sender: Any?) {
-        let row = sidebarOutline.clickedRow >= 0 ? sidebarOutline.clickedRow : sidebarOutline.selectedRow
+        let row =
+            sidebarOutline.clickedRow >= 0 ? sidebarOutline.clickedRow : sidebarOutline.selectedRow
         let item = sidebarOutline.item(atRow: row)
         if let collection = item as? CollectionNode {
             openQueryTab(for: collection)
@@ -775,7 +789,8 @@ extension ConnectionWindowController: NSMenuDelegate {
     }
 
     @objc func createDatabaseAction(_ sender: Any?) {
-        promptForName(title: String(localized: "New Database Name:"), placeholder: "Database Name") { [weak self] name in
+        promptForName(title: String(localized: "New Database Name:"), placeholder: "Database Name")
+        { [weak self] name in
             guard let self else { return }
             if !self.databases.contains(where: { $0.name == name }) {
                 let node = DatabaseNode(name: name)
@@ -790,7 +805,9 @@ extension ConnectionWindowController: NSMenuDelegate {
 
     @objc func createCollectionAction(_ sender: Any?) {
         guard let database = selectedDatabaseNode, let session else { return }
-        promptForName(title: String(localized: "New Collection Name:"), placeholder: "Collection Name") { [weak self] name in
+        promptForName(
+            title: String(localized: "New Collection Name:"), placeholder: "Collection Name"
+        ) { [weak self] name in
             guard let self else { return }
             Task {
                 do {
@@ -801,7 +818,8 @@ extension ConnectionWindowController: NSMenuDelegate {
                     self.loadCollections(for: database, expandWhenLoaded: true)
                 } catch {
                     self.presentError(
-                        title: String(localized: "Could Not Create Collection"), message: String(describing: error))
+                        title: String(localized: "Could Not Create Collection"),
+                        message: String(describing: error))
                 }
             }
         }
@@ -825,12 +843,14 @@ extension ConnectionWindowController: NSMenuDelegate {
                     if let tab = self.queryTabs.removeValue(forKey: collection.absoluteName) {
                         self.tabHost.removeTab(tab)
                     }
-                    if let database = self.databases.first(where: { $0.name == collection.database }) {
+                    if let database = self.databases.first(where: { $0.name == collection.database }
+                    ) {
                         self.loadCollections(for: database)
                     }
                 } catch {
                     self.presentError(
-                        title: String(localized: "Could Not Rename Collection"), message: String(describing: error))
+                        title: String(localized: "Could Not Rename Collection"),
+                        message: String(describing: error))
                 }
             }
         }
@@ -864,12 +884,14 @@ extension ConnectionWindowController: NSMenuDelegate {
                     if let tab = self.queryTabs.removeValue(forKey: collection.absoluteName) {
                         self.tabHost.removeTab(tab)
                     }
-                    if let database = self.databases.first(where: { $0.name == collection.database }) {
+                    if let database = self.databases.first(where: { $0.name == collection.database }
+                    ) {
                         self.loadCollections(for: database)
                     }
                 } catch {
                     self.presentError(
-                        title: String(localized: "Could Not Drop Collection"), message: String(describing: error))
+                        title: String(localized: "Could Not Drop Collection"),
+                        message: String(describing: error))
                 }
             }
         }
@@ -903,7 +925,8 @@ extension ConnectionWindowController: NSMenuDelegate {
                     await self.reloadDatabaseList()
                 } catch {
                     self.presentError(
-                        title: String(localized: "Could Not Drop Database"), message: String(describing: error))
+                        title: String(localized: "Could Not Drop Database"),
+                        message: String(describing: error))
                 }
             }
         }
@@ -925,8 +948,12 @@ extension ConnectionWindowController: NSMenuDelegate {
         }
         if let collection = selectedCollectionNode {
             add(String(localized: "Open \(collection.name)"), #selector(openQueryAction(_:)))
-            add(String(localized: "\(collection.name) Stats"), #selector(showCollectionStatsAction(_:)))
-            add(String(localized: "Rename \(collection.name)…"), #selector(renameCollectionAction(_:)))
+            add(
+                String(localized: "\(collection.name) Stats"),
+                #selector(showCollectionStatsAction(_:)))
+            add(
+                String(localized: "Rename \(collection.name)…"),
+                #selector(renameCollectionAction(_:)))
             add(String(localized: "Drop \(collection.name)…"), #selector(dropCollectionAction(_:)))
             menu.addItem(.separator())
             add(String(localized: "New Database…"), #selector(createDatabaseAction(_:)))
@@ -994,7 +1021,9 @@ extension ConnectionWindowController: NSOutlineViewDataSource, NSOutlineViewDele
     ) -> NSView? {
         let reuseID = NSUserInterfaceItemIdentifier("sidebarCell")
         let cell: NSTableCellView
-        if let reused = outlineView.makeView(withIdentifier: reuseID, owner: self) as? NSTableCellView {
+        if let reused = outlineView.makeView(withIdentifier: reuseID, owner: self)
+            as? NSTableCellView
+        {
             cell = reused
         } else {
             cell = NSTableCellView()

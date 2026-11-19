@@ -484,6 +484,38 @@ final class AggregationPaneController: NSViewController, NSTextViewDelegate {
         return parsed
     }
 
+    /// Fills the pane with a pipeline an assistant sent (MCP
+    /// open_aggregation), in the mode the user has chosen, and runs it. The
+    /// text was checked before it got here; one the pane can't read gets
+    /// the alert a typed one would.
+    func showPipeline(_ text: String) {
+        _ = view
+        do {
+            let parsed = try AggregationStages.stages(fromText: text)
+            if isTextMode {
+                pipelineTextView.string = try AggregationStages.text(from: parsed)
+                pipelineHighlighter.highlight(pipelineTextView)
+            } else {
+                stages =
+                    parsed.isEmpty
+                    ? [
+                        AggregationStage(
+                            operatorName: "$match",
+                            bodyText: AggregationStages.template(for: "$match"))
+                    ]
+                    : parsed
+                stageTable.reloadData()
+                selectStage(0)
+            }
+        } catch {
+            QueryPaneUI.alertSheet(
+                in: view, title: String(localized: "Error in Pipeline"),
+                message: String(describing: error))
+            return
+        }
+        runAction(nil)
+    }
+
     @objc func runAction(_ sender: Any?) {
         guard let session = context.session() else { return }
         let pipeline: Document

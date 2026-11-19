@@ -182,6 +182,62 @@ extension MCPTools {
             }
         })
 
+    static let openAggregation = MCPTool(
+        name: "open_aggregation",
+        title: "Show a pipeline in MongoHub Plus",
+        description: """
+            Shows an aggregation pipeline to the user in MongoHub Plus, so they can check it, \
+            change it and run it again: opens the connection's window (or uses the open one), \
+            opens the collection's tab on Aggregation, fills in the pipeline (as stages or as \
+            text, whichever the user's pane is set to) and runs it. Use it when the user wants \
+            to see or tweak a pipeline you ran with aggregate. The results appear on the \
+            user's screen and are not returned here; use aggregate to read them. The \
+            connection's access must be readOnly or readWrite.
+
+            pipeline is text, exactly as for aggregate, and the same stages are refused ($out, \
+            $merge, $changeStream). The app runs the pipeline as given, without aggregate's \
+            limit, so pass the same $limit stage you want the user to see. The collection's \
+            tab is reused, so this replaces the pipeline the user had in it.
+            """,
+        inputSchema: [
+            "type": "object",
+            "properties": [
+                "connection": MCPConnections.connectionArgumentSchema,
+                "database": ["type": "string", "description": "The database name."],
+                "collection": ["type": "string", "description": "The collection name."],
+                "pipeline": [
+                    "type": "string",
+                    "description":
+                        "The stages, as an Extended JSON or mongosh array, e.g. [{$match: {…}}, {$group: {…}}].",
+                ],
+            ],
+            "required": ["connection", "database", "collection", "pipeline"],
+            "additionalProperties": false,
+        ],
+        readOnly: true,
+        run: { arguments in
+            // aggregate's rules; its limit doesn't apply in the app.
+            let request: AggregateRequest
+            switch AggregateRequest.parse(arguments.filter { $0.key != "limit" }) {
+            case .success(let value): request = value
+            case .failure(let refusal): return .failure(refusal.message)
+            }
+            let shown = ConnectionWindowController.ShownQuery(
+                database: request.database, collection: request.collection,
+                pane: .aggregation(pipeline: request.pipelineText))
+            let stageCount = request.pipeline.count
+            return await MainActor.run {
+                show(shown, connectionArgument: arguments["connection"]) { alias, state in
+                    """
+                    Showing the pipeline in MongoHub Plus, in the "\(alias)" window (\(state)): \
+                    \(request.database).\(request.collection) on the Aggregation tab, \
+                    \(stageCount == 1 ? "1 stage" : "\(stageCount) stages"). The results are on \
+                    the user's screen, not returned here; use aggregate to read them.
+                    """
+                }
+            }
+        })
+
     /// aggregate's arguments, checked before connecting.
     struct AggregateRequest: Sendable {
         var database: String

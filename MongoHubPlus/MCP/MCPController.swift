@@ -156,8 +156,9 @@ final class MCPController {
                 off (no tool can use it), readOnly (reading), or readWrite (reading and \
                 inserting). Updates and deletes are never run directly: update_documents and \
                 delete_documents, on readWrite connections, ask the user, who applies or \
-                rejects each one in the app. The app never shares hosts, connection strings or \
-                passwords.
+                rejects each one in the app. When the user wants to check or tweak a query or \
+                pipeline you ran, show it in the app with open_query or open_aggregation. The \
+                app never shares hosts, connection strings or passwords.
                 """,
             tools: MCPTools.all,
             log: { event in
