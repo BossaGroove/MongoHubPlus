@@ -69,40 +69,6 @@
         }
       }
     },
-    "%1$lld documents exported to %2$@. Restore with: mongorestore %3$@": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld Dokumente nach %2$@ exportiert. Wiederherstellen mit: mongorestore %3$@"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld documents exportés vers %2$@. Restaurer avec : mongorestore %3$@"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$lld 件のドキュメントを %2$@ に書き出しました。復元コマンド: mongorestore %3$@"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已将 %1$lld 份文档导出至 %2$@。还原命令: mongorestore %3$@"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已將 %1$lld 份文件匯出至 %2$@。還原指令: mongorestore %3$@"
-          }
-        }
-      }
-    },
     "%@ Collections": {
       "localizations": {
         "de": {
@@ -303,6 +269,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "已將 %1$lld 個文件輸出至 %2$@。"
+          }
+        }
+      }
+    },
+    "%lld documents exported to %@. Restore with: mongorestore %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Dokumente nach %2$@ exportiert. Wiederherstellen mit: mongorestore %3$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld documents exportés vers %2$@. Restaurer avec : mongorestore %3$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 件のドキュメントを %2$@ に書き出しました。復元コマンド: mongorestore %3$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将 %1$lld 份文档导出至 %2$@。还原命令: mongorestore %3$@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已將 %1$lld 份文件匯出至 %2$@。還原指令: mongorestore %3$@"
           }
         }
       }
@@ -541,6 +541,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "名為「%@」的欄位已存在。"
+          }
+        }
+      }
+    },
+    "AI Access:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KI-Zugriff:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accès IA :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アクセス:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 访问权限:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 存取權限:"
           }
         }
       }
@@ -987,6 +1021,74 @@
         }
       }
     },
+    "Add this to ~/.codex/config.toml (create the file if it doesn't exist), then restart Codex. It adds MongoHub Plus for all your projects. It contains the token, so treat it like a password.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fügen Sie dies zu ~/.codex/config.toml hinzu (legen Sie die Datei an, falls sie nicht existiert), und starten Sie Codex dann neu. Damit ist MongoHub Plus in allen Ihren Projekten verfügbar. Es enthält das Token, behandeln Sie es also wie ein Passwort."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoutez ceci à ~/.codex/config.toml (créez le fichier s’il n’existe pas), puis redémarrez Codex. MongoHub Plus est alors ajouté pour tous vos projets. Ce texte contient le jeton : traitez-le comme un mot de passe."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これを ~/.codex/config.toml に追加し(ファイルがない場合は作成してください)、Codex を再起動してください。すべてのプロジェクトで MongoHub Plus が使えるようになります。トークンが含まれているため、パスワードと同様に扱ってください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将此内容添加到 ~/.codex/config.toml(若文件不存在则新建)，然后重新启动 Codex，即可在所有项目中使用 MongoHub Plus。其中包含令牌，请像对待密码一样妥善保管。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將此內容加入 ~/.codex/config.toml(若檔案不存在請新建)，然後重新啟動 Codex，即可在所有專案中使用 MongoHub Plus。其中包含權杖，請像密碼一樣妥善保管。"
+          }
+        }
+      }
+    },
+    "Add to an Assistant": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu einem Assistenten hinzufügen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter à un assistant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アシスタントに追加"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加到助手"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入助理"
+          }
+        }
+      }
+    },
     "Address:": {
       "localizations": {
         "de": {
@@ -1017,6 +1119,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "位址:"
+          }
+        }
+      }
+    },
+    "Affects:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Betrifft:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concerne :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "対象:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影响:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影響:"
           }
         }
       }
@@ -1157,6 +1293,108 @@
         }
       }
     },
+    "Allow AI assistants to connect": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KI-Assistenten die Verbindung erlauben"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser les assistants IA à se connecter"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アシスタントの接続を許可"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许 AI 助手连接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允許 AI 助理連線"
+          }
+        }
+      }
+    },
+    "An AI assistant wants to delete documents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein KI-Assistent möchte Dokumente löschen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un assistant IA veut supprimer des documents"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アシスタントがドキュメントの削除を求めています"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助手想要删除文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助理想要刪除文件"
+          }
+        }
+      }
+    },
+    "An AI assistant wants to update documents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein KI-Assistent möchte Dokumente aktualisieren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un assistant IA veut mettre à jour des documents"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アシスタントがドキュメントの更新を求めています"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助手想要更新文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助理想要更新文件"
+          }
+        }
+      }
+    },
     "An index on { %@ } may help.": {
       "localizations": {
         "de": {
@@ -1259,6 +1497,210 @@
         }
       }
     },
+    "Applied with errors: %lld deleted. %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit Fehlern angewendet: %lld gelöscht. %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appliqué avec des erreurs. Supprimés : %lld. %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エラーありで適用しました: %lld 件を削除。%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已应用，但有错误:删除了 %lld 个。%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已套用，但有錯誤:刪除了 %lld 個。%@"
+          }
+        }
+      }
+    },
+    "Applied with errors: %lld matched, %lld modified. %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit Fehlern angewendet: %lld gefunden, %lld geändert. %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appliqué avec des erreurs. Correspondants : %lld, modifiés : %lld. %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エラーありで適用しました: 一致 %lld 件、変更 %lld 件。%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已应用，但有错误:匹配 %lld 个，修改 %lld 个。%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已套用，但有錯誤:符合 %lld 個，修改 %lld 個。%@"
+          }
+        }
+      }
+    },
+    "Applied: %lld deleted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angewendet: %lld gelöscht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appliqué. Supprimés : %lld."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用しました: %lld 件を削除。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已应用:删除了 %lld 个。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已套用:刪除了 %lld 個。"
+          }
+        }
+      }
+    },
+    "Applied: %lld matched, %lld modified.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angewendet: %lld gefunden, %lld geändert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appliqué. Correspondants : %lld, modifiés : %lld."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用しました: 一致 %lld 件、変更 %lld 件。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已应用:匹配 %lld 个，修改 %lld 个。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已套用:符合 %lld 個，修改 %lld 個。"
+          }
+        }
+      }
+    },
+    "Apply Update": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisierung anwenden"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appliquer la mise à jour"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新を適用"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用更新"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "套用更新"
+          }
+        }
+      }
+    },
+    "Applying…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird angewendet …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Application…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在应用…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在套用⋯"
+          }
+        }
+      }
+    },
     "Ascending": {
       "localizations": {
         "de": {
@@ -1323,6 +1765,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "升冪 {_id: 1}"
+          }
+        }
+      }
+    },
+    "Assistant:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistent:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistant :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アシスタント:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "助手:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "助理:"
+          }
+        }
+      }
+    },
+    "Assistants using the current token will be refused until you set them up again with the new one.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistenten, die das aktuelle Token verwenden, werden abgewiesen, bis Sie sie mit dem neuen erneut einrichten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les assistants qui utilisent le jeton actuel seront refusés tant que vous ne les aurez pas reconfigurés avec le nouveau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のトークンを使っているアシスタントは、新しいトークンで設定し直すまで拒否されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用当前令牌的助手将被拒绝，直到用新令牌重新设置它们。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用目前權杖的助理將被拒絕，直到以新的權杖重新設定它們。"
           }
         }
       }
@@ -1527,6 +2037,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "背景:"
+          }
+        }
+      }
+    },
+    "Before and after, for the first %lld matching documents:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorher und nachher, für die ersten %lld passenden Dokumente:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avant et après, pour les %lld premiers documents correspondants :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一致した最初の %lld 件のドキュメントの変更前と変更後:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前 %lld 个匹配文档的更改前后:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前 %lld 個符合文件的更改前後:"
           }
         }
       }
@@ -2075,6 +2619,40 @@
         }
       }
     },
+    "Collection name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name der Sammlung"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de la collection"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コレクション名"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "集合名称"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "集合名稱"
+          }
+        }
+      }
+    },
     "Collection scan — no index used": {
       "localizations": {
         "de": {
@@ -2105,6 +2683,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "全集合掃描 — 未使用索引"
+          }
+        }
+      }
+    },
+    "Collection:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammlung:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コレクション:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "集合:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "集合:"
           }
         }
       }
@@ -2347,6 +2959,40 @@
         }
       }
     },
+    "Connection:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbindung:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connexion :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線:"
+          }
+        }
+      }
+    },
     "Connections": {
       "localizations": {
         "de": {
@@ -2479,6 +3125,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "拷貝"
+          }
+        }
+      }
+    },
+    "Copy Command": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl kopieren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier la commande"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドをコピー"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拷贝命令"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拷貝指令"
+          }
+        }
+      }
+    },
+    "Copy Config": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konfiguration kopieren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier la configuration"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定をコピー"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拷贝配置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拷貝設定"
           }
         }
       }
@@ -2721,6 +3435,40 @@
         }
       }
     },
+    "Couldn't read the token from the Keychain. Turn this off and on again to retry.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Token konnte nicht aus dem Schlüsselbund gelesen werden. Schalten Sie diese Option aus und wieder ein, um es erneut zu versuchen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de lire le jeton dans le trousseau. Désactivez puis réactivez cette option pour réessayer."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーチェーンからトークンを読み取れませんでした。オフにしてからオンに戻すと再試行します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法从钥匙串读取令牌。将此选项关闭再打开即可重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法從鑰匙圈讀取權杖。將此選項關閉再開啟即可重試。"
+          }
+        }
+      }
+    },
     "Create Index Failed": {
       "localizations": {
         "de": {
@@ -2785,6 +3533,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "建立索引⋯"
+          }
+        }
+      }
+    },
+    "Create a new token?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Token erstellen?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer un nouveau jeton ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいトークンを作成しますか?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要创建新令牌吗?"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要建立新的權杖嗎?"
           }
         }
       }
@@ -3265,6 +4047,108 @@
         }
       }
     },
+    "Deletes:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löscht:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprime :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除対象:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除:"
+          }
+        }
+      }
+    },
+    "Deleting…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird gelöscht …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suppression…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在删除…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在刪除⋯"
+          }
+        }
+      }
+    },
+    "Deletion Requested by an AI Assistant": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschung von einem KI-Assistenten angefordert"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suppression demandée par un assistant IA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アシスタントからの削除リクエスト"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助手请求删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助理要求刪除"
+          }
+        }
+      }
+    },
     "Descending": {
       "localizations": {
         "de": {
@@ -3465,6 +4349,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件數"
+          }
+        }
+      }
+    },
+    "Documents that will be deleted, the first %lld shown:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumente, die gelöscht werden (die ersten %lld werden angezeigt):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Documents qui seront supprimés (les %lld premiers sont affichés) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除されるドキュメント(最初の %lld 件を表示):"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将被删除的文档(显示前 %lld 个):"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將被刪除的文件(顯示前 %lld 個):"
           }
         }
       }
@@ -4111,6 +5029,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "管線錯誤"
+          }
+        }
+      }
+    },
+    "Every matching document": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle passenden Dokumente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les documents correspondants"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一致するすべてのドキュメント"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有匹配的文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有符合的文件"
+          }
+        }
+      }
+    },
+    "Every matching document: %lld match now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle passenden Dokumente: derzeit %lld Treffer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les documents correspondants (actuellement : %lld)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一致するすべてのドキュメント: 現在 %lld 件が一致"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有匹配的文档:当前匹配 %lld 个"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有符合的文件:目前符合 %lld 個"
           }
         }
       }
@@ -4829,6 +5815,40 @@
         }
       }
     },
+    "Filter:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィルタ:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "筛选条件:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "篩選條件:"
+          }
+        }
+      }
+    },
     "Find": {
       "localizations": {
         "de": {
@@ -5063,6 +6083,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "字體:"
+          }
+        }
+      }
+    },
+    "For AI assistants using MCP (Settings ▸ MCP). Read & Write also allows inserts. Updates and deletes always wait for you to apply them, one at a time.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für KI-Assistenten über MCP (Einstellungen ▸ MCP). „Lesen & Schreiben“ erlaubt auch das Einfügen. Aktualisierungen und Löschungen warten immer darauf, dass Sie sie anwenden – eine nach der anderen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour les assistants IA via MCP (Réglages ▸ MCP). « Lecture et écriture » autorise aussi les insertions. Les mises à jour et les suppressions attendent toujours que vous les appliquiez, une à la fois."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP を使う AI アシスタント向けの設定です(設定 ▸ MCP)。“読み/書き” では挿入もできます。更新と削除は、常に適用されるまで待機し、1 件ずつ処理されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "供通过 MCP 使用的 AI 助手(设置 ▸ MCP)。“读与写”还允许插入。更新和删除始终会等待手动应用，每次一个。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "供透過 MCP 使用的 AI 助理(設定 ▸ MCP)。「讀取和寫入」也允許插入。更新和刪除一律會等待手動套用，每次一個。"
           }
         }
       }
@@ -5437,6 +6491,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在輸入 %@⋯"
+          }
+        }
+      }
+    },
+    "In Antigravity, click … at the top of the agent panel, then MCP Servers ▸ Manage MCP Servers ▸ View raw config. Paste this in; if other servers are already listed, add just the \"mongohubplus\" entry inside \"mcpServers\". It contains the token, so treat it like a password.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicken Sie in Antigravity oben im Agent-Bereich auf … und dann auf MCP Servers ▸ Manage MCP Servers ▸ View raw config. Fügen Sie dies dort ein; sind bereits andere Server aufgeführt, fügen Sie nur den Eintrag \"mongohubplus\" innerhalb von \"mcpServers\" hinzu. Es enthält das Token, behandeln Sie es also wie ein Passwort."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Antigravity, cliquez sur … en haut du panneau de l’agent, puis sur MCP Servers ▸ Manage MCP Servers ▸ View raw config. Collez-y ce texte ; si d’autres serveurs sont déjà listés, ajoutez seulement l’entrée \"mongohubplus\" dans \"mcpServers\". Ce texte contient le jeton : traitez-le comme un mot de passe."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antigravity でエージェントパネル上部の … をクリックし、MCP Servers ▸ Manage MCP Servers ▸ View raw config を選択して、ここに貼り付けてください。ほかのサーバがすでにある場合は、\"mcpServers\" の中に \"mongohubplus\" の項目だけを追加してください。トークンが含まれているため、パスワードと同様に扱ってください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Antigravity 中，点按代理面板顶部的 …，然后选择 MCP Servers ▸ Manage MCP Servers ▸ View raw config，将此内容粘贴进去。如果已列出其他服务器，只需在 \"mcpServers\" 中添加 \"mongohubplus\" 这一项。其中包含令牌，请像对待密码一样妥善保管。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Antigravity 中，按一下代理面板頂部的 …，然後選擇 MCP Servers ▸ Manage MCP Servers ▸ View raw config，將此內容貼上。如果已列出其他伺服器，只要在 \"mcpServers\" 中加入 \"mongohubplus\" 這一項。其中包含權杖，請像密碼一樣妥善保管。"
           }
         }
       }
@@ -6325,6 +7413,40 @@
         }
       }
     },
+    "Listening on 127.0.0.1:%@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfängt auf 127.0.0.1:%@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À l’écoute sur 127.0.0.1:%@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "127.0.0.1:%@ で待機中"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在监听 127.0.0.1:%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在監聽 127.0.0.1:%@"
+          }
+        }
+      }
+    },
     "Live changes for this collection (replica set or Atlas required).": {
       "localizations": {
         "de": {
@@ -6389,6 +7511,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "日誌"
+          }
+        }
+      }
+    },
+    "MCP": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP"
           }
         }
       }
@@ -6835,6 +7991,74 @@
         }
       }
     },
+    "New Token": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Token"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau jeton"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいトークン"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新令牌"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新權杖"
+          }
+        }
+      }
+    },
+    "New Token…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Token…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau jeton…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいトークン…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新令牌…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新權杖⋯"
+          }
+        }
+      }
+    },
     "New Window": {
       "localizations": {
         "de": {
@@ -6899,6 +8123,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "下一頁結果 (⌥⌘→)"
+          }
+        }
+      }
+    },
+    "No Access": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Zugriff"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun accès"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセスなし"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无访问权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無存取權限"
           }
         }
       }
@@ -6971,6 +8229,142 @@
         }
       }
     },
+    "No documents match this filter right now, so there is nothing to preview.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derzeit passen keine Dokumente zu diesem Filter, daher gibt es keine Vorschau."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun document ne correspond à ce filtre pour le moment : il n’y a rien à prévisualiser."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在このフィルタに一致するドキュメントがないため、プレビューできるものはありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前没有文档匹配此筛选条件，因此没有可预览的内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前沒有文件符合此篩選條件，因此沒有可預覽的內容。"
+          }
+        }
+      }
+    },
+    "Not applied: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht angewendet: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non appliqué : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用されませんでした: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未应用:%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未套用:%@"
+          }
+        }
+      }
+    },
+    "Nothing changes unless you click Apply Update. If you don't answer, the request is rejected at %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wird nichts geändert, solange Sie nicht auf „Aktualisierung anwenden“ klicken. Ohne Antwort wird die Anfrage um %@ abgelehnt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’est modifié tant que vous ne cliquez pas sur « Appliquer la mise à jour ». Sans réponse, la demande sera refusée à %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“更新を適用” をクリックしない限り、何も変更されません。応答がない場合、リクエストは %@ に拒否されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非点按“应用更新”，否则不会更改任何内容。如果没有回应，请求将在 %@ 被拒绝。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非按一下「套用更新」，否則不會更改任何內容。若未回應，請求將於 %@ 被拒絕。"
+          }
+        }
+      }
+    },
+    "Nothing is deleted unless you click Delete. Deleted documents can't be recovered. If you don't answer, the request is rejected at %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wird nichts gelöscht, solange Sie nicht auf „Löschen“ klicken. Gelöschte Dokumente können nicht wiederhergestellt werden. Ohne Antwort wird die Anfrage um %@ abgelehnt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’est supprimé tant que vous ne cliquez pas sur « Supprimer ». Les documents supprimés sont irrécupérables. Sans réponse, la demande sera refusée à %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“削除” をクリックしない限り、何も削除されません。削除したドキュメントは復元できません。応答がない場合、リクエストは %@ に拒否されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非点按“删除”，否则不会删除任何内容。删除的文档无法恢复。如果没有回应，请求将在 %@ 被拒绝。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非按一下「刪除」，否則不會刪除任何內容。刪除的文件無法復原。若未回應，請求將於 %@ 被拒絕。"
+          }
+        }
+      }
+    },
     "Nothing to update": {
       "localizations": {
         "de": {
@@ -7035,6 +8429,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "數字與類型:"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉"
+          }
+        }
+      }
+    },
+    "Only the first matching document": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur das erste passende Dokument"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement le premier document correspondant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初に一致したドキュメントのみ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅第一个匹配的文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅第一個符合的文件"
+          }
+        }
+      }
+    },
+    "Only the first matching document: %lld match now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur das erste passende Dokument: derzeit %lld Treffer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement le premier document correspondant (actuellement : %lld)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初に一致したドキュメントのみ: 現在 %lld 件が一致"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅第一个匹配的文档:当前匹配 %lld 个"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅第一個符合的文件:目前符合 %lld 個"
           }
         }
       }
@@ -7515,6 +9011,40 @@
         }
       }
     },
+    "Port:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Port:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Port :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ポート:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "端口:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連接埠:"
+          }
+        }
+      }
+    },
     "Preview": {
       "localizations": {
         "de": {
@@ -7957,6 +9487,40 @@
         }
       }
     },
+    "Read & Write": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lesen & Schreiben"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture et écriture"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み/書き"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读与写"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讀取和寫入"
+          }
+        }
+      }
+    },
     "Read Mode:": {
       "localizations": {
         "de": {
@@ -7991,6 +9555,40 @@
         }
       }
     },
+    "Read Only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur lesen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture seule"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み出しのみ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只读"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "唯讀"
+          }
+        }
+      }
+    },
     "Redo": {
       "localizations": {
         "de": {
@@ -8021,6 +9619,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "重做"
+          }
+        }
+      }
+    },
+    "Reject": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ablehnen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refuser"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒否"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒绝"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒絕"
           }
         }
       }
@@ -8633,6 +10265,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "執行 (⌘R)"
+          }
+        }
+      }
+    },
+    "Run this once in Terminal. It adds MongoHub Plus to Claude Code for all your projects. The command contains the token, so treat it like a password.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Führen Sie dies einmal im Terminal aus. Es fügt MongoHub Plus für alle Ihre Projekte zu Claude Code hinzu. Der Befehl enthält das Token, behandeln Sie ihn also wie ein Passwort."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécutez cette commande une fois dans Terminal. Elle ajoute MongoHub Plus à Claude Code pour tous vos projets. La commande contient le jeton : traitez-la comme un mot de passe."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ターミナルでこれを一度実行してください。すべてのプロジェクトで Claude Code に MongoHub Plus が追加されます。コマンドにはトークンが含まれているため、パスワードと同様に扱ってください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在“终端”中运行一次，即可为所有项目将 MongoHub Plus 添加到 Claude Code。该命令包含令牌，请像对待密码一样妥善保管。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「終端機」中執行一次，即可為所有專案將 MongoHub Plus 加入 Claude Code。此指令包含權杖，請像密碼一樣妥善保管。"
+          }
+        }
+      }
+    },
+    "Runs an MCP server on this Mac only (127.0.0.1). Assistants can list your saved connections by name, but can use one only if you allow it in that connection's AI Access setting. New connections have no access. Assistants never see hosts, connection strings or passwords.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Führt einen MCP-Server nur auf diesem Mac aus (127.0.0.1). Assistenten sehen die Namen Ihrer gespeicherten Verbindungen, können eine aber nur verwenden, wenn Sie es in deren Einstellung „KI-Zugriff“ erlauben. Neue Verbindungen haben keinen Zugriff. Assistenten sehen nie Hosts, Verbindungszeichenfolgen oder Passwörter."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécute un serveur MCP uniquement sur ce Mac (127.0.0.1). Les assistants peuvent lister vos connexions enregistrées par leur nom, mais ne peuvent en utiliser une que si vous l’autorisez dans son réglage « Accès IA ». Les nouvelles connexions n’ont aucun accès. Les assistants ne voient jamais les hôtes, les chaînes de connexion ni les mots de passe."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この Mac 上でのみ MCP サーバを実行します(127.0.0.1)。アシスタントは保存済みの接続を名前で一覧できますが、使用できるのは、その接続の “AI アクセス” 設定で許可した場合だけです。新しい接続にはアクセス権がありません。アシスタントにホスト、接続文字列、パスワードが見えることはありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅在这台 Mac 上运行 MCP 服务器(127.0.0.1)。助手可以按名称列出已存储的连接，但只有在该连接的“AI 访问权限”设置中允许后才能使用它。新连接没有访问权限。助手永远看不到主机、连接字符串或密码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅在這台 Mac 上執行 MCP 伺服器(127.0.0.1)。助理可以依名稱列出已儲存的連線，但只有在該連線的「AI 存取權限」設定中允許後才能使用。新連線沒有存取權限。助理永遠看不到主機、連線字串或密碼。"
           }
         }
       }
@@ -9691,6 +11391,74 @@
         }
       }
     },
+    "Starting…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird gestartet …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrage…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "起動中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在启动…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在啟動⋯"
+          }
+        }
+      }
+    },
+    "Status:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状況:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "狀態:"
+          }
+        }
+      }
+    },
     "Stop": {
       "localizations": {
         "de": {
@@ -10065,6 +11833,40 @@
         }
       }
     },
+    "The first matching document right now:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das derzeit erste passende Dokument:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le premier document correspondant actuellement :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、最初に一致するドキュメント:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前第一个匹配的文档:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前第一個符合的文件:"
+          }
+        }
+      }
+    },
     "The new language takes effect the next time MongoHub Plus starts.": {
       "localizations": {
         "de": {
@@ -10095,6 +11897,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "新語言將於下次啟動 MongoHub Plus 時生效。"
+          }
+        }
+      }
+    },
+    "The port must be between 1024 and 65535.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Port muss zwischen 1024 und 65535 liegen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le port doit être compris entre 1024 et 65535."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ポートは 1024 から 65535 の間で指定してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "端口必须介于 1024 和 65535 之间。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連接埠必須介於 1024 和 65535 之間。"
+          }
+        }
+      }
+    },
+    "The preview can't be drawn: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Vorschau kann nicht angezeigt werden: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’afficher l’aperçu : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プレビューを表示できません: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法显示预览:%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法顯示預覽:%@"
           }
         }
       }
@@ -10197,6 +12067,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "此文件有未儲存的更動。"
+          }
+        }
+      }
+    },
+    "This filter matches every document in the collection. Type the collection's name, %@, to enable %@:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Filter trifft auf alle Dokumente der Sammlung zu. Geben Sie den Namen der Sammlung, %1$@, ein, um „%2$@“ zu aktivieren:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce filtre correspond à tous les documents de la collection. Saisissez le nom de la collection, %1$@, pour activer « %2$@ » :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフィルタはコレクション内のすべてのドキュメントに一致します。“%2$@” を有効にするには、コレクション名 %1$@ を入力してください:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此筛选条件匹配集合中的所有文档。请输入集合名称 %1$@ 以启用“%2$@”:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此篩選條件符合集合中的所有文件。請輸入集合名稱 %1$@ 以啟用「%2$@」:"
           }
         }
       }
@@ -10707,6 +12611,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "更新失敗"
+          }
+        }
+      }
+    },
+    "Update Requested by an AI Assistant": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisierung von einem KI-Assistenten angefordert"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mise à jour demandée par un assistant IA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI アシスタントからの更新リクエスト"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助手请求更新"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 助理要求更新"
+          }
+        }
+      }
+    },
+    "Update:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisierung:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mise à jour :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新:"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新:"
           }
         }
       }
