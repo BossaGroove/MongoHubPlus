@@ -172,6 +172,9 @@ h3 { font-size: 18px; margin: 0 0 6px; letter-spacing: -.01em; }
 .card .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 14px; background: rgb(30 92 65 / .12); color: var(--accent); }
 .card .ic svg { width: 20px; height: 20px; }
 .card .new { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--mango-ink); background: var(--mango); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: 2px; }
+.card.wide { grid-column: 1 / -1; }
+.card.wide p { max-width: 820px; }
+#ai { scroll-margin-top: 80px; }
 @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
@@ -292,6 +295,11 @@ footer .fine { margin-top: 20px; font-size: 12.5px; color: rgb(230 238 233 / .55
     <h2>Everything you do with MongoDB, in one native app.</h2>
     <p class="sub">The original's full toolset is here, plus features it never had.</p>
     <div class="grid">
+      <article class="card wide">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3l1.8 4.7 4.7 1.8-4.7 1.8L10 16l-1.8-4.7L3.5 9.5l4.7-1.8z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg></div>
+        <h3>AI assistants, on your terms <span class="new">New</span></h3>
+        <p>A built-in MCP server lets Claude Code, Codex or Antigravity read the connections you allow and put the queries they ran into the app for you to check. Updates and deletes they ask for wait in a window until you click Apply. <a href="#ai">How it works</a></p>
+      </article>
       <article class="card">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 100-9 6 6 0 00-11.6 2A3.5 3.5 0 006.5 19z"/></svg></div>
         <h3>MongoDB Atlas <span class="new">New</span></h3>
@@ -366,6 +374,19 @@ footer .fine { margin-top: 20px; font-size: 12.5px; color: rgb(230 238 233 / .55
         <p>Local servers, Atlas, replica sets and sharded clusters side by side. Pin favorites and search by name. Passwords live in the macOS Keychain, never in a settings file.</p>
       </div>
       <img src="assets/connections.webp" width="1864" height="914" loading="lazy" alt="Connection manager showing saved connections as cards, including Atlas and replica sets">
+    </div>
+    <div class="show flip" id="ai">
+      <div class="txt">
+        <p class="eyebrow">AI assistants</p>
+        <h2>Let an assistant look. You decide what changes.</h2>
+        <p>Turn on the MCP server in Settings, and Claude Code, Codex or Antigravity can run finds, counts and aggregations, read indexes, and see what you have selected while you debug. It can put the query it ran into the app for you to check and tweak. When it wants to update or delete, MongoHub Plus shows exactly what would change, and nothing runs until you click Apply.</p>
+        <ul>
+          <li>Every connection starts with No Access. Choose Read Only or Read &amp; Write for each one.</li>
+          <li>The server runs on your Mac only. Assistants never see hosts, connection strings or passwords.</li>
+          <li>Apply has no keyboard shortcut, and a filter that matches every document needs the collection's name typed first.</li>
+        </ul>
+      </div>
+      <img src="assets/mcp-update.webp" width="1504" height="1422" loading="lazy" alt="An update an AI assistant asked for, waiting in MongoHub Plus: the filter and update, four matching documents, and a before and after preview">
     </div>
   </div>
 </section>
@@ -445,6 +466,10 @@ footer .fine { margin-top: 20px; font-size: 12.5px; color: rgb(230 238 233 / .55
     <details>
       <summary>Is it free? Where is my password stored?</summary>
       <p>It's free and open source under the MIT license. Connection passwords are stored in the macOS Keychain, and the app runs in Apple's App Sandbox.</p>
+    </details>
+    <details>
+      <summary>Can an AI assistant change my data?</summary>
+      <p>Only if you let it. The MCP server is off until you turn it on, and every connection starts with No Access. Read Only lets assistants read; Read &amp; Write also lets them insert documents and ask for updates and deletes. Those always open a window in MongoHub Plus showing exactly what would change, and nothing happens until you click Apply. The server listens on your Mac only and needs a token.</p>
     </details>
     <details>
       <summary>How does it compare with MongoDB Compass?</summary>

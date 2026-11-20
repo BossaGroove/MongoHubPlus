@@ -9,6 +9,39 @@ someone using MongoHub Plus, not how it was implemented.
 Version headings are `## <version> — <date>`; the release workflow reads the
 version from the heading, so it must match the tag exactly.
 
+## 4.5.0 — unreleased
+
+### Added
+
+- **AI assistants through MCP.** Settings → MCP turns on a Model Context
+  Protocol server on your Mac, so an AI assistant such as Claude Code, Codex
+  or Antigravity can help while you work: list databases, collections and
+  indexes, find, count and aggregate, see what you have selected, and put a
+  query or pipeline it ran into the app for you to check and tweak. The page
+  shows the setup to copy for each of those assistants. The server is off
+  until you turn it on, listens on your Mac only, and every request needs its
+  token.
+- **AI Access for each connection.** In the connection editor, choose No
+  Access, Read Only or Read & Write. Every connection starts with No Access,
+  and assistants never see hosts, connection strings or passwords.
+- **Changes an assistant asks for wait for you.** On a Read & Write
+  connection an assistant can insert documents, but an update or delete it
+  asks for opens a window showing exactly what would run, how many documents
+  match, and a preview. Nothing changes until you click Apply Update or
+  Delete. That button has no keyboard shortcut, a filter that matches every
+  document needs the collection's name typed first, and a request nobody
+  answers is rejected after 10 minutes.
+
+### Fixed
+
+- **The Update tab's preview no longer leaves out fields the update
+  creates with a value only the server knows.** A `$currentDate` or `$bit`
+  on a field the document doesn't have yet now shows that field as *will
+  change*, instead of not showing it at all.
+- **The message after a BSON-folder export is translated.** It reported
+  how many documents were exported and how to restore them in English
+  whatever language the app was set to.
+
 ## 4.4.1 — 2026-11-09
 
 ### Changed
