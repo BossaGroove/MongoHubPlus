@@ -55,6 +55,7 @@ Requires **macOS 14 (Sonoma) or later**. MongoDB **6.0+** servers and
 - **Edit documents** in place in the results tree (values, add/delete fields — type-fidelity preserved) or in a syntax-colored JSON editor using official MongoDB Extended JSON (Compass-compatible; accepts mongosh-style input like `ObjectId(…)` and unquoted keys), with byte-level round-trip verification so editing never silently changes BSON types. Typing a bare id in a query field still means `{_id: ObjectId("…")}` — the classic MongoHub shortcut.
 - **Monitor**: mongostat-style live activity table, log window.
 - **Import/Export**: JSON-Lines (lossless canonical Extended JSON), CSV (flattened, spreadsheet-friendly), and **BSON folders `mongorestore` reads** — whole collections, current query results, or selected documents.
+- **AI assistants (MCP)**: a built-in MCP server lets Claude Code, Codex or Antigravity read the connections you allow, show queries in the app, and ask for changes that only run when you click Apply — see [AI assistants (MCP)](#ai-assistants-mcp).
 - **Localized**: English, 日本語, Deutsch, 繁體中文, 简体中文, Français — switchable in Settings.
 
 ## New since the original MongoHub
@@ -99,6 +100,9 @@ macOS evolution brought features the original never had:
   changing the system language.
 - **System dark and light appearance** — with a follow-system default and an
   in-app override.
+- **AI assistants via MCP** — a local MCP server, off by default, with
+  per-connection access; updates and deletes an assistant asks for wait in a
+  window until you apply them.
 
 ## Writing queries
 
@@ -164,6 +168,74 @@ JSON-Lines exports are valid JSON that Compass, `mongoimport`, and every
 driver can read — the shorthand is a convenience for writing and reading in
 the app, never something we write into a file.
 
+## AI assistants (MCP)
+
+MongoHub Plus can run a [Model Context Protocol](https://modelcontextprotocol.io)
+server, so an AI assistant can look things up in your databases while you
+debug, put the queries it ran into the app for you to check and tweak, and
+ask for changes — which run only when you click Apply in MongoHub Plus.
+
+**Setting it up**
+
+1. **Settings → MCP**: turn on **Allow AI assistants to connect**. The server
+   listens on `127.0.0.1` only (port 47017 by default) and every request
+   needs its token.
+2. Pick your assistant in the **Assistant** menu — Claude Code, Codex or
+   Antigravity — and copy what it shows: a command to run once in Terminal
+   for Claude Code, a `config.toml` table for Codex, an `mcp_config.json`
+   entry for Antigravity. It contains the token, so treat it like a
+   password; **New Token…** replaces it.
+3. Give each connection access in its editor, under **AI Access**:
+
+| AI Access | What assistants can do |
+|---|---|
+| **No Access** (the default, for every connection) | See the connection's name, nothing else |
+| **Read Only** | Read: databases, collections, indexes, documents, counts, aggregations |
+| **Read & Write** | Read, insert documents, and ask for updates and deletes |
+
+**Tools**
+
+| Tool | What it does |
+|---|---|
+| `list_connections` | Saved connections by name, with their AI Access |
+| `list_databases`, `list_collections` | What's on a server, with sizes and collection types |
+| `list_indexes` | Each index's definition, size, and how often queries use it |
+| `find`, `count` | Find documents (filter, projection, sort, skip, limit), or count them |
+| `aggregate` | Run a pipeline; `$out`, `$merge` and `$changeStream` are refused |
+| `get_current_view` | What you're looking at: windows, tabs, the Find query, the documents you selected |
+| `open_query`, `open_aggregation` | Put a query or pipeline into the app's Find or Aggregation pane and run it |
+| `insert_documents` | Insert documents — runs directly, on Read & Write connections only |
+| `update_documents`, `delete_documents` | Ask you to update or delete — see below |
+| `wait_for_decision` | Keep waiting for your answer to a change request |
+
+**Updates and deletes wait for you.** An assistant never runs one itself:
+MongoHub Plus opens a window showing exactly what would run — the
+connection, collection, filter and update, how many documents match, and a
+preview (before/after for an update, the documents themselves for a
+delete). Nothing changes until you click **Apply Update** or **Delete**:
+
+- That button is never the default, has no keyboard shortcut and can't take
+  keyboard focus, so Return or Space can't press it. Esc, **Reject** and
+  closing the window all reject.
+- A filter that matches every document (`{}`) keeps it disabled until you
+  type the collection's name.
+- One request waits at a time; an unanswered one is rejected after 10
+  minutes, and turning MCP off withdraws it.
+- AI Access is checked again when you apply, in case you lowered it while
+  the request waited.
+
+**What assistants see.** Connection names and the data their tools return —
+never hosts, connection strings or passwords; connection errors reach them
+only as "couldn't connect", with the details in **Window → Logs**.
+Documents come back as Extended JSON with exact BSON types in their stored
+field order. Reads are capped at 100 documents and about 200 KB per call,
+and the server stops a query after 10 seconds.
+
+**Limits.** Connections that go through an SSH tunnel are refused by the
+tools that connect to a database (`open_query` and `open_aggregation` still
+work, through the app's own window). Each tool call opens its own
+connection.
+
 ## Building from source
 
 ```bash
@@ -175,7 +247,8 @@ xcodebuild -project MongoHubPlus.xcodeproj -scheme MongoHubPlus build
 The Xcode project is generated — edit `project.yml`, never the pbxproj. The
 local packages have their own test suites:
 `swift test --package-path Packages/ExtendedJSON` (tested against the
-official BSON corpus) and `…/MongoService`, whose integration tests are
+official BSON corpus), `…/MCPServer` (the MCP server's HTTP endpoint and
+JSON-RPC handling) and `…/MongoService`, whose integration tests are
 env-gated: set `MONGOHUBPLUS_TEST_URI=mongodb://localhost:27017` with a
 local server running (e.g. `docker run -p 27017:27017 mongo:7`), or they
 skip.
