@@ -224,6 +224,8 @@ delete). Nothing changes until you click **Apply Update** or **Delete**:
 - AI Access is checked again when you apply, in case you lowered it while
   the request waited.
 
+![An update an AI assistant asked for, waiting in MongoHub Plus: the filter and update, how many documents match, and a before/after preview](docs/images/mcp-update.png)
+
 **What assistants see.** Connection names and the data their tools return —
 never hosts, connection strings or passwords; connection errors reach them
 only as "couldn't connect", with the details in **Window → Logs**.
